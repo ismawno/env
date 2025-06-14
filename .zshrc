@@ -33,7 +33,7 @@ zinit snippet OMZP::sudo
 zinit snippet OMZP::command-not-found
 
 # Load completions
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -u
 
 zinit cdreplay -q
 

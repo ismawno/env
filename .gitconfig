@@ -1,0 +1,27 @@
+[user]
+	name = Ismael Bueno
+	email = ismaelwno@gmail.com
+[init]
+	defaultBranch = master
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = true
+[core]
+	editor = code --wait
+[safe]
+	directory = /Users/ismael/onyx/build/_deps/glm-src
+	directory = /Users/ismael/onyx/build/_deps/vma-src
+	directory = /Users/ismael/onyx/build/_deps/imgui-src
+	directory = /Users/ismael/onyx/build/_deps/tobjl-src
+	directory = /Users/ismael/onyx/build/_deps/vulkit-src
+	directory = /Users/ismael/onyx/build/_deps/toolkit-src
+	directory = /Users/ismael/onyx/build/_deps/implot-src
+	directory = /Users/ismael/onyx/build/_deps/glfw-src
+	directory = /Users/ismael/toolkit/build/_deps/yaml-cpp-src
+	directory = /Users/ismael/toolkit/build/_deps/catch2-src
+	directory = /Users/ismael/vulkit/build/_deps/vma-src
+	directory = /Users/ismael/vulkit/build/_deps/toolkit-src
+	directory = /Users/ismael/vulkit/build/_deps/catch2-src
+	directory = /Users/ismael/onyx/build/_deps/tracy-src
+	directory = /Users/ismael/onyx/build/_deps/argparse-src

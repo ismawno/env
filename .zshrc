@@ -43,6 +43,9 @@ zinit cdreplay -q
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
+bindkey '^w' autosuggest-accept
+bindkey '^e' forward-word
+
 # History
 HISTSIZE=5000
 HISTFILE=~/.zsh_history

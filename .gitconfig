@@ -25,3 +25,5 @@
 	directory = ~/vulkit/build/_deps/catch2-src
 	directory = ~/onyx/build/_deps/tracy-src
 	directory = ~/onyx/build/_deps/argparse-src
+[credential]
+	helper = store

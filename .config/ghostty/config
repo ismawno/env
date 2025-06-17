@@ -1,0 +1,6 @@
+theme = catppuccin-mocha
+font-family = FiraCode Nerd Font
+font-size = 14
+background-opacity = 0.9
+confirm-close-surface = false
+resize-overlay = never

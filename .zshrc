@@ -5,6 +5,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+source ~/vulkan/1.3.250.1/setup-env.sh
+
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
@@ -40,8 +42,16 @@ zinit cdreplay -q
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-bindkey '^p' history-search-backward
-bindkey '^n' history-search-forward
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+
+bindkey '^p' up-line-or-beginning-search   # Ctrl-P
+bindkey '^n' down-line-or-beginning-search # Ctrl-N
+
+# bindkey '^p' history-search-backward
+# bindkey '^n' history-search-forward
 
 bindkey '^w' autosuggest-accept
 bindkey '^e' forward-word

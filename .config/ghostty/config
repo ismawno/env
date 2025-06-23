@@ -1,4 +1,5 @@
 theme = catppuccin-mocha
+cursor-color = #7a7d92
 font-family = FiraCode Nerd Font
 font-size = 14
 background-opacity = 0.9

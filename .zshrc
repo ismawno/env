@@ -9,6 +9,10 @@ if [ -e "$HOME/vulkan/1.3.250.1/setup-env.sh" ]; then
     source "$HOME/vulkan/1.3.250.1/setup-env.sh"
 fi
 
+if command -v fd > /dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --no-ignore'
+fi
+
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
@@ -55,8 +59,8 @@ bindkey '^n' down-line-or-beginning-search # Ctrl-N
 # bindkey '^p' history-search-backward
 # bindkey '^n' history-search-forward
 
-bindkey '^w' autosuggest-accept
-bindkey '^e' forward-word
+bindkey '^y' autosuggest-accept
+bindkey '^u' forward-word
 
 # History
 HISTSIZE=5000

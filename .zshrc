@@ -12,6 +12,7 @@ fi
 if command -v fd > /dev/null 2>&1; then
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --no-ignore'
 fi
+export FZF_DEFAULT_OPTS="--bind 'ctrl-j:down,ctrl-k:up' --no-mouse"
 
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -53,6 +54,8 @@ autoload -U down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 
+bindkey -v
+
 bindkey '^p' up-line-or-beginning-search   # Ctrl-P
 bindkey '^n' down-line-or-beginning-search # Ctrl-N
 
@@ -84,7 +87,6 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Aliases
 alias ls='ls --color'
-alias vim='nvim'
 alias c='clear'
 
 # Shell integrations

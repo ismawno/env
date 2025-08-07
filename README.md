@@ -1,2 +1,2 @@
-# dotfiles
-A collection of all dotfiles I care about
+# env
+My environment-specific files and scripts

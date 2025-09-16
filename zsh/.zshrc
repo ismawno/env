@@ -5,8 +5,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-if [ -e "$HOME/vulkan/1.3.250.1/setup-env.sh" ]; then
-    source "$HOME/vulkan/1.3.250.1/setup-env.sh"
+if [ -e "$HOME/vulkan/1.4.321.1/setup-env.sh" ]; then
+    source "$HOME/vulkan/1.4.321.1/setup-env.sh"
 fi
 
 if command -v fd > /dev/null 2>&1; then

@@ -1,20 +1,29 @@
 {
+  description = "NixOS + Home Manager configuration";
 
-description = "NixOS Configuration";
-inputs = {
-nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-};
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-outputs = {self, nixpkgs}: {
-nixosConfigurations = {
-nomad = nixpkgs.lib.nixosSystem {
-system = "x86_64-linux";
-modules = [
-./configuration.nix
-./hosts/nomad/hardware-configuration.nix];
-};
+  outputs = { self, nixpkgs, home-manager, ... }: {
+    nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./configuration.nix
+        ./hosts/nomad/hardware-configuration.nix
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
 
-};
-};
-
+          home-manager.users.ismawno = {
+            home.stateVersion = "25.05";
+            imports = [ ./home.nix ];
+          };
+        }
+      ];
+    };
+  };
 }

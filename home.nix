@@ -11,6 +11,7 @@
 
   home.file.".tmux.conf".source = ./tmux/.tmux.conf;
 
+  home.file.".config/nvim".source = ./nvim/.config/nvim;
   home.file.".config/hypr".source = ./hyprland/.config/hypr;
   home.file.".config/ghostty".source = ./ghostty/.config/ghostty;
   home.file.".config/waybar".source = ./waybar/.config/waybar;

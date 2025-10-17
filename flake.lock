@@ -37,10 +37,26 @@
         "type": "github"
       }
     },
+    "nvim": {
+      "locked": {
+        "lastModified": 1760741929,
+        "narHash": "sha256-UmpopiCqPO0dCHyaCCznuP3B6V82lNQg4rYX3HqJfpY=",
+        "owner": "ismawno",
+        "repo": "nvim",
+        "rev": "b01811d9b70efe5ba4b1ff11fc49f1a2d5073c81",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ismawno",
+        "repo": "nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nvim": "nvim"
       }
     }
   },

@@ -74,7 +74,7 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
   programs.zsh.enable = true;
 programs.hyprland.enable = true;
   environment.systemPackages = with pkgs; [
-  vim 
+  vim
   git
   zoxide
   ghostty
@@ -89,6 +89,10 @@ programs.hyprland.enable = true;
   linuxPackages.perf
   firefox
   nodejs_22
+  cmake
+  gcc
+  clang
+  gnumake
   ];
 
 services.xserver.enable = false;

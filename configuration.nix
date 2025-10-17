@@ -55,6 +55,7 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
     description = "ismawno";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [];
+    shell = pkgs.zsh;
   };
 
   # Allow unfree packages
@@ -63,11 +64,11 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   programs.nano.enable = false;
+  programs.zsh.enable = true;
 programs.hyprland.enable = true;
   environment.systemPackages = with pkgs; [
   vim 
   git
-  zsh
   zoxide
   ghostty
   neovim

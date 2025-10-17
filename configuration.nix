@@ -75,6 +75,7 @@ programs.hyprland.enable = true;
   ripgrep
   wofi
   hyprlock
+  hyprpaper
   hypridle
   linuxPackages.perf
   firefox

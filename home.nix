@@ -15,6 +15,7 @@
   home.file.".config/ghostty".source = ./ghostty/.config/ghostty;
   home.file.".config/waybar".source = ./waybar/.config/waybar;
   home.file.".config/wofi".source = ./wofi/.config/wofi;
+  home.file.".config/backgrounds".source = ./backgrounds/.config/backgrounds;
 
   home.stateVersion = "25.05";
 }

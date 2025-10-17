@@ -58,6 +58,13 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
     shell = pkgs.zsh;
   };
 
+  fonts = {
+    enableDefaultPackages = true;  # optional but recommended
+    packages = with pkgs; [
+      nerd-fonts.fira-code
+    ];
+  };
+
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -74,12 +81,14 @@ programs.hyprland.enable = true;
   neovim
   ripgrep
   wofi
+  fzf
   waybar
   hyprlock
   hyprpaper
   hypridle
   linuxPackages.perf
   firefox
+  nodejs_22
   ];
 
 services.xserver.enable = false;

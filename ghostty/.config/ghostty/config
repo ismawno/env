@@ -1,4 +1,4 @@
-theme = Catppuccin Mocha
+theme = catppuccin-mocha.conf
 cursor-color = #7a7d92
 font-family = FiraCode Nerd Font
 font-size = 14

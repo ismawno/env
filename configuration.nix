@@ -74,6 +74,7 @@ programs.hyprland.enable = true;
   neovim
   ripgrep
   wofi
+  waybar
   hyprlock
   hyprpaper
   hypridle

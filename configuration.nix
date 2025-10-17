@@ -92,6 +92,7 @@
     clang
     gnumake
     unzip
+    python313
   ];
 
   services.xserver.enable = false;

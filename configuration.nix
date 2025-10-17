@@ -80,6 +80,7 @@ programs.hyprland.enable = true;
   hyprlock
   hypridle
   linuxPackages.perf
+  firefox
   ];
 
 services.xserver.enable = false;

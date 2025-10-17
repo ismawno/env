@@ -21,7 +21,7 @@
 
           home-manager.users.ismawno = {
             home.stateVersion = "25.05";
-	    _module.args = {inherit inputs;};
+            _module.args = { inherit inputs; };
             imports = [ ./home.nix ];
           };
         }

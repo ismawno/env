@@ -6,7 +6,7 @@
 
 {
 
-nix.settings.experimental-features = [ "nix-command" "flakes"];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -54,15 +54,13 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
     isNormalUser = true;
     description = "ismawno";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 
   fonts = {
-    enableDefaultPackages = true;  # optional but recommended
-    packages = with pkgs; [
-      nerd-fonts.fira-code
-    ];
+    enableDefaultPackages = true; # optional but recommended
+    packages = with pkgs; [ nerd-fonts.fira-code ];
   };
 
   # Allow unfree packages
@@ -72,31 +70,32 @@ nix.settings.experimental-features = [ "nix-command" "flakes"];
   # $ nix search wget
   programs.nano.enable = false;
   programs.zsh.enable = true;
-programs.hyprland.enable = true;
+  programs.hyprland.enable = true;
   environment.systemPackages = with pkgs; [
-  vim
-  git
-  zoxide
-  ghostty
-  neovim
-  ripgrep
-  wofi
-  fzf
-  waybar
-  hyprlock
-  hyprpaper
-  hypridle
-  linuxPackages.perf
-  firefox
-  nodejs_22
-  cmake
-  gcc
-  clang
-  gnumake
+    vim
+    git
+    zoxide
+    ghostty
+    neovim
+    ripgrep
+    wofi
+    fzf
+    waybar
+    hyprlock
+    hyprpaper
+    hypridle
+    linuxPackages.perf
+    firefox
+    nodejs_22
+    cmake
+    gcc
+    clang
+    gnumake
+    unzip
   ];
 
-services.xserver.enable = false;
-services.displayManager.ly.enable = true;
+  services.xserver.enable = false;
+  services.displayManager.ly.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

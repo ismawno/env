@@ -72,11 +72,12 @@
       python313
       tmux
       hwloc
-      pamixer
-      brightnessctl
+      bibata-cursors
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle
+      pamixer
+      brightnessctl
     ] else
       [ ]);
 

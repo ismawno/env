@@ -1,39 +1,23 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_6_16;
 
-  networking.hostName = "nomad"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
   networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Europe/Madrid";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  networking.hostName = "nomad";
 
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
 
+  time.timeZone = "Europe/Madrid";
+
+  i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "es_ES.UTF-8";
     LC_IDENTIFICATION = "es_ES.UTF-8";
@@ -46,13 +30,6 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.ismawno = {
     isNormalUser = true;
     description = "ismawno";
@@ -62,66 +39,57 @@
   };
 
   fonts = {
-    enableDefaultPackages = true; # optional but recommended
+    enableDefaultPackages = true;
     packages = with pkgs; [ nerd-fonts.fira-code ];
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   programs.nano.enable = false;
   programs.zsh.enable = true;
   programs.hyprland.enable = true;
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    zoxide
-    ghostty
-    neovim
-    ripgrep
-    wofi
-    fzf
-    waybar
-    hyprlock
-    hyprpaper
-    hypridle
-    linuxPackages.perf
-    firefox
-    nodejs_22
-    cmake
-    gcc
-    clang
-    gnumake
-    unzip
-    python313
-    adwaita-icon-theme
-    nvme-cli
-  ];
+
+  environment.systemPackages = with pkgs;
+    [
+      vim
+      git
+      zoxide
+      ghostty
+      neovim
+      ripgrep
+      wofi
+      fzf
+      waybar
+      hyprpaper
+      linuxPackages.perf
+      firefox
+      nodejs_22
+      cmake
+      gcc
+      clang
+      gnumake
+      unzip
+      python313
+      tmux
+      hwloc
+      pamixer
+      brightnessctl
+    ] ++ (if config.networking.hostName == "nomad" then [
+      hyprlock
+      hypridle
+    ] else
+      [ ]);
 
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

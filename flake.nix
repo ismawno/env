@@ -8,24 +8,28 @@
     nvim.url = "github:ismawno/nvim";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
-    nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+    let
       system = "x86_64-linux";
-      modules = [
-        ./hosts/nomad/hardware-configuration.nix
-./configuration.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
+      hostName = "nomad";
+    in {
+      nixosConfigurations.${hostName} = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./hosts/nomad/hardware-configuration.nix
+          ./configuration.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
 
-          home-manager.users.ismawno = {
-            home.stateVersion = "25.05";
-            _module.args = { inherit inputs; };
-            imports = [ ./home.nix ];
-          };
-        }
-      ];
+            home-manager.users.ismawno = {
+              home.stateVersion = "25.05";
+              _module.args = { inherit inputs hostName; };
+              imports = [ ./home.nix ];
+            };
+          }
+        ];
+      };
     };
-  };
 }

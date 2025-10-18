@@ -94,6 +94,7 @@
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
+  services.logind.lidSwitch = "ignore";
 
   services.pipewire = {
     enable = true;

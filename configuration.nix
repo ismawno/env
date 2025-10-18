@@ -94,6 +94,7 @@
     unzip
     python313
     adwaita-icon-theme
+    nvme-cli
   ];
 
   services.xserver.enable = false;

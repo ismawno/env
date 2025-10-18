@@ -79,6 +79,7 @@
       shellcheck
       stylua
       lua-language-server
+      lldb
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle

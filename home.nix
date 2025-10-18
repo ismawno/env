@@ -2,7 +2,8 @@
 
 let
   nomadSpecific = if hostName == "nomad" then {
-    ".config/hypr".source = ./hyprlock/.config/hypr;
+    ".config/hypr/hyprlock".source = ./hyprlock/.config/hypr/hyprlock.conf;
+    ".config/hypr/hypridle".source = ./hyprlock/.config/hypr/hypridle.conf;
   } else
     { };
 in {
@@ -17,7 +18,10 @@ in {
     ".tmux.conf".source = ./tmux/.tmux.conf;
 
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr".source = ./hyprland/.config/hypr;
+    ".config/hypr/hyprland.conf".source = ./hyprland/.config/hypr/hyprland.conf;
+    ".config/hypr/hyprpaper.conf".source =
+      ./hyprland/.config/hypr/hyprpaper.conf;
+    ".config/hypr/mocha.conf".source = ./hyprland/.config/hypr/mocha.conf;
     ".config/ghostty".source = ./ghostty/.config/ghostty;
     ".config/waybar".source = ./waybar/.config/waybar;
     ".config/wofi".source = ./wofi/.config/wofi;

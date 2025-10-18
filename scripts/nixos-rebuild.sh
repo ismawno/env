@@ -14,8 +14,8 @@ echo "NixOS Rebuilding..."
 
 sudo nixos-rebuild switch --flake ~/env#$1
 
-current=$(nixos-rebuild list-generations | grep current)
+current=$(nixos-rebuild list-generations | grep current | awk '{print $2}')
 
-git commit -am "$current"
+git commit -am "rebuild: NixOS configuration generation: $current"
 
 popd

@@ -93,6 +93,7 @@
     gnumake
     unzip
     python313
+    adwaita-icon-theme
   ];
 
   services.xserver.enable = false;

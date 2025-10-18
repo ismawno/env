@@ -48,6 +48,10 @@
   programs.nano.enable = false;
   programs.zsh.enable = true;
   programs.hyprland.enable = true;
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+  };
 
   environment.systemPackages = with pkgs;
     [
@@ -55,7 +59,6 @@
       git
       zoxide
       ghostty
-      neovim
       ripgrep
       wofi
       fzf
@@ -79,7 +82,7 @@
       shellcheck
       stylua
       lua-language-server
-      vscode-extensions.vadimcn.vscode-lldb
+      vscode-extensions.vadimcn.vscode-lldb.adapter
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle

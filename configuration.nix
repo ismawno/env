@@ -67,6 +67,7 @@
       cmake
       gcc
       clang
+      clang-tools
       gnumake
       unzip
       python313
@@ -74,6 +75,10 @@
       hwloc
       bibata-cursors
       neofetch
+      htop
+      shellcheck
+      stylua
+      lua-language-server
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle

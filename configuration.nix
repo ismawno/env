@@ -79,7 +79,7 @@
       shellcheck
       stylua
       lua-language-server
-      lldb
+      vscode-extensions.vadimcn.vscode-lldb
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle

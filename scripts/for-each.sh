@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 dirs="../dotfiles ../.config/nvim ../convoy ../toolkit ../vulkit ../onyx ../drizzle"
 

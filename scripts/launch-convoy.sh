@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 toolkit="$HOME/toolkit"
 vulkit="$HOME/vulkit"

@@ -5,3 +5,5 @@ font-size = 14
 background-opacity = 0.9
 confirm-close-surface = false
 resize-overlay = never
+command = zsh -lc "neofetch; exec zsh"
+

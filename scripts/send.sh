@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 src="$HOME/env/scripts"
 

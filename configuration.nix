@@ -73,6 +73,7 @@
       tmux
       hwloc
       bibata-cursors
+      neofetch
     ] ++ (if config.networking.hostName == "nomad" then [
       hyprlock
       hypridle

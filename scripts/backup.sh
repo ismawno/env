@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 dest="$HOME/env/env/"
 

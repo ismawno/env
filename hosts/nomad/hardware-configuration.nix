@@ -11,6 +11,11 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+  boot.kernelParams = [
+    "nvme_core.default_ps_max_latency_us=0"
+    "rcupdate.rcu_expedited=1"
+    "intel_iommu=off" # optional: test this only if you use Intel CPU
+  ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/cb648434-8a64-45b2-bf43-928c1e904d0e";

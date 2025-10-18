@@ -12,8 +12,8 @@
     nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ./configuration.nix
         ./hosts/nomad/hardware-configuration.nix
+./configuration.nix
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;

@@ -9,11 +9,16 @@
   boot.initrd.systemd.enable = true;
   boot.initrd.verbose = true;
   boot.initrd.availableKernelModules =
-    [ "xhci_pci" "vmd" "nvme" "usb_storage" "sd_mod" ];
+    [ "xhci_pci" "nvme" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
-  boot.kernelParams = [ "loglevel=7" "systemd.log_level=debug" ];
+  boot.kernelParams = [
+    "loglevel=7"
+    "systemd.log_level=debug"
+    "modprobe.blacklist=vmd"
+    "nowatchdog"
+  ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/cb648434-8a64-45b2-bf43-928c1e904d0e";

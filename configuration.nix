@@ -5,10 +5,47 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.warn-dirty = false;
 
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot = {
+    loader = {
+      systemd-boot.enable = false;
+      efi.canTouchEfiVariables = true;
 
-  boot.kernelPackages = pkgs.linuxPackages_6_16;
+      grub = {
+        enable = true;
+        efiSupport = true;
+        device = "nodev";
+      };
+
+      grub2-theme = {
+        enable = true;
+        theme = "tela";
+        footer = true;
+      };
+
+    };
+
+    consoleLogLevel = 3;
+    initrd.verbose = false;
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "udev.log_priority=3"
+      "rd.systemd.show_status=auto"
+    ];
+
+    plymouth = {
+      enable = true;
+      theme = "colorful_loop";
+      themePackages = with pkgs;
+        [
+          (adi1090x-plymouth-themes.override {
+            selected_themes = [ "colorful_loop" ];
+          })
+        ];
+    };
+    kernelPackages = pkgs.linuxPackages_6_16;
+  };
 
   networking.networkmanager.enable = true;
   networking.hostName = "nomad";

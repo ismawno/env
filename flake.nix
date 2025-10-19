@@ -6,9 +6,10 @@
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nvim.url = "github:ismawno/nvim";
+    grub2-themes.url = "github:vinceliuice/grub2-themes";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs:
     let
       system = "x86_64-linux";
       hostName = "nomad";
@@ -18,6 +19,7 @@
         modules = [
           ./hosts/nomad/hardware-configuration.nix
           ./configuration.nix
+          grub2-themes.nixosModules.default
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;

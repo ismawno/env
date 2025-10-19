@@ -1,21 +1,49 @@
 #!/bin/sh
+
 set -e
 
+
+show_usage() {
+  cat <<EOF
+Usage: $(basename "$0") <hostname> [flake-path]
+
+Rebuild a NixOS configuration for the given hostname.
+
+Arguments:
+  <hostname>      The hostname of the NixOS configuration to build (e.g., "desktop" or "laptop").
+  [flake-path]    Optional path to the flake (default: $HOME/env)
+
+Options:
+  -h, --help      Show this help message and exit.
+
+Examples:
+  $(basename "$0") desktop
+  $(basename "$0") laptop ~/my-flakes/nixos
+EOF
+}
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  show_usage
+  exit 0
+fi
+
+# Validate arguments
 if [ "$#" -lt 1 ]; then
-  echo "Usage: $0 <hostname>"
+  echo "Error: missing required arguments."
+  echo
+  show_usage
   exit 1
 fi
 
-pushd ~/env
+HOSTNAME="$1"
+FLAKE_PATH="${2:-$HOME/env}"
 
 sudo nix flake update nvim
 
 echo "NixOS Rebuilding..."
-
-sudo nixos-rebuild switch --flake ~/env#$1
+sudo nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
 
 current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
-
 git commit -am "rebuild: NixOS configuration generation: $current"
 
-popd
+

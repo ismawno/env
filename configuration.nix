@@ -96,7 +96,7 @@
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
   services.logind.lidSwitch = "ignore";
-  services.hypridle = { enable = config.networking.hostName == "nomal"; };
+  services.hypridle = { enable = config.networking.hostName == "nomad"; };
 
   services.pipewire = {
     enable = true;

@@ -115,7 +115,7 @@
       python313
       tmux
       hwloc
-      bibata-cursors
+      catppuccin-cursors.mochaPeach
       neofetch
       htop
       shellcheck

@@ -115,7 +115,7 @@
       python313
       tmux
       hwloc
-      catppuccin-cursors.mochaPeach
+      catppuccin-cursors.mochaDark
       neofetch
       htop
       shellcheck

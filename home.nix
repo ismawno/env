@@ -2,8 +2,8 @@
 
 let
   nomadSpecific = if hostName == "nomad" then {
-    ".config/hypr/hyprlock".source = ./hyprlock/.config/hypr/hyprlock.conf;
-    ".config/hypr/hypridle".source = ./hyprlock/.config/hypr/hypridle.conf;
+    ".config/hypr/hyprlock.conf".source = ./hyprlock/.config/hypr/hyprlock.conf;
+    ".config/hypr/hypridle.conf".source = ./hyprlock/.config/hypr/hypridle.conf;
   } else
     { };
 in {

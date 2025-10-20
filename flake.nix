@@ -14,7 +14,7 @@
       system = "x86_64-linux";
       specialArgs = {
         inherit inputs;
-        rootPath = "";
+        rootPath = builtins.getEnv "ROOT_PATH";
       };
       modules = [
         ./configuration.nix

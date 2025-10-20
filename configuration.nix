@@ -100,6 +100,7 @@
     ripgrep
     wofi
     fzf
+    pkg-config
     wayland
     wayland-protocols
     wayland-scanner

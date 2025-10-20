@@ -100,7 +100,10 @@
     ripgrep
     wofi
     fzf
+    wayland
+    wayland-protocols
     wayland-scanner
+    libxkbcommon
     waybar
     hyprpaper
     linuxPackages.perf

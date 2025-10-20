@@ -100,11 +100,6 @@
     ripgrep
     wofi
     fzf
-    pkg-config
-    wayland
-    wayland-protocols
-    wayland-scanner
-    libxkbcommon
     waybar
     hyprpaper
     linuxPackages.perf
@@ -131,13 +126,6 @@
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
-
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-    wireplumber.enable = true;
-  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

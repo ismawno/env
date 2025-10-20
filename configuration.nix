@@ -92,43 +92,36 @@
     defaultEditor = true;
   };
 
-  environment.systemPackages = with pkgs;
-    [
-      vim
-      git
-      zoxide
-      ghostty
-      ripgrep
-      wofi
-      fzf
-      waybar
-      hyprpaper
-      linuxPackages.perf
-      firefox
-      nodejs_22
-      cmake
-      gcc
-      clang
-      clang-tools
-      gnumake
-      unzip
-      python313
-      tmux
-      hwloc
-      catppuccin-cursors.mochaDark
-      neofetch
-      htop
-      shellcheck
-      stylua
-      lua-language-server
-      vscode-extensions.vadimcn.vscode-lldb.adapter
-    ] ++ (if config.networking.hostName == "nomad" then [
-      hyprlock
-      hypridle
-      pamixer
-      brightnessctl
-    ] else
-      [ ]);
+  environment.systemPackages = with pkgs; [
+    vim
+    git
+    zoxide
+    ghostty
+    ripgrep
+    wofi
+    fzf
+    waybar
+    hyprpaper
+    linuxPackages.perf
+    firefox
+    nodejs_22
+    cmake
+    gcc
+    clang
+    clang-tools
+    gnumake
+    unzip
+    python313
+    tmux
+    hwloc
+    catppuccin-cursors.mochaDark
+    neofetch
+    htop
+    shellcheck
+    stylua
+    lua-language-server
+    vscode-extensions.vadimcn.vscode-lldb.adapter
+  ];
 
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;

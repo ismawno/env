@@ -1,12 +1,6 @@
-{ config, pkgs, inputs, hostName, ... }:
+{ config, pkgs, inputs, ... }:
 
-let
-  nomadSpecific = if hostName == "nomad" then {
-    ".config/hypr/hyprlock.conf".source = ./hyprlock/.config/hypr/hyprlock.conf;
-    ".config/hypr/hypridle.conf".source = ./hyprlock/.config/hypr/hypridle.conf;
-  } else
-    { };
-in {
+{
   home.username = "ismawno";
   home.homeDirectory = "/home/ismawno";
 
@@ -32,7 +26,7 @@ in {
     ".config/waybar".source = ./waybar/.config/waybar;
     ".config/wofi".source = ./wofi/.config/wofi;
     ".config/backgrounds".source = ./backgrounds/.config/backgrounds;
-  } // nomadSpecific;
+  };
 
   home.stateVersion = "25.05";
 }

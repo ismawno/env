@@ -9,29 +9,25 @@
     grub2-themes.url = "github:vinceliuice/grub2-themes";
   };
 
-  outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs:
-    let
+  outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs: {
+    nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
-      hostName = "nomad";
-    in {
-      nixosConfigurations.${hostName} = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./hosts/nomad/hardware-configuration.nix
-          ./configuration.nix
-          grub2-themes.nixosModules.default
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
+      modules = [
+        ./configuration.nix
+        ./hosts/nomad/configuration.nix
+        grub2-themes.nixosModules.default
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
 
-            home-manager.users.ismawno = {
-              home.stateVersion = "25.05";
-              _module.args = { inherit inputs hostName; };
-              imports = [ ./home.nix ];
-            };
-          }
-        ];
-      };
+          home-manager.users.ismawno = {
+            home.stateVersion = "25.05";
+            imports = [ ./home.nix ./hosts/nomad/home.nix ];
+            _module.args = { inherit inputs; };
+          };
+        }
+      ];
     };
+  };
 }

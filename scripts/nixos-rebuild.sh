@@ -36,13 +36,18 @@ if [ "$#" -lt 1 ]; then
 fi
 
 HOSTNAME="$1"
-FLAKE_PATH="${2:-$HOME/env}"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
+SCRIPT_DIR="$(realpath "$SCRIPT_DIR/..")"
+
+FLAKE_PATH="${2:-$SCRIPT_DIR}"
+
+echo "Flake path is $FLAKE_PATH"
 
 sudo nix flake update nvim
 
-path="$(realpath "$PWD/..")"
 echo "NixOS Rebuilding..."
-sudo ROOT_PATH="$path" nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
+sudo ROOT_PATH="$FLAKE_PATH" nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
 
 current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
 git commit -am "rebuild: NixOS configuration generation: $current"

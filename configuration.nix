@@ -1,7 +1,6 @@
-{ config, pkgs, rootPath, ... }:
+{ config, pkgs, ... }:
 
 {
-  environment.variables.ENV_FLAKE_PATH = rootPath;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.warn-dirty = false;
 

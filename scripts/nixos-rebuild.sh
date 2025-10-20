@@ -2,7 +2,6 @@
 
 set -e
 
-
 show_usage() {
   cat <<EOF
 Usage: $(basename "$0") <hostname> [flake-path]
@@ -48,9 +47,7 @@ sudo nix flake update nvim
 
 echo "NixOS Rebuilding..."
 
-export ROOT_PATH="$SCRIPT_DIR"
-sudo --preserve-env=ROOT_PATH nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
-unset ROOT_PATH
+sudo nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
 
 current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
 git commit -am "rebuild: NixOS configuration generation: $current"

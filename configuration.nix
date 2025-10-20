@@ -1,12 +1,7 @@
-{ config, pkgs, ... }:
+{ config, pkgs, rootPath, ... }:
 
-let
-  thisfile = builtins.toString __curPos.file;
-  rootPath = builtins.dirOf thisfile;
-in {
-
+{
   environment.variables.ENV_FLAKE_PATH = rootPath;
-
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.warn-dirty = false;
 

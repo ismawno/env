@@ -12,6 +12,10 @@
   outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs: {
     nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
+      specialArgs = {
+        inherit inputs;
+        rootPath = "";
+      };
       modules = [
         ./configuration.nix
         ./hosts/nomad/configuration.nix

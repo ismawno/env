@@ -93,3 +93,27 @@ alias c='clear'
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
+command_not_found_handle() {
+  if ! command -v nix-locate >/dev/null 2>&1; then
+    echo "nix-index is not installed. Install it with:"
+    echo "nix profile install nixpkgs#nix-index"
+    return 127
+  fi
+
+  nix-index --fetch || {
+      echo "nix-index --fetch failed, trying full build..."
+      nix-index
+    }
+
+  local results=$(nix-locate --whole-name "/bin/$1" 2>/dev/null | head -n 10)
+
+  if [ -z "$results" ]; then
+    echo "Command '$1' not found in nixpkgs index."
+  else
+    echo "Found possible matches:"
+    echo "$results"
+  fi
+  return 127
+}
+
+

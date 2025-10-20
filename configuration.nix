@@ -83,6 +83,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  programs.command-not-found.enable = false;
   programs.nano.enable = false;
   programs.zsh.enable = true;
   programs.hyprland.enable = true;
@@ -120,6 +121,7 @@
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
+    nix-index
   ];
 
   services.xserver.enable = false;

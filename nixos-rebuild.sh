@@ -37,8 +37,6 @@ fi
 HOSTNAME="$1"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
-SCRIPT_DIR="$(realpath "$SCRIPT_DIR/..")"
-
 FLAKE_PATH="${2:-$SCRIPT_DIR}"
 
 echo "Flake path is $FLAKE_PATH"

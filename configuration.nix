@@ -121,7 +121,6 @@
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
-    nix-index
   ];
 
   services.xserver.enable = false;

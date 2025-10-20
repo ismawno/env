@@ -7,6 +7,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nvim.url = "github:ismawno/nvim";
     grub2-themes.url = "github:vinceliuice/grub2-themes";
+    nix-index-database.url = "github:nix-community/nix-index-database";
   };
 
   outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs: {

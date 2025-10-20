@@ -100,10 +100,10 @@ command_not_found_handler() {
     return 127
   fi
 
-  nix-index --fetch || {
-      echo "nix-index --fetch failed, trying full build..."
-      nix-index
-    }
+  # nix-index --fetch || {
+  #     echo "nix-index --fetch failed, trying full build..."
+  #     nix-index
+  #   }
 
   local results=$(nix-locate --whole-name "/bin/$1" 2>/dev/null | head -n 10)
 

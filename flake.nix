@@ -11,25 +11,27 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, grub2-themes, ... }@inputs: {
-    nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./configuration.nix
-        ./hosts/nomad/configuration.nix
-        grub2-themes.nixosModules.default
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
+  outputs = { self, nixpkgs, home-manager, grub2-themes, nix-index-database, ...
+    }@inputs: {
+      nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          ./configuration.nix
+          ./hosts/nomad/configuration.nix
+          nix-index-database.nixosModules.nix-index
+          grub2-themes.nixosModules.default
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
 
-          home-manager.users.ismawno = {
-            home.stateVersion = "25.05";
-            imports = [ ./home.nix ./hosts/nomad/home.nix ];
-            _module.args = { inherit inputs; };
-          };
-        }
-      ];
+            home-manager.users.ismawno = {
+              home.stateVersion = "25.05";
+              imports = [ ./home.nix ./hosts/nomad/home.nix ];
+              _module.args = { inherit inputs; };
+            };
+          }
+        ];
+      };
     };
-  };
 }

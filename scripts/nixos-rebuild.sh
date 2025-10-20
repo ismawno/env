@@ -47,7 +47,10 @@ echo "Flake path is $FLAKE_PATH"
 sudo nix flake update nvim
 
 echo "NixOS Rebuilding..."
-sudo ROOT_PATH="$FLAKE_PATH" nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
+
+export ROOT_PATH="$SCRIPT_DIR"
+sudo --preserve-env=ROOT_PATH nixos-rebuild switch --flake "$FLAKE_PATH#$HOSTNAME"
+unset ROOT_PATH
 
 current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
 git commit -am "rebuild: NixOS configuration generation: $current"

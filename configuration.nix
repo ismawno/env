@@ -100,6 +100,7 @@
     ripgrep
     wofi
     fzf
+    wayland-scanner
     waybar
     hyprpaper
     linuxPackages.perf

@@ -93,7 +93,7 @@ alias c='clear'
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-command_not_found_handle() {
+command_not_found_handler() {
   if ! command -v nix-locate >/dev/null 2>&1; then
     echo "nix-index is not installed. Install it with:"
     echo "nix profile install nixpkgs#nix-index"

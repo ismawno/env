@@ -73,7 +73,7 @@
         };
       };
       homeConfigurations = {
-        "ismawno" = mkHome {
+        "ismawno@nomad" = mkHome {
           host = "nomad";
           user = "ismawno";
         };

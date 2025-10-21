@@ -40,6 +40,6 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 git add .
-git commit -m "rebuild: user configuration generation for user '$USER' with host '$(hostname -s)' - $current"
+git commit -m "rebuild: User configuration generation for user '$USER' with host '$(hostname -s)' - $current"
 
 

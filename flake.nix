@@ -54,13 +54,15 @@
         };
 
       mkHome = { host, user }:
-        home-manager.lib.homeManagerConfiguration {
+        (home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs { inherit system; };
           modules = mkUserModule {
             host = host;
             user = user;
           };
           extraSpecialArgs = { inherit inputs; };
+        }) // {
+          activationPackageUserName = user;
         };
 
     in {
@@ -71,7 +73,7 @@
         };
       };
       homeConfigurations = {
-        ismawno = mkHome {
+        "ismawno" = mkHome {
           host = "nomad";
           user = "ismawno";
         };

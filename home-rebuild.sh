@@ -33,13 +33,13 @@ echo "Rebuilding user $USER..."
 
 home-manager switch --flake "$FLAKE_PATH"
 
-current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
+current=$(home-manager generations | head -n1 | awk '{print $5}')
 
 if git diff --quiet && git diff --cached --quiet; then
     exit 0
 fi
 
 git add .
-git commit -m "rebuild: user configuration generation for $USER - $current"
+git commit -m "rebuild: user configuration generation for user $USER with host $HOST - $current"
 
 

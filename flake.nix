@@ -15,25 +15,25 @@
     }@inputs:
     let
       system = "x86_64-linux";
+      mkUserModule = { host, user }:
+        let
+          userPath = ./users/${user}/home.nix;
+          userOverridePath = ./hosts/${host}/${user}.nix;
+          hasOverride = builtins.pathExists userOverridePath;
+        in if hasOverride then [ userPath userOverridePath ] else [ userPath ];
+
       mkHost = { host, users }:
         let
           hostPath = ./hosts/${host}/configuration.nix;
 
-          mkUser = user:
-            let
-              userPath = ./users/${user}/home.nix;
-              userOverridePath = ./hosts/${host}/${user}.nix;
-              hasOverride = builtins.pathExists userOverridePath;
-              finalUserModule = if hasOverride then [
-                userPath
-                userOverridePath
-              ] else
-                [ userPath ];
-            in {
-              home.stateVersion = "25.05";
-              imports = finalUserModule;
-              _module.args = { inherit inputs; };
+          mkUser = user: {
+            home.stateVersion = "25.05";
+            imports = mkUserModule {
+              host = host;
+              user = user;
             };
+            _module.args = { inherit inputs; };
+          };
 
           homeUsers = nixpkgs.lib.genAttrs users (u: mkUser u);
 
@@ -52,11 +52,28 @@
             }
           ];
         };
+
+      mkHome = { host, user }:
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs { inherit system; };
+          modules = mkUserModule {
+            host = host;
+            user = user;
+          };
+          extraSpecialArgs = { inherit inputs; };
+        };
+
     in {
       nixosConfigurations = {
         nomad = mkHost {
           host = "nomad";
           users = [ "ismawno" ];
+        };
+      };
+      homeConfigurations = {
+        ismawno = mkHome {
+          host = "nomad";
+          user = "ismawno";
         };
       };
     };

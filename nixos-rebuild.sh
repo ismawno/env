@@ -50,6 +50,6 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 git add .
-git commit -m "rebuild: NixOS hostname generation for host $HOST_NAME - $current"
+git commit -m "rebuild: NixOS hostname generation for host '$HOST_NAME' - $current"
 
 

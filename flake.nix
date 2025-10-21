@@ -12,26 +12,52 @@
   };
 
   outputs = { self, nixpkgs, home-manager, grub2-themes, nix-index-database, ...
-    }@inputs: {
-      nixosConfigurations.nomad = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          ./configuration.nix
-          ./hosts/nomad/configuration.nix
-          nix-index-database.nixosModules.nix-index
-          grub2-themes.nixosModules.default
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
+    }@inputs:
+    let
+      system = "x86_64-linux";
+      mkHost = { host, users }:
+        let
+          hostPath = ./hosts/${host}/configuration.nix;
 
-            home-manager.users.ismawno = {
+          mkUser = user:
+            let
+              userPath = ./users/${user}/home.nix;
+              userOverridePath = ./hosts/${host}/${user}.nix;
+              hasOverride = builtins.pathExists userOverridePath;
+              finalUserModule = if hasOverride then [
+                userPath
+                userOverridePath
+              ] else
+                [ userPath ];
+            in {
               home.stateVersion = "25.05";
-              imports = [ ./home.nix ./hosts/nomad/home.nix ];
+              imports = finalUserModule;
               _module.args = { inherit inputs; };
             };
-          }
-        ];
+
+          homeUsers = nixpkgs.lib.genAttrs users (u: mkUser u);
+
+        in nixpkgs.lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./configuration.nix
+            hostPath
+            nix-index-database.nixosModules.nix-index
+            grub2-themes.nixosModules.default
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users = homeUsers;
+            }
+          ];
+        };
+    in {
+      nixosConfigurations = {
+        nomad = mkHost {
+          host = "nomad";
+          users = [ "ismawno" ];
+        };
       };
     };
 }

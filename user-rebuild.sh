@@ -6,10 +6,10 @@ show_usage() {
   cat <<EOF
 Usage: $(basename "$0") <configuration> [flake-path]
 
-Rebuild a NixOS configuration.
+Rebuild a user configuration.
 
 Arguments:
-  <configuration>   The NixOS configuration to build (e.g., "nomad")
+  <configuration>   The user configuration to build (e.g., "ismawno")
   [flake-path]      Optional path to the flake (default: $HOME/env)
 
 Options:
@@ -30,7 +30,7 @@ if [ "$#" -lt 1 ]; then
   exit 1
 fi
 
-CONFIG="$1"
+USER="$1"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 FLAKE_PATH="${2:-$SCRIPT_DIR}"
@@ -39,9 +39,9 @@ echo "Flake path is $FLAKE_PATH"
 
 nix flake update nvim
 
-echo "Rebuilding NixOS with $CONFIG..."
+echo "Rebuilding user $USER..."
 
-sudo nixos-rebuild switch --flake "$FLAKE_PATH#$CONFIG"
+home-manager switch --flake "$FLAKE_PATH#$USER"
 
 current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
 
@@ -50,6 +50,6 @@ if git diff --quiet && git diff --cached --quiet; then
 fi
 
 git add .
-git commit -m "rebuild: NixOS configuration generation for $CONFIG - $current"
+git commit -m "rebuild: user configuration generation for $USER - $current"
 
 

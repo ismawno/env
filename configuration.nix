@@ -83,45 +83,12 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  programs.command-not-found.enable = false;
-  programs.nano.enable = false;
+  environment.systemPackages = with pkgs; [ home-manager ];
   programs.zsh.enable = true;
+  programs.git.enable = true;
   programs.hyprland.enable = true;
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-  };
-
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    zoxide
-    ghostty
-    ripgrep
-    wofi
-    fzf
-    waybar
-    hyprpaper
-    linuxPackages.perf
-    firefox
-    nodejs_22
-    cmake
-    gcc
-    clang
-    clang-tools
-    gnumake
-    unzip
-    python313
-    tmux
-    hwloc
-    catppuccin-cursors.mochaDark
-    neofetch
-    htop
-    shellcheck
-    stylua
-    lua-language-server
-    vscode-extensions.vadimcn.vscode-lldb.adapter
-  ];
+  programs.nano.enable = false;
+  programs.command-not-found.enable = false;
 
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;

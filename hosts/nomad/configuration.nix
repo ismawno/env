@@ -28,13 +28,6 @@
 
   swapDevices = [ ];
 
-  environment.systemPackages = with pkgs; [
-    hyprlock
-    hypridle
-    pamixer
-    brightnessctl
-  ];
-
   services.pipewire = {
     enable = true;
     alsa.enable = true;

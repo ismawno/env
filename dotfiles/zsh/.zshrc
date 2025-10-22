@@ -113,4 +113,4 @@ command_not_found_handler() {
   return 127
 }
 
-
+eval "$(starship init zsh)"

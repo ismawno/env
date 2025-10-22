@@ -27,7 +27,7 @@
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
-    nixfmt
+    nixfmt-rfc-style
     vscode-langservers-extracted
     nodePackages_latest.prettier
     black

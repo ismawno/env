@@ -40,9 +40,12 @@
     enable = true;
     defaultEditor = true;
   };
-  home.sessionVariables = {
-    ENV_PATH = "/home/ismawno/env";
-    NVIM_PATH = "/home/ismawno/nvim";
+  programs.zsh = {
+    enable = true;
+    sessionVariables = {
+      ENV_PATH = "/home/ismawno/env";
+      NVIM_PATH = "/home/ismawno/nvim";
+    };
   };
 
   home.username = "ismawno";

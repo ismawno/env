@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   home.packages = with pkgs; [
@@ -36,13 +41,16 @@
     bash-language-server
     cmake-language-server
     cmake-format
+    glsl_analyzer
   ];
 
   programs.git = {
     enable = true;
     userName = "Ismael Bueno";
     userEmail = "ismaelwno@gmail.com";
-    extraConfig = { credential.helper = "store"; };
+    extraConfig = {
+      credential.helper = "store";
+    };
   };
   programs.vim.enable = true;
   programs.neovim = {
@@ -75,15 +83,11 @@
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    ".config/starship.toml".source =
-      ../../dotfiles/starship/.config/sharship.toml;
+    ".config/starship.toml".source = ../../dotfiles/starship/.config/sharship.toml;
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source =
-      ../../dotfiles/hyprland/.config/hypr/hyprland.conf;
-    ".config/hypr/hyprpaper.conf".source =
-      ../../dotfiles/hyprland/.config/hypr/hyprpaper.conf;
-    ".config/hypr/mocha.conf".source =
-      ../../dotfiles/hyprland/.config/hypr/mocha.conf;
+    ".config/hypr/hyprland.conf".source = ../../dotfiles/hyprland/.config/hypr/hyprland.conf;
+    ".config/hypr/hyprpaper.conf".source = ../../dotfiles/hyprland/.config/hypr/hyprpaper.conf;
+    ".config/hypr/mocha.conf".source = ../../dotfiles/hyprland/.config/hypr/mocha.conf;
     ".config/ghostty".source = ../../dotfiles/ghostty/.config/ghostty;
     ".config/waybar".source = ../../dotfiles/waybar/.config/waybar;
     ".config/wofi".source = ../../dotfiles/wofi/.config/wofi;
@@ -92,4 +96,3 @@
 
   home.stateVersion = "25.05";
 }
-

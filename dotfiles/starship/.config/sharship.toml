@@ -33,7 +33,7 @@ crust = "#11111b"
 
 
 [character]
-success_symbol = "[➜]"
+success_symbol = "[➜](bold green)"
 
 [package]
 disabled = true

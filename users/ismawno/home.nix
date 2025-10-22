@@ -40,14 +40,13 @@
     enable = true;
     defaultEditor = true;
   };
-
-  home.username = "ismawno";
-  home.homeDirectory = "/home/ismawno";
-
-  home.sessionVariables = {
+  programs.zsh.sessionVariables = {
     ENV_PATH = "/home/ismawno/env";
     NVIM_PATH = "/home/ismawno/nvim";
   };
+
+  home.username = "ismawno";
+  home.homeDirectory = "/home/ismawno";
 
   home.file = {
     ".zshrc".source = ../../dotfiles/zsh/.zshrc;

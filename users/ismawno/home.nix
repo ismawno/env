@@ -40,7 +40,7 @@
     enable = true;
     defaultEditor = true;
   };
-  programs.zsh.sessionVariables = {
+  home.sessionVariables = {
     ENV_PATH = "/home/ismawno/env";
     NVIM_PATH = "/home/ismawno/nvim";
   };

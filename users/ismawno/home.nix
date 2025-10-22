@@ -40,11 +40,16 @@
     enable = true;
     defaultEditor = true;
   };
+  programs.starship.enable = true;
   programs.zsh = {
     enable = true;
     sessionVariables = {
-      ENV_PATH = "/home/ismawno/env";
-      NVIM_PATH = "/home/ismawno/nvim";
+      WNO_ENV_PATH = "/home/ismawno/env";
+      WNO_NVIM_PATH = "/home/ismawno/nvim";
+      WNO_CONVOY_PATH = "/home/ismawno/convoy";
+      WNO_TOOLKIT_PATH = "/home/ismawno/toolkit";
+      WNO_ONYX_PATH = "/home/ismawno/onyx";
+      WNO_DRIZZLE_PATH = "/home/ismawno/drizzle";
     };
   };
 
@@ -53,7 +58,6 @@
 
   home.file = {
     ".zshrc".source = ../../dotfiles/zsh/.zshrc;
-    ".p10k.zsh".source = ../../dotfiles/zsh/.p10k.zsh;
     ".tmux.conf".source = ../../dotfiles/tmux/.tmux.conf;
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
@@ -62,6 +66,8 @@
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
+    ".config/starship.toml".source =
+      ../../dotfiles/starship/.config/sharship.toml;
     ".config/nvim".source = inputs.nvim;
     ".config/hypr/hyprland.conf".source =
       ../../dotfiles/hyprland/.config/hypr/hyprland.conf;

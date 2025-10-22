@@ -27,6 +27,15 @@
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
+    nixfmt
+    vscode-langservers-extracted
+    nodePackages_latest.prettier
+    black
+    pyright
+    shfmt
+    bash-language-server
+    cmake-language-server
+    cmake-format
   ];
 
   programs.git = {

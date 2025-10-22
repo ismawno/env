@@ -11,18 +11,34 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, grub2-themes, nix-index-database, ...
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      grub2-themes,
+      nix-index-database,
+      ...
     }@inputs:
     let
       system = "x86_64-linux";
-      mkUserModule = { host, user }:
+      mkUserModule =
+        { host, user }:
         let
           userPath = ./users/${user}/home.nix;
           userOverridePath = ./hosts/${host}/${user}.nix;
           hasOverride = builtins.pathExists userOverridePath;
-        in if hasOverride then [ userPath userOverridePath ] else [ userPath ];
+        in
+        if hasOverride then
+          [
+            userPath
+            userOverridePath
+          ]
+        else
+          [ userPath ];
 
-      mkHost = { host, users }:
+      mkHost =
+        { host, users }:
         let
           hostPath = ./hosts/${host}/configuration.nix;
 
@@ -37,7 +53,8 @@
 
           homeUsers = nixpkgs.lib.genAttrs users (u: mkUser u);
 
-        in nixpkgs.lib.nixosSystem {
+        in
+        nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
             ./configuration.nix
@@ -53,7 +70,8 @@
           ];
         };
 
-      mkHome = { host, user }:
+      mkHome =
+        { host, user }:
         (home-manager.lib.homeManagerConfiguration {
           pkgs = import nixpkgs { inherit system; };
           modules = mkUserModule {
@@ -61,11 +79,13 @@
             user = user;
           };
           extraSpecialArgs = { inherit inputs; };
-        }) // {
+        })
+        // {
           activationPackageUserName = user;
         };
 
-    in {
+    in
+    {
       nixosConfigurations = {
         nomad = mkHost {
           host = "nomad";

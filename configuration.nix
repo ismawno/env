@@ -1,7 +1,10 @@
 { config, pkgs, ... }:
 
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
   nix.settings.warn-dirty = false;
 
   boot = {
@@ -37,12 +40,11 @@
     plymouth = {
       enable = true;
       theme = "colorful_loop";
-      themePackages = with pkgs;
-        [
-          (adi1090x-plymouth-themes.override {
-            selected_themes = [ "colorful_loop" ];
-          })
-        ];
+      themePackages = with pkgs; [
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "colorful_loop" ];
+        })
+      ];
     };
     kernelPackages = pkgs.linuxPackages_6_16;
   };
@@ -71,7 +73,10 @@
   users.users.ismawno = {
     isNormalUser = true;
     description = "ismawno";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };

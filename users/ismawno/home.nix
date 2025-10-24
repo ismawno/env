@@ -37,9 +37,11 @@
     cmake-language-server
     cmake-format
     glsl_analyzer
+    # maybe temporary
     mpv
     spotify
     cava
+    ollama
   ];
 
   programs.git = {

@@ -42,6 +42,7 @@
     spotify
     cava
     ollama
+    gdu
   ];
 
   programs.git = {

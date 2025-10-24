@@ -25,6 +25,10 @@
           gnumake
           python313
         ];
+        shellHook = ''
+          export SHELL=${pkgs.zsh}/bin/zsh
+        '';
+
       };
     };
 }

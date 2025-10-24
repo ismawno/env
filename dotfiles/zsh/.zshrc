@@ -87,7 +87,7 @@ alias ls='ls --color'
 alias c='clear'
 
 alias ldev='nix develop --command $SHELL -il'
-alias gdev='$WNO_ENV_PATH/develop nix develop --command $SHELL -il'
+alias gdev='nix develop $WNO_ENV_PATH/develop --command $SHELL -il'
 
 # Shell integrations
 eval "$(fzf --zsh)"

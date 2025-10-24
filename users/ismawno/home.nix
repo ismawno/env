@@ -14,15 +14,9 @@
     fzf
     waybar
     hyprpaper
-    linuxPackages.perf
     firefox
     nodejs_22
-    cmake
-    clang
-    clang-tools
-    gnumake
     unzip
-    python313
     tmux
     hwloc
     catppuccin-cursors.mochaDark

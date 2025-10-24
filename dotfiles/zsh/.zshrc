@@ -85,7 +85,9 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 # Aliases
 alias ls='ls --color'
 alias c='clear'
-alias ndev='nix develop --command $SHELL -il'
+
+alias ldev='nix develop --command $SHELL -il'
+alias gdev='nix develop --command $SHELL -il $ENV_PATH/develop'
 
 # Shell integrations
 eval "$(fzf --zsh)"

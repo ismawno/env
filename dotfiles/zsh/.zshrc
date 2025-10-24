@@ -89,6 +89,8 @@ alias c='clear'
 alias ldev='nix develop --command $SHELL -il'
 alias gdev='nix develop $WNO_ENV_PATH/develop --command $SHELL -il'
 
+alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
+
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"

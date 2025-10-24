@@ -6,6 +6,7 @@
 }:
 
 {
+  nixpkgs.config.allowUnfree = true;
   home.packages = with pkgs; [
     zoxide
     ghostty
@@ -37,6 +38,8 @@
     cmake-format
     glsl_analyzer
     mpv
+    spotify
+    cava
   ];
 
   programs.git = {

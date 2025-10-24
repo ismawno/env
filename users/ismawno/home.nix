@@ -36,6 +36,7 @@
     cmake-language-server
     cmake-format
     glsl_analyzer
+    mpv
   ];
 
   programs.git = {

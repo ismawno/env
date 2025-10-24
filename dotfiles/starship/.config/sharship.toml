@@ -37,3 +37,7 @@ success_symbol = "[➜](bold green)"
 
 [package]
 disabled = true
+
+[cmake]
+symbol = "🛠️"
+

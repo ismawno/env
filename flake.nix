@@ -22,7 +22,7 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      allowUnfree = true;
+      unfree = [ "spotify" ];
       mkUserModule =
         { host, user }:
         let
@@ -64,6 +64,10 @@
             grub2-themes.nixosModules.default
             home-manager.nixosModules.home-manager
             {
+              nixpkgs.config = {
+                allowUnfreePredicate =
+                  pkg: builtins.elem (pkg.pname or (builtins.parseDrvName pkg.name).name) unfree;
+              };
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users = homeUsers;

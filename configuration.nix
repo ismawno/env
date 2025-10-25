@@ -86,7 +86,7 @@
     packages = with pkgs; [ nerd-fonts.fira-code ];
   };
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfree = false;
 
   environment.systemPackages = with pkgs; [ home-manager ];
   programs.zsh.enable = true;

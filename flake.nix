@@ -22,6 +22,7 @@
     }@inputs:
     let
       system = "x86_64-linux";
+      allowUnfree = true;
       mkUserModule =
         { host, user }:
         let

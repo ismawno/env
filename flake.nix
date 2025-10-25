@@ -78,7 +78,14 @@
       mkHome =
         { host, user }:
         (home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs { inherit system; };
+          pkgs = import nixpkgs {
+            inherit system;
+            inherit unfree;
+            config = {
+              allowUnfreePredicate =
+                pkg: builtins.elem (pkg.pname or (builtins.parseDrvName pkg.name).name) unfree;
+            };
+          };
           modules = mkUserModule {
             host = host;
             user = user;

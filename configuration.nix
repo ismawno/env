@@ -52,8 +52,15 @@
   networking.networkmanager.enable = true;
   networking.hostName = "nomad";
 
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Experimental = true;
+      };
+    };
+  };
 
   time.timeZone = "Europe/Madrid";
 

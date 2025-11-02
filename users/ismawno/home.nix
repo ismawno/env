@@ -23,6 +23,7 @@
     catppuccin-cursors.mochaDark
     neofetch
     htop
+    python313
     shellcheck
     stylua
     lua-language-server

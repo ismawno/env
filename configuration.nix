@@ -52,7 +52,6 @@
   networking.networkmanager.enable = true;
   networking.hostName = "nomad";
 
-  hardware.pulseaudio.enable = false;
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -103,6 +102,7 @@
   programs.nano.enable = false;
   programs.command-not-found.enable = false;
 
+  services.pulseaudio.enable = false;
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;

@@ -19,6 +19,7 @@
     unzip
     tmux
     hwloc
+    pulseaudio
     catppuccin-cursors.mochaDark
     neofetch
     htop

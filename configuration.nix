@@ -52,6 +52,7 @@
   networking.networkmanager.enable = true;
   networking.hostName = "nomad";
 
+  hardware.pulseaudio.enable = false;
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;

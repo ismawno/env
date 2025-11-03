@@ -50,7 +50,6 @@
   };
 
   networking.networkmanager.enable = true;
-  networking.hostName = "nomad";
 
   hardware.bluetooth = {
     enable = true;
@@ -106,6 +105,12 @@
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

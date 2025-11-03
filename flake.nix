@@ -103,10 +103,20 @@
           host = "nomad";
           users = [ "ismawno" ];
         };
+
+        elder = mkHost {
+          host = "elder";
+          users = [ "ismawno" ];
+        };
       };
       homeConfigurations = {
         "ismawno@nomad" = mkHome {
           host = "nomad";
+          user = "ismawno";
+        };
+
+        "ismawno@elder" = mkHome {
+          host = "elder";
           user = "ismawno";
         };
       };

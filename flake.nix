@@ -22,7 +22,11 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      unfree = [ "spotify" ];
+      unfree = [
+        "spotify"
+        "nvidia-x11"
+        "nvidia-settings"
+      ];
       mkUserModule =
         { host, user }:
         let

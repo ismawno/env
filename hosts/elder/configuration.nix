@@ -21,12 +21,14 @@
   boot.initrd.luks.devices."luks-217f8548-0e7b-4e25-b7d5-d20b3059dbf0".device = "/dev/disk/by-uuid/217f8548-0e7b-4e25-b7d5-d20b3059dbf0";
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/D049-0E31";
+    { device = "/dev/disk/by-uuid/619C-C423";
       fsType = "vfat";
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
   swapDevices = [ ];
+
+  networking.hostName = "elder";
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

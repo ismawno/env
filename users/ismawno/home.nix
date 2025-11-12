@@ -2,6 +2,7 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
@@ -72,7 +73,7 @@
   };
 
   home.username = "ismawno";
-  home.homeDirectory = "/home/ismawno";
+  home.homeDirectory = lib.mkForce "/home/ismawno";
 
   home.file = {
     ".zshrc".source = ../../users/ismawno/dotfiles/zsh/.zshrc;

@@ -45,7 +45,7 @@
       mkHost =
         { host, users }:
         let
-          hostPath = ./hosts/${host}/configuration.nix;
+          hostConfig = ./hosts/${host}/configuration.nix;
 
           mkUser = user: {
             home.stateVersion = "25.05";
@@ -63,7 +63,7 @@
           inherit system;
           modules = [
             ./configuration.nix
-            hostPath
+            hostConfig
             nix-index-database.nixosModules.nix-index
             grub2-themes.nixosModules.default
             home-manager.nixosModules.home-manager

@@ -76,17 +76,6 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  users.users.ismawno = {
-    isNormalUser = true;
-    description = "ismawno";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    packages = with pkgs; [ ];
-    shell = pkgs.zsh;
-  };
-
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [ nerd-fonts.fira-code ];

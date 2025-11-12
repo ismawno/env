@@ -2,67 +2,55 @@
   config,
   pkgs,
   inputs,
-  lib,
   ...
 }:
 
-let
-  projectdir = ../..;
-  username = "ismawno";
-  dotfiles = "${projectdir}/dotfiles/vanilla";
-  homedir = "/home/${username}";
-  userdir = "${projectdir}/users/${username}";
-in
 {
-  home.username = "${username}";
-  home.homeDirectory = "${homedir}";
-
   home.packages = with pkgs; [
-    bash-language-server
-    black
-    catppuccin-cursors.mochaDark
-    cava
-    cloc
-    cmake-format
-    cmake-language-server
-    firefox
-    fzf
-    gdu
-    ghostty
-    glsl_analyzer
-    htop
-    hwloc
-    hyprpaper
-    lua-language-server
-    mpv
-    neofetch
-    nixfmt-rfc-style
-    nodePackages_latest.prettier
-    nodejs_22
-    ollama
-    pulseaudio
-    pyright
-    ripgrep
-    shellcheck
-    shfmt
-    spotify
-    stylua
-    tmux
-    unzip
-    vscode-extensions.vadimcn.vscode-lldb.adapter
-    vscode-langservers-extracted
-    waybar
-    wofi
     zoxide
+    ghostty
+    ripgrep
+    wofi
+    fzf
+    waybar
+    hyprpaper
+    firefox
+    nodejs_22
+    unzip
+    tmux
+    hwloc
+    pulseaudio
+    catppuccin-cursors.mochaDark
+    neofetch
+    htop
+    shellcheck
+    stylua
+    lua-language-server
+    vscode-extensions.vadimcn.vscode-lldb.adapter
+    nixfmt-rfc-style
+    vscode-langservers-extracted
+    nodePackages_latest.prettier
+    black
+    pyright
+    shfmt
+    bash-language-server
+    cmake-language-server
+    cmake-format
+    glsl_analyzer
+    # maybe temporary
+    mpv
+    spotify
+    cava
+    ollama
+    gdu
   ];
 
   programs.git = {
     enable = true;
-    settings = {
-      user.name = "Ismael Bueno";
-      user.email = "ismaelwno@gmail.com";
+    userName = "Ismael Bueno";
+    userEmail = "ismaelwno@gmail.com";
+    extraConfig = {
       credential.helper = "store";
-      push.autoSetupRemote = true;
     };
   };
   programs.vim.enable = true;
@@ -81,24 +69,14 @@ in
       WNO_ONYX_PATH = "/home/ismawno/onyx";
       WNO_DRIZZLE_PATH = "/home/ismawno/drizzle";
     };
-    dotDir = "${config.home.homeDirectory}/.config/zsh";
   };
 
-  home.activation.copyDevelop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    echo "Copying develop directory..."
-
-    [ -d "$HOME/develop" ] && chmod -R u+rwX "$HOME/develop"
-
-    rm -f "$HOME/develop/flake.nix"
-    rm -rf "$HOME/develop/scripts"
-    mkdir -p "$HOME/develop"
-
-    cp "${userdir}/develop/flake.nix" "$HOME/develop"
-    cp -r "${userdir}/develop/scripts" "$HOME/develop"
-  '';
+  home.username = "ismawno";
+  home.homeDirectory = "/home/ismawno";
 
   home.file = {
-    ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
+    ".zshrc".source = ../../users/ismawno/dotfiles/zsh/.zshrc;
+    ".tmux.conf".source = ../../users/ismawno/dotfiles/tmux/.tmux.conf;
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
@@ -106,19 +84,17 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    # "develop/flake.nix".source = "${userdir}/develop/flake.nix";
-    # "develop/scripts".source = "${userdir}/develop/scripts";
-
-    ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
-    ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";
+    ".config/starship.toml".source = ../../users/ismawno/dotfiles/starship/.config/sharship.toml;
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprland.conf";
-    ".config/hypr/hyprpaper.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprpaper.conf";
-    ".config/hypr/mocha.conf".source = "${dotfiles}/hyprland/.config/hypr/mocha.conf";
-    ".config/ghostty".source = "${dotfiles}/ghostty/.config/ghostty";
-    ".config/waybar".source = "${dotfiles}/waybar/.config/waybar";
-    ".config/wofi".source = "${dotfiles}/wofi/.config/wofi";
-    ".config/backgrounds".source = "${dotfiles}/backgrounds/.config/backgrounds";
+    ".config/hypr/hyprland.conf".source =
+      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprland.conf;
+    ".config/hypr/hyprpaper.conf".source =
+      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprpaper.conf;
+    ".config/hypr/mocha.conf".source = ../../users/ismawno/dotfiles/hyprland/.config/hypr/mocha.conf;
+    ".config/ghostty".source = ../../users/ismawno/dotfiles/ghostty/.config/ghostty;
+    ".config/waybar".source = ../../users/ismawno/dotfiles/waybar/.config/waybar;
+    ".config/wofi".source = ../../users/ismawno/dotfiles/wofi/.config/wofi;
+    ".config/backgrounds".source = ../../users/ismawno/backgrounds/.config/backgrounds;
   };
 
   home.stateVersion = "25.05";

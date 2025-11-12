@@ -72,7 +72,7 @@
   };
 
   home.username = "maddev";
-  home.homeDirectory = "/home/maddev";
+  home.homeDirectory = lib.mkForce "/home/maddev";
 
   home.file = {
     ".zshrc".source = ../../users/maddev/dotfiles/zsh/.zshrc;

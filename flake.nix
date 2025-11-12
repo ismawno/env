@@ -112,6 +112,11 @@
           host = "elder";
           users = [ "ismawno" ];
         };
+
+        smalltop = mkHost {
+          host = "smalltop";
+          users = [ "maddev" ];
+        };
       };
       homeConfigurations = {
         "ismawno@nomad" = mkHome {
@@ -122,6 +127,11 @@
         "ismawno@elder" = mkHome {
           host = "elder";
           user = "ismawno";
+        };
+
+        "maddev@smalltop" = mkHome {
+          host = "smalltop";
+          user = "maddev";
         };
       };
     };

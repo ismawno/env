@@ -76,9 +76,9 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  users.users.ismawno = {
+  users.users.maddev = {
     isNormalUser = true;
-    description = "ismawno";
+    description = "maddev";
     extraGroups = [
       "networkmanager"
       "wheel"

@@ -75,8 +75,8 @@
   home.homeDirectory = "/home/ismawno";
 
   home.file = {
-    ".zshrc".source = ../../dotfiles/zsh/.zshrc;
-    ".tmux.conf".source = ../../dotfiles/tmux/.tmux.conf;
+    ".zshrc".source = ../../users/ismawno/dotfiles/zsh/.zshrc;
+    ".tmux.conf".source = ../../users/ismawno/dotfiles/tmux/.tmux.conf;
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
@@ -84,15 +84,17 @@
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    ".config/starship.toml".source = ../../dotfiles/starship/.config/sharship.toml;
+    ".config/starship.toml".source = ../../users/ismawno/dotfiles/starship/.config/sharship.toml;
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source = ../../dotfiles/hyprland/.config/hypr/hyprland.conf;
-    ".config/hypr/hyprpaper.conf".source = ../../dotfiles/hyprland/.config/hypr/hyprpaper.conf;
-    ".config/hypr/mocha.conf".source = ../../dotfiles/hyprland/.config/hypr/mocha.conf;
-    ".config/ghostty".source = ../../dotfiles/ghostty/.config/ghostty;
-    ".config/waybar".source = ../../dotfiles/waybar/.config/waybar;
-    ".config/wofi".source = ../../dotfiles/wofi/.config/wofi;
-    ".config/backgrounds".source = ../../backgrounds/.config/backgrounds;
+    ".config/hypr/hyprland.conf".source =
+      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprland.conf;
+    ".config/hypr/hyprpaper.conf".source =
+      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprpaper.conf;
+    ".config/hypr/mocha.conf".source = ../../users/ismawno/dotfiles/hyprland/.config/hypr/mocha.conf;
+    ".config/ghostty".source = ../../users/ismawno/dotfiles/ghostty/.config/ghostty;
+    ".config/waybar".source = ../../users/ismawno/dotfiles/waybar/.config/waybar;
+    ".config/wofi".source = ../../users/ismawno/dotfiles/wofi/.config/wofi;
+    ".config/backgrounds".source = ../../users/ismawno/backgrounds/.config/backgrounds;
   };
 
   home.stateVersion = "25.05";

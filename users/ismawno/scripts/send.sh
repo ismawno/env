@@ -1,6 +1,6 @@
 #!/bin/sh
 
-src="$HOME/env/scripts"
+src="$HOME/env/users/ismawno/scripts"
 
 # cp "$src/for-each.sh" "$HOME/convoy"
 cp "$src/launch-convoy.sh" "$HOME/convoy"

@@ -90,6 +90,7 @@ alias ldev='nix develop --command $SHELL -il'
 alias gdev='nix develop $WNO_ENV_PATH/develop --command $SHELL -il'
 
 alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
+alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
 # Shell integrations
 eval "$(fzf --zsh)"

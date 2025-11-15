@@ -46,6 +46,7 @@ in
     cava
     ollama
     gdu
+    cloc
   ];
 
   programs.git = {

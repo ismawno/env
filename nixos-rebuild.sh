@@ -43,7 +43,7 @@ echo "Rebuilding NixOS with host $HOST_NAME..."
 
 sudo nixos-rebuild switch --flake "$FLAKE_PATH#$HOST_NAME"
 
-current=$(nixos-rebuild list-generations | grep current | awk '{print $1}')
+current=$(nixos-rebuild list-generations | sed -n '2p' | awk '{print $1}')
 
 if git diff --quiet && git diff --cached --quiet; then
     exit 0

@@ -80,7 +80,6 @@ in
   };
 
   home.file = {
-    ".zshrc".source = "${dotfiles}/zsh/.zshrc";
     ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
@@ -89,6 +88,7 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
+    ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
     ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";
     ".config/nvim".source = inputs.nvim;
     ".config/hypr/hyprland.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprland.conf";

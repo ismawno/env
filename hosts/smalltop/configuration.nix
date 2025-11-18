@@ -44,6 +44,9 @@
   };
 
   swapDevices = [ ];
+
+  networking.hostName = "smalltop";
+
   users.users.maddev = {
     isNormalUser = true;
     description = "maddev";

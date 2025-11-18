@@ -76,17 +76,6 @@
     LC_TIME = "es_ES.UTF-8";
   };
 
-  users.users.maddev = {
-    isNormalUser = true;
-    description = "maddev";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    packages = with pkgs; [ ];
-    shell = pkgs.zsh;
-  };
-
   fonts = {
     enableDefaultPackages = true;
     packages = with pkgs; [ nerd-fonts.fira-code ];

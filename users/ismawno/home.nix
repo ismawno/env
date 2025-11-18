@@ -9,6 +9,9 @@ let
   dotfiles = ../../dotfiles/vanilla;
 in
 {
+  home.username = "ismawno";
+  home.homeDirectory = "/home/ismawno";
+
   home.packages = with pkgs; [
     zoxide
     ghostty
@@ -51,9 +54,9 @@ in
 
   programs.git = {
     enable = true;
-    userName = "Ismael Bueno";
-    userEmail = "ismaelwno@gmail.com";
-    extraConfig = {
+    settings = {
+      user.name = "Ismael Bueno";
+      user.email = "ismaelwno@gmail.com";
       credential.helper = "store";
     };
   };
@@ -73,11 +76,8 @@ in
       WNO_ONYX_PATH = "/home/ismawno/onyx";
       WNO_DRIZZLE_PATH = "/home/ismawno/drizzle";
     };
-    dotDir = ".config/zsh";
+    dotDir = "${config.home.homeDirectory}/.config/zsh";
   };
-
-  home.username = "ismawno";
-  home.homeDirectory = "/home/ismawno";
 
   home.file = {
     ".zshrc".source = "${dotfiles}/zsh/.zshrc";

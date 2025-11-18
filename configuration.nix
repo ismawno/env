@@ -46,7 +46,7 @@
         })
       ];
     };
-    kernelPackages = pkgs.linuxPackages_6_16;
+    kernelPackages = pkgs.linuxPackages_6_12;
   };
 
   networking.networkmanager.enable = true;

@@ -73,6 +73,7 @@ in
       WNO_ONYX_PATH = "/home/ismawno/onyx";
       WNO_DRIZZLE_PATH = "/home/ismawno/drizzle";
     };
+    dotDir = ".config/zsh";
   };
 
   home.username = "ismawno";

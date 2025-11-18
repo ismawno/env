@@ -6,6 +6,9 @@
   ...
 }:
 
+let
+  dotfiles = ../../dotfiles/vanilla;
+in
 {
   home.packages = with pkgs; [
     zoxide
@@ -76,8 +79,7 @@
   home.homeDirectory = lib.mkForce "/home/maddev";
 
   home.file = {
-    ".zshrc".source = ../../users/maddev/dotfiles/zsh/.zshrc;
-    ".tmux.conf".source = ../../users/maddev/dotfiles/tmux/.tmux.conf;
+    ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
@@ -85,17 +87,16 @@
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    ".config/starship.toml".source = ../../users/maddev/dotfiles/starship/.config/sharship.toml;
+    ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
+    ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source =
-      ../../users/maddev/dotfiles/hyprland/.config/hypr/hyprland.conf;
-    ".config/hypr/hyprpaper.conf".source =
-      ../../users/maddev/dotfiles/hyprland/.config/hypr/hyprpaper.conf;
-    ".config/hypr/mocha.conf".source = ../../users/maddev/dotfiles/hyprland/.config/hypr/mocha.conf;
-    ".config/ghostty".source = ../../users/maddev/dotfiles/ghostty/.config/ghostty;
-    ".config/waybar".source = ../../users/maddev/dotfiles/waybar/.config/waybar;
-    ".config/wofi".source = ../../users/maddev/dotfiles/wofi/.config/wofi;
-    ".config/backgrounds".source = ../../users/maddev/backgrounds/.config/backgrounds;
+    ".config/hypr/hyprland.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprland.conf";
+    ".config/hypr/hyprpaper.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprpaper.conf";
+    ".config/hypr/mocha.conf".source = "${dotfiles}/hyprland/.config/hypr/mocha.conf";
+    ".config/ghostty".source = "${dotfiles}/ghostty/.config/ghostty";
+    ".config/waybar".source = "${dotfiles}/waybar/.config/waybar";
+    ".config/wofi".source = "${dotfiles}/wofi/.config/wofi";
+    ".config/backgrounds".source = "${dotfiles}/backgrounds/.config/backgrounds";
   };
 
   home.stateVersion = "25.05";

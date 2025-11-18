@@ -1,9 +1,0 @@
-theme = catppuccin-mocha.conf
-cursor-color = #7a7d92
-font-family = FiraCode Nerd Font
-font-size = 14
-background-opacity = 0.9
-confirm-close-surface = false
-resize-overlay = never
-command = zsh -lc "neofetch; exec zsh -l"
-

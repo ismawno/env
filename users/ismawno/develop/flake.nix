@@ -2,7 +2,7 @@
   description = "Generic dev shell";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   };
 
   outputs =
@@ -16,19 +16,25 @@
         name = "dev";
 
         buildInputs = with pkgs; [
-          cmake
-          clang-tools
           clang
+          clang-tools
+          lld
+          libcxx
+
+          cmake
           fmt
+          pkg-config
           hwloc
-          linuxPackages.perf
+          perf
           gnumake
           python313
         ];
         shellHook = ''
           export SHELL=${pkgs.zsh}/bin/zsh
+          export CC=clang
+          export CXX=clang++
+          export CLANGD_FLAGS="$CLANGD_FLAGS --query-driver=/nix/store/*-clang-wrapper-*/bin/clang++"
         '';
-
       };
     };
 }

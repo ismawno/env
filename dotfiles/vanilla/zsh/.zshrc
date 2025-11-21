@@ -87,7 +87,7 @@ alias ls='ls --color'
 alias c='clear'
 
 alias ldev='nix develop --command $SHELL -il'
-alias gdev='nix develop $WNO_ENV_PATH/develop --command $SHELL -il'
+alias gdev='nix develop $WNO_ENV_PATH/users/ismawno/develop --command $SHELL -il'
 
 alias lnvim='nix develop --command $SHELL -il -c "nvim ."'
 alias gnvim='nix develop $WNO_ENV_PATH/develop --command $SHELL -il -c "nvim ."'

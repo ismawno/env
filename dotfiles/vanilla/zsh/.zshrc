@@ -91,6 +91,7 @@ alias gdev='nix develop $WNO_ENV_PATH/users/ismawno/develop --command $SHELL -il
 
 alias lnvim='nix develop --command $SHELL -il -c "nvim ."'
 alias gnvim='nix develop $WNO_ENV_PATH/develop --command $SHELL -il -c "nvim ."'
+alias reload='source ${ZDOTDIR:-$HOME}/.zshrc'
 
 alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'

@@ -4,7 +4,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 show_usage() {
-  cat <<EOF
+    cat <<EOF
 Usage: $(basename "$0") <hostname> [flake-path]
 
 Rebuild a NixOS hostname given a host name.
@@ -19,15 +19,15 @@ EOF
 }
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  show_usage
-  exit 0
+    show_usage
+    exit 0
 fi
 
 if [ "$#" -lt 1 ]; then
-  echo "Error: missing required arguments."
-  echo
-  show_usage
-  exit 1
+    echo "Error: missing required arguments."
+    echo
+    show_usage
+    exit 1
 fi
 
 HOST_NAME="$1"
@@ -50,5 +50,3 @@ fi
 
 git add .
 git commit -m "rebuild: NixOS hostname generation for host '$HOST_NAME' - $current"
-
-

@@ -4,7 +4,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
 show_usage() {
-  cat <<EOF
+    cat <<EOF
 Usage: $(basename "$0") [flake-path]
 
 Rebuild a user configuration.
@@ -18,8 +18,8 @@ EOF
 }
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-  show_usage
-  exit 0
+    show_usage
+    exit 0
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" >/dev/null 2>&1 && pwd)"
@@ -41,5 +41,3 @@ fi
 
 git add .
 git commit -m "rebuild: User configuration generation for user '$USER' with host '$(hostname -s)' - $current"
-
-

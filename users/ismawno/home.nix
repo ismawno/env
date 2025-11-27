@@ -86,6 +86,7 @@ in
 
   home.activation.copyDevelop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Copying develop directory..."
+    chmod -R u+rwX "$HOME/develop"
     rm -f "$HOME/develop/flake.nix"
     rm -rf "$HOME/develop/scripts"
     mkdir -p "$HOME/develop"

@@ -2,6 +2,7 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
@@ -83,6 +84,14 @@ in
     dotDir = "${config.home.homeDirectory}/.config/zsh";
   };
 
+  home.activation.copyDevelop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    echo "Copying develop directory..."
+    rm "$HOME/develop/flake.nix"
+    rm -r "$HOME/develop/scripts"
+
+    cp -a "${userdir}/develop" "$HOME/develop"
+  '';
+
   home.file = {
     ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
@@ -92,8 +101,8 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    "develop/flake.nix".source = "${userdir}/develop/flake.nix";
-    "develop/scripts".source = "${userdir}/develop/scripts";
+    # "develop/flake.nix".source = "${userdir}/develop/flake.nix";
+    # "develop/scripts".source = "${userdir}/develop/scripts";
 
     ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
     ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";

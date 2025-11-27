@@ -95,7 +95,7 @@ alias gnvim='nix develop $HOME/develop --command $SHELL -il -c "nvim ."'
 alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
-alias git-rename-branch='$HOME/develop/git-rename-branch.sh'
+alias git-rename-branch='$HOME/develop/scripts/git-rename-branch.sh'
 alias reload='source .config/zsh/.zshrc'
 
 # Shell integrations

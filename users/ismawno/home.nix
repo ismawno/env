@@ -6,11 +6,15 @@
 }:
 
 let
-  dotfiles = ../../dotfiles/vanilla;
+  projectdir = ../..;
+  username = "ismawno";
+  dotfiles = "${projectdir}/dotfiles/vanilla";
+  homedir = "/home/${username}";
+  userdir = "${projectdir}/users/${username}";
 in
 {
-  home.username = "ismawno";
-  home.homeDirectory = "/home/ismawno";
+  home.username = "${username}";
+  home.homeDirectory = "${homedir}";
 
   home.packages = with pkgs; [
     zoxide
@@ -87,6 +91,8 @@ in
       rev = "v3.1.0"; # check the latest release
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
+
+    "develop".source = "${userdir}/develop";
 
     ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
     ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";

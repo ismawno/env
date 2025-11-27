@@ -87,15 +87,16 @@ alias ls='ls --color'
 alias c='clear'
 
 alias ldev='nix develop --command $SHELL -il'
-alias gdev='nix develop $WNO_ENV_PATH/develop --command $SHELL -il'
+alias gdev='nix develop $HOME/develop --command $SHELL -il'
 
 alias lnvim='nix develop --command $SHELL -il -c "nvim ."'
-alias gnvim='nix develop $WNO_ENV_PATH/develop --command $SHELL -il -c "nvim ."'
+alias gnvim='nix develop $HOME/develop --command $SHELL -il -c "nvim ."'
 
 alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
-alias git-rename-branch='$WNO_ENV_PATH/users/ismawno/scripts/git-rename-branch.sh'
+alias git-rename-branch='$HOME/develop/git-rename-branch.sh'
+alias reload='source .config/zsh/.zshrc'
 
 # Shell integrations
 eval "$(fzf --zsh)"

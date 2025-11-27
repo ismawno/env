@@ -42,16 +42,23 @@ else
   new="$2"
 fi
 
+remote_branch_exists() {
+  git ls-remote --heads origin "$1" | grep -q .
+}
+
 if ! git rev-parse --verify --quiet "refs/heads/$old" >/dev/null; then
-  echo "Error: local branch '$old' does not exist."
+    if remote_branch_exists "$old"; then
+        echo "Remote branch '$old' exists. Creating local tracking branch..."
+    git fetch origin "$old"
+    git branch "$old" "origin/$old"
+else
+  echo "Error: branch '$old' does not exist."
   exit 1
+fi
 fi
 
 git branch -m "$old" "$new"
 
-remote_branch_exists() {
-  git ls-remote --heads origin "$1" | grep -q .
-}
 
 if remote_branch_exists "$old"; then
   echo "Remote branch '$old' exists. Updating..."

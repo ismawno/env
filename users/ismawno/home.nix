@@ -92,7 +92,8 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    "develop".source = "${userdir}/develop";
+    "develop/flake.nix".source = "${userdir}/develop/flake.nix";
+    "develop/scripts".source = "${userdir}/develop/scripts";
 
     ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
     ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";

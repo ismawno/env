@@ -86,10 +86,12 @@ in
 
   home.activation.copyDevelop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     echo "Copying develop directory..."
-    rm "$HOME/develop/flake.nix"
-    rm -r "$HOME/develop/scripts"
+    rm -f "$HOME/develop/flake.nix"
+    rm -rf "$HOME/develop/scripts"
+    mkdir -p "$HOME/develop"
 
-    cp -a "${userdir}/develop" "$HOME/develop"
+    cp "${userdir}/develop/flake.nix" "$HOME/develop"
+    cp -r "${userdir}/develop/scripts" "$HOME/develop"
   '';
 
   home.file = {

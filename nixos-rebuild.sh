@@ -23,7 +23,6 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
   exit 0
 fi
 
-# Validate arguments
 if [ "$#" -lt 1 ]; then
   echo "Error: missing required arguments."
   echo

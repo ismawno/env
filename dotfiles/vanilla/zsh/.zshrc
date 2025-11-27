@@ -95,6 +95,8 @@ alias gnvim='nix develop $WNO_ENV_PATH/develop --command $SHELL -il -c "nvim ."'
 alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
+alias git-rename-branch='$WNO_ENV_PATH/users/ismawno/scripts/git-rename-branch.sh'
+
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"

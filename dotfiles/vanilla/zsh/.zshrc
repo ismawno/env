@@ -86,17 +86,17 @@ zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 alias ls='ls --color'
 alias c='clear'
 
-alias ldev='nix develop --command $SHELL -il'
-alias gdev='nix develop $HOME/develop --command $SHELL -il'
+alias ldev="nix develop --command $SHELL -il"
+alias gdev="nix develop $HOME/develop --command $SHELL -il"
 
-alias lnvim='nix develop --command $SHELL -il -c "nvim ."'
-alias gnvim='nix develop $HOME/develop --command $SHELL -il -c "nvim ."'
+alias lnvim="nix develop --command $SHELL -il -c 'nvim .'"
+alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
 
-alias airpods='bluetoothctl connect F0:04:E1:D5:04:DB'
+alias airpods="bluetoothctl connect F0:04:E1:D5:04:DB"
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
-alias git-rename-branch='$HOME/develop/scripts/git-rename-branch.sh'
-alias reload='source .config/zsh/.zshrc'
+alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
+alias reload="source .config/zsh/.zshrc"
 
 # Shell integrations
 eval "$(fzf --zsh)"

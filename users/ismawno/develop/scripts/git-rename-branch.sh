@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 show_usage() {
   cat <<EOF
 Usage: $(basename "$0") <name1> [name2]
@@ -7,11 +9,12 @@ Usage: $(basename "$0") <name1> [name2]
 Rename a git branch both locally and remotely (if applicable).
 
 Arguments:
-  <name1>      Treated as the new name when only 1 argument is provided, or the old name when 2 arguments are provided
-  [name2]      The branch's new name
+  <name1>      With one argument: the new name of the current branch.
+               With two arguments: the old branch name.
+  [name2]      The new branch name (only when two arguments are provided).
 
 Options:
-  -h, --help      Show this help message and exit.
+  -h, --help   Show this help message and exit.
 EOF
 }
 
@@ -29,13 +32,33 @@ fi
 
 if [ "$#" -eq 1 ]; then
   old=$(git branch --show-current)
+  if [ -z "$old" ]; then
+    echo "Error: unable to detect current branch."
+    exit 1
+  fi
   new="$1"
 else
   old="$1"
   new="$2"
 fi
 
+if ! git rev-parse --verify --quiet "refs/heads/$old" >/dev/null; then
+  echo "Error: local branch '$old' does not exist."
+  exit 1
+fi
+
 git branch -m "$old" "$new"
-git push origin "$new"
-git push origin -d "$old"
-git push --set-upstream origin "$new"
+
+remote_branch_exists() {
+  git ls-remote --heads origin "$1" | grep -q .
+}
+
+if remote_branch_exists "$old"; then
+  echo "Remote branch '$old' exists. Updating..."
+
+  git push --set-upstream origin "$new"
+  git push origin --delete "$old"
+else
+  echo "No remote branch '$old' found. Local rename only."
+fi
+

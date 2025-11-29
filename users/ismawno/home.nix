@@ -63,6 +63,7 @@ in
       user.name = "Ismael Bueno";
       user.email = "ismaelwno@gmail.com";
       credential.helper = "store";
+      push.autoSetupRemote = true;
     };
   };
   programs.vim.enable = true;

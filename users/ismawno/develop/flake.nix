@@ -22,8 +22,6 @@
           libcxx
           llvm
 
-          dbus
-
           cmake
           fmt
           pkg-config

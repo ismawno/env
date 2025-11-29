@@ -83,8 +83,8 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
 # Aliases
-alias ls='ls --color'
-alias c='clear'
+alias ls="ls --color"
+alias c="clear"
 
 alias ldev="nix develop --command $SHELL -il"
 alias gdev="nix develop $HOME/develop --command $SHELL -il"
@@ -96,7 +96,7 @@ alias airpods="bluetoothctl connect F0:04:E1:D5:04:DB"
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header"'
 
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
-alias reload="source .config/zsh/.zshrc"
+alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
 # Shell integrations
 eval "$(fzf --zsh)"

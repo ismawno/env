@@ -22,7 +22,7 @@
           libcxx
           llvm
 
-          dbus-1
+          dbus
 
           cmake
           fmt

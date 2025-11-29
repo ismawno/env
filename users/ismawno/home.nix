@@ -48,7 +48,6 @@ in
     cmake-language-server
     cmake-format
     glsl_analyzer
-    tracy
     # maybe temporary
     mpv
     spotify

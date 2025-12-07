@@ -18,43 +18,43 @@ in
   home.homeDirectory = "${homedir}";
 
   home.packages = with pkgs; [
-    zoxide
-    ghostty
-    ripgrep
-    wofi
-    fzf
-    waybar
-    hyprpaper
-    firefox
-    nodejs_22
-    unzip
-    tmux
-    hwloc
-    pulseaudio
-    catppuccin-cursors.mochaDark
-    neofetch
-    htop
-    shellcheck
-    stylua
-    lua-language-server
-    vscode-extensions.vadimcn.vscode-lldb.adapter
-    nixfmt-rfc-style
-    vscode-langservers-extracted
-    nodePackages_latest.prettier
-    black
-    pyright
-    shfmt
     bash-language-server
-    cmake-language-server
-    cmake-format
-    glsl_analyzer
-    # maybe temporary
-    mpv
-    spotify
+    black
+    catppuccin-cursors.mochaDark
     cava
-    ollama
-    gdu
     cloc
+    cmake-format
+    cmake-language-server
+    firefox
+    fzf
+    gdu
+    ghostty
+    git-filter-repo
+    glsl_analyzer
+    htop
+    hwloc
+    hyprpaper
+    lua-language-server
+    mpv
+    neofetch
+    nixfmt-rfc-style
+    nodePackages_latest.prettier
+    nodejs_22
+    ollama
+    pulseaudio
+    pyright
+    ripgrep
+    shellcheck
+    shfmt
+    spotify
+    stylua
+    tmux
+    unzip
+    vscode-extensions.vadimcn.vscode-lldb.adapter
+    vscode-langservers-extracted
+    waybar
+    wofi
+    zoxide
   ];
 
   programs.git = {

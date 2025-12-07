@@ -29,7 +29,6 @@ in
     fzf
     gdu
     ghostty
-    git-filter-repo
     glsl_analyzer
     htop
     hwloc

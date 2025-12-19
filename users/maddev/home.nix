@@ -7,26 +7,51 @@
 }:
 
 let
-  dotfiles = ../../dotfiles/vanilla;
+  shub = ../../dotfiles/shub;
+  vanilla = ../../dotfiles/vanilla;
 in
 {
   home.packages = with pkgs; [
+    # --- CORE ---
     zoxide
-    ghostty
     ripgrep
-    wofi
     fzf
+    unzip
+    htop
+    gdu
+    
+    # --- GUI / HYPRLAND UTILS ---
     waybar
     hyprpaper
+    hyprlock
+    rofi               # UPDATED: Using 'rofi' as per your Nixpkgs version
+    swaynotificationcenter 
+    wlogout
+    fastfetch
+    hyprpicker
+    
+    # hyprsunset       # WARNING: This is likely not in standard nixpkgs. 
+                       # Uncomment only if you are sure it exists or have an overlay.
+    
+    # --- MEDIA / APPS ---
     firefox
+    ghostty
+    mpv
+    spotify
+    cava
+    ollama
+    
+    # --- DEV / TERMINAL ---
     nodejs_22
-    unzip
     tmux
     hwloc
     pulseaudio
-    catppuccin-cursors.mochaDark
+    
+    # --- THEME STUFF ---
+    catppuccin-cursors.mochaDark 
+    
+    # --- CODING ---
     neofetch
-    htop
     shellcheck
     stylua
     lua-language-server
@@ -41,27 +66,23 @@ in
     cmake-language-server
     cmake-format
     glsl_analyzer
-    # maybe temporary
-    mpv
-    spotify
-    cava
-    ollama
-    gdu
   ];
 
   programs.git = {
     enable = true;
-    userName = "Mars-Wave";
-    userEmail = "tmorolias@protonmail.com";
-    extraConfig = {
+    settings = {
+      user.name = "Mars-Wave";
+      user.email = "tmorolias@protonmail.com";
       credential.helper = "store";
     };
   };
+
   programs.vim.enable = true;
   programs.neovim = {
     enable = true;
     defaultEditor = true;
   };
+
   programs.starship.enable = true;
   programs.zsh = {
     enable = true;
@@ -78,25 +99,39 @@ in
   home.username = "maddev";
   home.homeDirectory = lib.mkForce "/home/maddev";
 
+  # Mappings
+  xdg.configFile = {
+    # --- HYPRLAND (From Shub) ---
+    "hypr".source = "${shub}/hyprland";
+
+    # --- UI COMPONENTS (From Shub) ---
+    "waybar".source = "${shub}/waybar";
+    "rofi".source = "${shub}/rofi";
+    "swaync".source = "${shub}/swaync";
+    "wlogout".source = "${shub}/wlogout";
+    "fastfetch".source = "${shub}/fastfetch";
+    "kitty".source = "${shub}/kitty";
+
+    # --- WALLPAPERS (From Shub) ---
+    "backgrounds".source = "${shub}/backgrounds";
+
+    # --- LEGACY / VANILLA CONFIGS ---
+    "ghostty".source = "${vanilla}/ghostty/.config/ghostty";
+    "zsh/.zshrc".source = "${vanilla}/zsh/.zshrc";
+    "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
+    
+    # --- NVIM ---
+    "nvim".source = inputs.nvim;
+  };
+
   home.file = {
-    ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
+    ".tmux.conf".source = "${vanilla}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
-      rev = "v3.1.0"; # check the latest release
+      rev = "v3.1.0"; 
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
-
-    ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
-    ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";
-    ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprland.conf";
-    ".config/hypr/hyprpaper.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprpaper.conf";
-    ".config/hypr/mocha.conf".source = "${dotfiles}/hyprland/.config/hypr/mocha.conf";
-    ".config/ghostty".source = "${dotfiles}/ghostty/.config/ghostty";
-    ".config/waybar".source = "${dotfiles}/waybar/.config/waybar";
-    ".config/wofi".source = "${dotfiles}/wofi/.config/wofi";
-    ".config/backgrounds".source = "${dotfiles}/backgrounds/.config/backgrounds";
   };
 
   home.stateVersion = "25.05";

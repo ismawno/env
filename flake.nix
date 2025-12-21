@@ -113,6 +113,11 @@
           users = [ "ismawno" ];
         };
 
+        razor = mkHost {
+          host = "razor";
+          users = [ "ismawno" ];
+        };
+
         smalltop = mkHost {
           host = "smalltop";
           users = [ "maddev" ];
@@ -126,6 +131,11 @@
 
         "ismawno@elder" = mkHome {
           host = "elder";
+          user = "ismawno";
+        };
+
+        "ismawno@razor" = mkHome {
+          host = "razor";
           user = "ismawno";
         };
 

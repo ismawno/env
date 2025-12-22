@@ -12,45 +12,48 @@ let
 in
 {
   home.packages = with pkgs; [
-    # --- CORE ---
     zoxide
     ripgrep
     fzf
     unzip
     htop
     gdu
-    
-    # --- GUI / HYPRLAND UTILS ---
+    imagemagick
+
     waybar
     hyprpaper
     hyprlock
-    rofi               # UPDATED: Using 'rofi' as per your Nixpkgs version
-    swaynotificationcenter 
+    rofi
+    swaynotificationcenter
     wlogout
     fastfetch
     hyprpicker
-    
-    # hyprsunset       # WARNING: This is likely not in standard nixpkgs. 
-                       # Uncomment only if you are sure it exists or have an overlay.
-    
-    # --- MEDIA / APPS ---
+    hyprshot
+    copyq
+    nwg-look
+    polkit_gnome
+
     firefox
     ghostty
+    nemo
+    nemo-fileroller
     mpv
     spotify
     cava
     ollama
-    
-    # --- DEV / TERMINAL ---
+
     nodejs_22
     tmux
     hwloc
     pulseaudio
+
+    gruvbox-gtk-theme
+    gruvbox-dark-icons-gtk
+    bibata-cursors
+    jetbrains-mono
+    noto-fonts
+    noto-fonts-color-emoji
     
-    # --- THEME STUFF ---
-    catppuccin-cursors.mochaDark 
-    
-    # --- CODING ---
     neofetch
     shellcheck
     stylua
@@ -96,31 +99,54 @@ in
     };
   };
 
+  gtk = {
+    enable = true;
+    theme = {
+      name = "Gruvbox-Dark-BL";
+      package = pkgs.gruvbox-gtk-theme;
+    };
+    iconTheme = {
+      name = "oomox-gruvbox-dark";
+      package = pkgs.gruvbox-dark-icons-gtk;
+    };
+    cursorTheme = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+    };
+    gtk3.extraConfig = {
+      Settings = ''
+        gtk-application-prefer-dark-theme=1
+      '';
+    };
+    gtk4.extraConfig = {
+      Settings = ''
+        gtk-application-prefer-dark-theme=1
+      '';
+    };
+  };
+
+  home.pointerCursor = {
+    gtk.enable = true;
+    name = "Bibata-Modern-Classic";
+    package = pkgs.bibata-cursors;
+    size = 24;
+  };
+
   home.username = "maddev";
   home.homeDirectory = lib.mkForce "/home/maddev";
 
-  # Mappings
   xdg.configFile = {
-    # --- HYPRLAND (From Shub) ---
     "hypr".source = "${shub}/hyprland";
-
-    # --- UI COMPONENTS (From Shub) ---
     "waybar".source = "${shub}/waybar";
     "rofi".source = "${shub}/rofi";
     "swaync".source = "${shub}/swaync";
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
     "kitty".source = "${shub}/kitty";
-
-    # --- WALLPAPERS (From Shub) ---
     "backgrounds".source = "${shub}/backgrounds";
-
-    # --- LEGACY / VANILLA CONFIGS ---
     "ghostty".source = "${vanilla}/ghostty/.config/ghostty";
     "zsh/.zshrc".source = "${vanilla}/zsh/.zshrc";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
-    
-    # --- NVIM ---
     "nvim".source = inputs.nvim;
   };
 
@@ -129,10 +155,10 @@ in
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
-      rev = "v3.1.0"; 
+      rev = "v3.1.0";
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
   };
 
-  home.stateVersion = "25.05";
+  home.stateVersion = "25.11";
 }

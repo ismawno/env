@@ -34,6 +34,7 @@ in
     polkit_gnome
 
     firefox
+    librewolf
     ghostty
     nemo
     nemo-fileroller
@@ -41,6 +42,7 @@ in
     spotify
     cava
     ollama
+    smile
 
     nodejs_22
     tmux
@@ -53,7 +55,7 @@ in
     jetbrains-mono
     noto-fonts
     noto-fonts-color-emoji
-    
+
     neofetch
     shellcheck
     stylua
@@ -102,7 +104,7 @@ in
   gtk = {
     enable = true;
     theme = {
-      name = "Gruvbox-Dark-BL";
+      name = "Gruvbox-Light";
       package = pkgs.gruvbox-gtk-theme;
     };
     iconTheme = {
@@ -110,24 +112,24 @@ in
       package = pkgs.gruvbox-dark-icons-gtk;
     };
     cursorTheme = {
-      name = "Bibata-Modern-Classic";
+      name = "Bibata-Modern-Ice";
       package = pkgs.bibata-cursors;
     };
     gtk3.extraConfig = {
       Settings = ''
-        gtk-application-prefer-dark-theme=1
+        gtk-application-prefer-dark-theme=0
       '';
     };
     gtk4.extraConfig = {
       Settings = ''
-        gtk-application-prefer-dark-theme=1
+        gtk-application-prefer-dark-theme=0
       '';
     };
   };
 
   home.pointerCursor = {
     gtk.enable = true;
-    name = "Bibata-Modern-Classic";
+    name = "Bibata-Modern-Ice";
     package = pkgs.bibata-cursors;
     size = 24;
   };

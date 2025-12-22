@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if a file and line number are provided
 if [[ $# -ne 2 ]]; then

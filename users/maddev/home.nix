@@ -33,9 +33,8 @@ in
     nwg-look
     polkit_gnome
 
-    firefox
-    librewolf
-    ghostty
+    librewolf    # Main Browser
+    ghostty      # Main Terminal
     nemo
     nemo-fileroller
     mpv
@@ -43,6 +42,9 @@ in
     cava
     ollama
     smile
+
+    # Helper for sunset script (Note: using wlsunset is often safer on stable)
+    hyprsunset
 
     nodejs_22
     tmux
@@ -101,7 +103,7 @@ in
     };
   };
 
-  # Cursor and Theme Environment Variables
+  # Enforce Cursor and Theme Variables
   home.sessionVariables = {
     XCURSOR_THEME = "Bibata-Modern-Ice";
     XCURSOR_SIZE = "24";
@@ -138,7 +140,7 @@ in
 
   home.pointerCursor = {
     gtk.enable = true;
-    x11.enable = true; # Important for some apps
+    x11.enable = true;
     name = "Bibata-Modern-Ice";
     package = pkgs.bibata-cursors;
     size = 24;

@@ -18,7 +18,12 @@
         device = "nodev";
       };
       
-      grub2-theme.enable = false;
+      grub2-theme = {
+        enable = true;
+        theme = "whitesur";
+        footer = true;
+      };
+
     };
 
     consoleLogLevel = 3;
@@ -34,10 +39,10 @@
 
     plymouth = {
       enable = true;
-      theme = "abstract_ring_alt";
+      theme = "pixels";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "abstract_ring_alt" ];
+          selected_themes = [ "pixels" ];
         })
       ];
     };

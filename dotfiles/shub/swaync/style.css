@@ -82,7 +82,7 @@
 }
 
 .control-center-list {
-  background: transparent;
+  background: alpha(black, 0.1);
 }
 
 .control-center-list-placeholder {
@@ -90,12 +90,12 @@
 }
 
 .floating-notifications {
-  background: transparent;
+  background: alpha(black, 0.1);
 }
 
 .blank-window {
-  background: transparent;
-  background: transparent;
+  background: alpha(black, 0.1);
+  background: alpha(black, 0.1);
 }
 
 .widget-title {

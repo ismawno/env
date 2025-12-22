@@ -20,7 +20,7 @@
 
       grub2-theme = {
         enable = true;
-        theme = "tela";
+        theme = "vimix";
         footer = true;
       };
 

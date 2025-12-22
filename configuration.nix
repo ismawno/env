@@ -39,10 +39,10 @@
 
     plymouth = {
       enable = true;
-      theme = "solar";
+      theme = "abstract_ring_alt";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "solar" ];
+          selected_themes = [ "abstract_ring_alt" ];
         })
       ];
     };
@@ -107,6 +107,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.05"; # Did you read the comment?
+  system.stateVersion = "25.11"; # Did you read the comment?
 
 }

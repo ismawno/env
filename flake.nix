@@ -48,7 +48,7 @@
           hostConfig = ./hosts/${host}/configuration.nix;
 
           mkUser = user: {
-            home.stateVersion = "25.05";
+            home.stateVersion = "25.11";
             imports = mkUserModule {
               host = host;
               user = user;

@@ -17,13 +17,6 @@
         efiSupport = true;
         device = "nodev";
       };
-
-      grub2-theme = {
-        enable = true;
-        theme = "whitesur";
-        footer = true;
-      };
-
     };
 
     consoleLogLevel = 3;

@@ -82,7 +82,7 @@
 }
 
 .control-center-list {
-  background: alpha(black, 0.1);
+  background: transparent;
 }
 
 .control-center-list-placeholder {
@@ -90,11 +90,10 @@
 }
 
 .floating-notifications {
-  background: alpha(black, 0.1);
+  background: transparent;
 }
 
 .blank-window {
-  background: alpha(black, 0.1);
   background: alpha(black, 0.1);
 }
 

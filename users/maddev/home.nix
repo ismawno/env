@@ -101,6 +101,15 @@ in
     };
   };
 
+  # Cursor and Theme Environment Variables
+  home.sessionVariables = {
+    XCURSOR_THEME = "Bibata-Modern-Ice";
+    XCURSOR_SIZE = "24";
+    HYPRCURSOR_THEME = "Bibata-Modern-Ice";
+    HYPRCURSOR_SIZE = "24";
+    GTK_THEME = "Gruvbox-Light";
+  };
+
   gtk = {
     enable = true;
     theme = {
@@ -129,6 +138,7 @@ in
 
   home.pointerCursor = {
     gtk.enable = true;
+    x11.enable = true; # Important for some apps
     name = "Bibata-Modern-Ice";
     package = pkgs.bibata-cursors;
     size = 24;

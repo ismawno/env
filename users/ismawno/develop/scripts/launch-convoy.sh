@@ -2,6 +2,7 @@
 
 toolkit="$HOME/toolkit"
 vulkit="$HOME/vulkit"
+vulkit="$HOME/onyx"
 
 convoy="$HOME/convoy/src"
 feach="$convoy/for_each.py"

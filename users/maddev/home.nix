@@ -20,6 +20,10 @@ in
     gdu
     imagemagick
 
+    gcc
+    gnumake
+    fd
+
     waybar
     hyprpaper
     hyprlock
@@ -33,8 +37,8 @@ in
     nwg-look
     polkit_gnome
 
-    librewolf    # Main Browser
-    ghostty      # Main Terminal
+    librewolf
+    ghostty
     nemo
     nemo-fileroller
     mpv
@@ -43,7 +47,6 @@ in
     ollama
     smile
 
-    # Helper for sunset script (Note: using wlsunset is often safer on stable)
     hyprsunset
 
     nodejs_22
@@ -103,7 +106,6 @@ in
     };
   };
 
-  # Enforce Cursor and Theme Variables
   home.sessionVariables = {
     XCURSOR_THEME = "Bibata-Modern-Ice";
     XCURSOR_SIZE = "24";

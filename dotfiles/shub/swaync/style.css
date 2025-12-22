@@ -94,7 +94,7 @@
 }
 
 .blank-window {
-  background: transparent;
+  background: alpha(black, 0.1);
 }
 
 .widget-title {

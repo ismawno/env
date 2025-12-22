@@ -17,6 +17,8 @@
         efiSupport = true;
         device = "nodev";
       };
+      
+      grub2-theme.enable = false;
     };
 
     consoleLogLevel = 3;

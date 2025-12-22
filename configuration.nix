@@ -20,7 +20,7 @@
 
       grub2-theme = {
         enable = true;
-        theme = "vimix";
+        theme = "tela";
         footer = true;
       };
 
@@ -39,10 +39,10 @@
 
     plymouth = {
       enable = true;
-      theme = "colorful_loop";
+      theme = "solar";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "colorful_loop" ];
+          selected_themes = [ "solar" ];
         })
       ];
     };

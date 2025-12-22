@@ -1,4 +1,4 @@
 #!/bin/bash
 
 killall waybar
-waybar -c ~/.config/dotfiles/waybar/lumi-config -s ~/.config/dotfiles/waybar/style.css &
+waybar -c ~/.config/waybar/lumi-config -s ~/.config/waybar/style.css &

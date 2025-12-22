@@ -4,6 +4,6 @@
 
 killall waybar
 killall swaync
-waybar -c ~/.config/dotfiles/waybar/config -s ~/.config/dotfiles/waybar/style.css &
-swaync -s ~/.config/dotfiles/swaync/style.css -c ~/.config/dotfiles/swaync/config.json &
-notify-send --app-name=HOME -i ~/.config/dotfiles/fastfetch/moon.png Hello
+waybar -c ~/.config/waybar/config -s ~/.config/waybar/style.css &
+swaync -s ~/.config/swaync/style.css -c ~/.config/swaync/config.json &
+notify-send --app-name=HOME -i ~/.config/fastfetch/moon.png Hello

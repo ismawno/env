@@ -31,7 +31,7 @@ nix flake update nvim
 
 echo "Rebuilding user $USER..."
 
-home-manager switch --flake "$FLAKE_PATH"
+home-manager switch --flake "$FLAKE_PATH" -b backup
 
 current=$(home-manager generations | head -n1 | awk '{print $5}')
 

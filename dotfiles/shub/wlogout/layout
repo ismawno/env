@@ -12,7 +12,7 @@
 }
 {
     "label" : "suspend",
-    "action" : "hyprlock -c ~/.config/dotfiles/hyprland/hyprlock/hyprlock.conf & systemctl suspend",
+    "action" : "hyprlock -c ~/.config/hypr/hyprlock/hyprlock.conf & systemctl suspend",
     "text" : "Suspend",
     "keybind" : "u"
 }
@@ -24,7 +24,7 @@
 }
 {
     "label" : "lock",
-    "action" : "~/.config/dotfiles/hyprland/scripts/lockscreen.sh",
+    "action" : "~/.config/hypr/scripts/lockscreen.sh",
     "text" : "Lock",
     "keybind" : "l"
 }

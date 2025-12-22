@@ -20,7 +20,7 @@ fi
 
 # If multiple devices are connected, prompt to select one
 if [ "$device_count" -gt 1 ]; then
-    selected_device=$(echo "$devices" | rofi -dmenu -config ~/.config/dotfiles/rofi/config.rasi -p "Select Device: ")
+    selected_device=$(echo "$devices" | rofi -dmenu -config ~/.config/rofi/config.rasi -p "Select Device: ")
 else
     selected_device=$(echo "$devices")
 fi
@@ -35,7 +35,7 @@ fi
 options="Video\nNo Video\nVideo & Audio"
 
 # Prompt to select the SCRCPY mode
-selected_option=$(echo -e "$options" | rofi -dmenu -config ~/.config/dotfiles/rofi/config.rasi -p "Select SCRCPY mode: ")
+selected_option=$(echo -e "$options" | rofi -dmenu -config ~/.config/rofi/config.rasi -p "Select SCRCPY mode: ")
 
 # Run scrcpy with the selected mode and device
 case "$selected_option" in

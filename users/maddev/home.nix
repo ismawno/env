@@ -57,7 +57,7 @@ in
     gruvbox-gtk-theme
     gruvbox-dark-icons-gtk
     bibata-cursors
-    jetbrains-mono
+    nerd-fonts.jetbrains-mono
     noto-fonts
     noto-fonts-color-emoji
 
@@ -77,6 +77,8 @@ in
     cmake-format
     glsl_analyzer
   ];
+
+  fonts.fontconfig.enable = true;
 
   programs.git = {
     enable = true;
@@ -116,6 +118,10 @@ in
 
   gtk = {
     enable = true;
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 11;
+    };
     theme = {
       name = "Gruvbox-Light";
       package = pkgs.gruvbox-gtk-theme;

@@ -20,6 +20,7 @@ in
   home.packages = with pkgs; [
     bash-language-server
     black
+    blender
     catppuccin-cursors.mochaDark
     cava
     cloc

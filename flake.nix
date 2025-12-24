@@ -117,11 +117,6 @@
           host = "razor";
           users = [ "ismawno" ];
         };
-
-        smalltop = mkHost {
-          host = "smalltop";
-          users = [ "maddev" ];
-        };
       };
       homeConfigurations = {
         "ismawno@nomad" = mkHome {
@@ -137,11 +132,6 @@
         "ismawno@razor" = mkHome {
           host = "razor";
           user = "ismawno";
-        };
-
-        "maddev@smalltop" = mkHome {
-          host = "smalltop";
-          user = "maddev";
         };
       };
     };

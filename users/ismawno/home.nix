@@ -26,6 +26,7 @@ in
     cloc
     cmake-format
     cmake-language-server
+    fastfetch
     firefox
     fzf
     gdu
@@ -36,7 +37,6 @@ in
     hyprpaper
     lua-language-server
     mpv
-    neofetch
     nixfmt-rfc-style
     nodePackages_latest.prettier
     nodejs_22

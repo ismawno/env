@@ -48,7 +48,6 @@ in
     shfmt
     spotify
     stylua
-    slang
     tmux
     unzip
     vscode-extensions.vadimcn.vscode-lldb.adapter

@@ -26,6 +26,7 @@ in
     cloc
     cmake-format
     cmake-language-server
+    discord
     fastfetch
     firefox
     fzf

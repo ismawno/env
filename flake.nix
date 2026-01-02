@@ -26,6 +26,7 @@
         "spotify"
         "nvidia-x11"
         "nvidia-settings"
+        "discord"
       ];
       mkUserModule =
         { host, user }:

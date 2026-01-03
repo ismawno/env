@@ -32,7 +32,6 @@ in
     fzf
     gdu
     ghostty
-    glsl_analyzer
     htop
     hwloc
     hyprpaper

@@ -39,8 +39,7 @@ in
 
     librewolf
     ghostty
-    nemo
-    nemo-fileroller
+    kdePackages.dolphin
     mpv
     spotify
     cava

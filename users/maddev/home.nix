@@ -53,7 +53,9 @@ in
     tmux
     hwloc
     pulseaudio
-
+    
+    nmap
+    
     gruvbox-gtk-theme
     gruvbox-dark-icons-gtk
     bibata-cursors

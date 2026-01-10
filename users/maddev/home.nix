@@ -53,6 +53,7 @@ in
     hwloc
     pulseaudio
     
+    wget    
     nmap
     
     gruvbox-gtk-theme

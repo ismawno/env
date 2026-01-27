@@ -24,6 +24,8 @@ in
     gnumake
     fd
 
+    wakeonlan
+
     waybar
     hyprpaper
     hyprlock

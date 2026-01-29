@@ -85,6 +85,61 @@ in
     glsl_analyzer
   ];
 
+  xdg.desktopEntries.mpv = {
+    name = "mpv";
+    genericName = "Multimedia Player";
+    exec = "mpv --player-operation-mode=pseudo-gui %U";
+    terminal = false;
+    categories = [ "AudioVideo" "Audio" "Video" "Player" ];
+    mimeType = [ "video/mp4" "video/mkv" "video/webm" ]; # (You can list more here if you want)
+  };
+
+  xdg.desktopEntries.imv = {
+    name = "imv";
+    genericName = "Image Viewer";
+    exec = "imv %f";
+    terminal = false;
+    categories = [ "Graphics" "Viewer" ];
+    mimeType = [ "image/bmp" "image/gif" "image/jpeg" "image/jpg" "image/png" "image/tiff" "image/webp" ];
+  };
+
+  # Associate MIME types for video and image opening
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      # --- Images (imv) ---
+      "image/bmp" = [ "imv.desktop" ];
+      "image/gif" = [ "imv.desktop" ];
+      "image/jpeg" = [ "imv.desktop" ];
+      "image/jpg" = [ "imv.desktop" ];
+      "image/pjpeg" = [ "imv.desktop" ];
+      "image/png" = [ "imv.desktop" ];
+      "image/tiff" = [ "imv.desktop" ];
+      "image/webp" = [ "imv.desktop" ];
+      "image/x-bmp" = [ "imv.desktop" ];
+      "image/x-pcx" = [ "imv.desktop" ];
+      "image/x-png" = [ "imv.desktop" ];
+      "image/x-portable-anymap" = [ "imv.desktop" ];
+      "image/x-portable-bitmap" = [ "imv.desktop" ];
+      "image/x-portable-graymap" = [ "imv.desktop" ];
+      "image/x-portable-pixmap" = [ "imv.desktop" ];
+      "image/x-tga" = [ "imv.desktop" ];
+      "image/x-xbitmap" = [ "imv.desktop" ];
+      "image/heic" = [ "imv.desktop" ];
+
+      # --- Videos (mpv) ---
+      "video/mp4" = [ "mpv.desktop" ];
+      "video/mkv" = [ "mpv.desktop" ];
+      "video/x-matroska" = [ "mpv.desktop" ];
+      "video/webm" = [ "mpv.desktop" ];
+      "video/quicktime" = [ "mpv.desktop" ]; # .mov files
+      "video/x-msvideo" = [ "mpv.desktop" ]; # .avi files
+      "video/x-flv" = [ "mpv.desktop" ];
+      "video/mpeg" = [ "mpv.desktop" ];
+      "video/ogg" = [ "mpv.desktop" ];
+    };
+  };
+
   fonts.fontconfig.enable = true;
 
   programs.git = {

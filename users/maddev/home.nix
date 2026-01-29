@@ -54,7 +54,8 @@ in
     tmux
     hwloc
     pulseaudio
-    
+
+    geeqie 
     wget    
     nmap
     

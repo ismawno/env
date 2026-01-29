@@ -55,7 +55,7 @@ in
     hwloc
     pulseaudio
 
-    geeqie 
+    imv 
     wget    
     nmap
     

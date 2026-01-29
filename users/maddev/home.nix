@@ -19,9 +19,13 @@ in
     htop
     gdu
     imagemagick
-    
-    kdePackages.kservice
-    kdePackages.kio-extras
+
+    xfce.thunar                
+    xfce.thunar-archive-plugin 
+    xfce.thunar-volman         
+    xfce.tumbler               
+
+    gvfs
 
     gcc
     gnumake
@@ -44,7 +48,6 @@ in
 
     librewolf
     ghostty
-    kdePackages.dolphin
     mpv
     spotify
     cava

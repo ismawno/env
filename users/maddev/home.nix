@@ -56,6 +56,8 @@ in
     pulseaudio
 
     imv 
+    mpv
+    
     wget    
     nmap
     

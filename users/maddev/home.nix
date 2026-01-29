@@ -113,6 +113,7 @@ in
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
+      "inode/directory" = [ "thunar.desktop" ]; 
       # --- Images (imv) ---
       "image/bmp" = [ "imv.desktop" ];
       "image/gif" = [ "imv.desktop" ];

@@ -101,11 +101,16 @@
     wireplumber.enable = true;
   };
 
-  services.samba = {
+  services.avahi = {
     enable = true;
-    winbindd.enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
   };
-
+  
+  services.gvfs = {
+    enable = true;
+    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

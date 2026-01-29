@@ -19,6 +19,9 @@ in
     htop
     gdu
     imagemagick
+    
+    kdePackages.kservice
+    kdePackages.kio-extras
 
     gcc
     gnumake

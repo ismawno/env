@@ -12,12 +12,10 @@ let
 in
 {  
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "discord"
     "spotify"
     "vesktop"
   ];
   home.packages = with pkgs; [
-    discord 
     vesktop
 
     zoxide

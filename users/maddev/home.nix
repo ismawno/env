@@ -11,7 +11,10 @@ let
   vanilla = ../../dotfiles/vanilla;
 in
 {  
-  nixpkgs.config.allowUnfree = true; #Discord is proprietary
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+    "discord"
+    "spotify" # Example of adding more later
+  ];
   home.packages = with pkgs; [
     zoxide
     ripgrep
@@ -20,8 +23,7 @@ in
     htop
     gdu
     imagemagick
-    discord
-
+    
     xfce.thunar                
     xfce.thunar-archive-plugin 
     xfce.thunar-volman         

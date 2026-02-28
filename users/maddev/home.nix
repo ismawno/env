@@ -10,11 +10,13 @@ let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
 in
-{  
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-    "spotify"
-    "vesktop"
-  ];
+{
+  nixpkgs.config.allowUnfreePredicate =
+    pkg:
+    builtins.elem (lib.getName pkg) [
+      "spotify"
+      "vesktop"
+    ];
   home.packages = with pkgs; [
     vesktop
 
@@ -25,11 +27,11 @@ in
     htop
     gdu
     imagemagick
-    
-    xfce.thunar                
-    xfce.thunar-archive-plugin 
-    xfce.thunar-volman         
-    xfce.tumbler               
+
+    xfce.thunar
+    xfce.thunar-archive-plugin
+    xfce.thunar-volman
+    xfce.tumbler
 
     gvfs
 
@@ -67,12 +69,12 @@ in
     hwloc
     pulseaudio
 
-    imv 
+    imv
     mpv
-    
-    wget    
+
+    wget
     nmap
-    
+
     gruvbox-gtk-theme
     gruvbox-dark-icons-gtk
     bibata-cursors
@@ -102,8 +104,17 @@ in
     genericName = "Multimedia Player";
     exec = "mpv --player-operation-mode=pseudo-gui %U";
     terminal = false;
-    categories = [ "AudioVideo" "Audio" "Video" "Player" ];
-    mimeType = [ "video/mp4" "video/mkv" "video/webm" ]; # (You can list more here if you want)
+    categories = [
+      "AudioVideo"
+      "Audio"
+      "Video"
+      "Player"
+    ];
+    mimeType = [
+      "video/mp4"
+      "video/mkv"
+      "video/webm"
+    ]; # (You can list more here if you want)
   };
 
   xdg.desktopEntries.imv = {
@@ -111,15 +122,26 @@ in
     genericName = "Image Viewer";
     exec = "imv %f";
     terminal = false;
-    categories = [ "Graphics" "Viewer" ];
-    mimeType = [ "image/bmp" "image/gif" "image/jpeg" "image/jpg" "image/png" "image/tiff" "image/webp" ];
+    categories = [
+      "Graphics"
+      "Viewer"
+    ];
+    mimeType = [
+      "image/bmp"
+      "image/gif"
+      "image/jpeg"
+      "image/jpg"
+      "image/png"
+      "image/tiff"
+      "image/webp"
+    ];
   };
 
   # Associate MIME types for video and image opening
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
-      "inode/directory" = [ "thunar.desktop" ]; 
+      "inode/directory" = [ "thunar.desktop" ];
       # --- Images (imv) ---
       "image/bmp" = [ "imv.desktop" ];
       "image/gif" = [ "imv.desktop" ];
@@ -255,11 +277,12 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
   };
-    xdg.portal = {
+
+  xdg.portal = {
     enable = true;
-    extraPortals = [ 
-      pkgs.xdg-desktop-portal-hyprland 
-      pkgs.xdg-desktop-portal-gtk 
+    extraPortals = [
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk
     ];
     config = {
       common = {

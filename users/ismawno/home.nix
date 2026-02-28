@@ -7,42 +7,42 @@
 
 {
   home.packages = with pkgs; [
-    zoxide
-    ghostty
-    ripgrep
-    wofi
-    fzf
-    waybar
-    hyprpaper
-    firefox
-    nodejs_22
-    unzip
-    tmux
-    hwloc
-    pulseaudio
-    catppuccin-cursors.mochaDark
-    neofetch
-    htop
-    shellcheck
-    stylua
-    lua-language-server
-    vscode-extensions.vadimcn.vscode-lldb.adapter
-    nixfmt-rfc-style
-    vscode-langservers-extracted
-    nodePackages_latest.prettier
-    black
-    pyright
-    shfmt
     bash-language-server
-    cmake-language-server
-    cmake-format
-    glsl_analyzer
-    # maybe temporary
-    mpv
-    spotify
+    black
+    blender
+    catppuccin-cursors.mochaDark
     cava
-    ollama
+    cloc
+    cmake-format
+    cmake-language-server
+    discord
+    fastfetch
+    firefox
+    fzf
     gdu
+    ghostty
+    htop
+    hwloc
+    hyprpaper
+    lua-language-server
+    mpv
+    nixfmt-rfc-style
+    nodePackages_latest.prettier
+    nodejs_22
+    ollama
+    pulseaudio
+    pyright
+    ripgrep
+    shellcheck
+    shfmt
+    spotify
+    stylua
+    tmux
+    unzip
+    vscode-extensions.vadimcn.vscode-lldb.adapter
+    vscode-langservers-extracted
+    waybar
+    wofi
   ];
 
   programs.git = {

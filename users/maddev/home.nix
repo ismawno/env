@@ -13,9 +13,11 @@ in
 {  
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
     "discord"
-    "spotify" # Example of adding more later
+    "spotify"
   ];
   home.packages = with pkgs; [
+    discord 
+
     zoxide
     ripgrep
     fzf

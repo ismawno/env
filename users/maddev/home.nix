@@ -10,7 +10,8 @@ let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
 in
-{
+{  
+  nixpkgs.config.allowUnfree = true; #Discord is proprietary
   home.packages = with pkgs; [
     zoxide
     ripgrep
@@ -19,6 +20,7 @@ in
     htop
     gdu
     imagemagick
+    discord
 
     xfce.thunar                
     xfce.thunar-archive-plugin 

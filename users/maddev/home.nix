@@ -12,7 +12,7 @@ let
 in
 {
   home.packages = with pkgs; [
-    vesktop
+    discord
 
     zoxide
     ripgrep

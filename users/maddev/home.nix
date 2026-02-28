@@ -239,7 +239,6 @@ in
     "swaync".source = "${shub}/swaync";
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
-    "kitty".source = "${shub}/kitty";
     "backgrounds".source = "${shub}/backgrounds";
     "ghostty".source = "${vanilla}/ghostty/.config/ghostty";
     "zsh/.zshrc".source = "${vanilla}/zsh/.zshrc";
@@ -254,6 +253,20 @@ in
       repo = "tpm";
       rev = "v3.1.0";
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
+    };
+  };
+    xdg.portal = {
+    enable = true;
+    extraPortals = [ 
+      pkgs.xdg-desktop-portal-hyprland 
+      pkgs.xdg-desktop-portal-gtk 
+    ];
+    config = {
+      common = {
+        default = [ "gtk" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+        "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
+      };
     };
   };
 

@@ -11,12 +11,6 @@ let
   vanilla = ../../dotfiles/vanilla;
 in
 {
-  nixpkgs.config.allowUnfreePredicate =
-    pkg:
-    builtins.elem (lib.getName pkg) [
-      "spotify"
-      "vesktop"
-    ];
   home.packages = with pkgs; [
     vesktop
 

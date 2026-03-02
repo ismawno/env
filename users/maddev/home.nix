@@ -26,6 +26,8 @@ in
     xfce.thunar-archive-plugin
     xfce.thunar-volman
     xfce.tumbler
+    file-roller
+    unzip
 
     gvfs
 

@@ -32,6 +32,7 @@ in
     fzf
     gdu
     ghostty
+    grim
     htop
     hwloc
     hyprpaper

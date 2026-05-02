@@ -119,6 +119,11 @@
           users = [ "ismawno" ];
         };
 
+        bigsys = mkHost {
+          host = "bigsys";
+          users = [ "maddev" ];
+        };
+
         smalltop = mkHost {
           host = "smalltop";
           users = [ "maddev" ];
@@ -138,6 +143,11 @@
         "ismawno@razor" = mkHome {
           host = "razor";
           user = "ismawno";
+        };
+
+        "maddev@bigsys" = mkHome {
+          host = "bigsys";
+          user = "maddev";
         };
 
         "maddev@smalltop" = mkHome {

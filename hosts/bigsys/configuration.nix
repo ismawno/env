@@ -25,6 +25,8 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
   boot.loader.grub.useOSProber = true;
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   fileSystems."/" =
     { device = "/dev/mapper/luks-57ce758c-724d-46d8-a858-b645e4426b57";

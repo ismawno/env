@@ -26,18 +26,22 @@
   boot.extraModulePackages = [ ];
   boot.loader.grub.useOSProber = true;
 
-  fileSystems."/" =
-    { device = "/dev/mapper/luks-57ce758c-724d-46d8-a858-b645e4426b57";
-      fsType = "ext4";
-    };
+  fileSystems."/" = {
+    device = "/dev/mapper/luks-57ce758c-724d-46d8-a858-b645e4426b57";
+    fsType = "ext4";
+  };
 
-  boot.initrd.luks.devices."luks-57ce758c-724d-46d8-a858-b645e4426b57".device = "/dev/disk/by-uuid/57ce758c-724d-46d8-a858-b645e4426b57";
+  boot.initrd.luks.devices."luks-57ce758c-724d-46d8-a858-b645e4426b57".device =
+    "/dev/disk/by-uuid/57ce758c-724d-46d8-a858-b645e4426b57";
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/AF02-9640";
-      fsType = "vfat";
-      options = [ "fmask=0077" "dmask=0077" ];
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/AF02-9640";
+    fsType = "vfat";
+    options = [
+      "fmask=0077"
+      "dmask=0077"
+    ];
+  };
 
   swapDevices = [ ];
 
@@ -61,6 +65,16 @@
     ];
     packages = with pkgs; [ ];
     shell = pkgs.zsh;
+  };
+
+  # 1. Allow unfree for Discord/Spotify
+  nixpkgs.config.allowUnfree = lib.mkForce true;
+
+  # GPU acceleration on wayland
+  hardware.graphics.enable = lib.mkForce true;
+
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
   };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

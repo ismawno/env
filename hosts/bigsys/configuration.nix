@@ -74,13 +74,33 @@
     shell = pkgs.zsh;
   };
 
-  # 1. Allow unfree for Discord/Spotify
+  # Allow unfree for Discord/Spotify
   nixpkgs.config.allowUnfree = lib.mkForce true;
 
+  # Enable the NVIDIA driver
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.nvidia = {
+    modesetting.enable = true;
+    powerManagement.enable = false;
+    powerManagement.finegrained = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    open = false;
+  };
+  boot.kernelParams = [
+    "nvidia_drm.modeset=1"
+    "nvidia_drm.fbdev=1"
+  ];
   # GPU acceleration on wayland
   hardware.graphics.enable = lib.mkForce true;
 
   environment.sessionVariables = {
+    # WLR_NO_HARDWARE_CURSORS = "1";
+
+    # Direct Wayland to use NVIDIA
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     NIXOS_OZONE_WL = "1";
   };
 

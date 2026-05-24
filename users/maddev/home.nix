@@ -93,6 +93,7 @@ in
     cmake-language-server
     cmake-format
     glsl_analyzer
+    python3
   ];
 
   xdg.desktopEntries.mpv = {

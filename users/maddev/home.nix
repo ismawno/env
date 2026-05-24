@@ -54,6 +54,7 @@ in
     ghostty
     mpv
     spotify
+    obs-studio
     cava
     ollama
     smile

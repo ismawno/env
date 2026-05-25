@@ -97,7 +97,7 @@ alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 
 alias tkit-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 alias vkit-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build --not-match-f="loader\.hpp|loader\.cpp"'
-alias onyx-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build --not-match-f="spirv\.hpp|onyx/source/font\.hpp"'
+alias onyx-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build --not-match-f="spirv\.hpp|/source/font\.hpp"'
 
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"

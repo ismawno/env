@@ -95,6 +95,10 @@ alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
 alias airpods="bluetoothctl connect F0:04:E1:D5:04:DB"
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 
+alias tkit-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
+alias vkit-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build --not-match-f="loader\.hpp|loader\.cpp"'
+alias onyx-cloc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build --not-match-f="spirv\.hpp|ttf\.hpp"'
+
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 

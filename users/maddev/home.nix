@@ -179,7 +179,7 @@ in
     enable = true;
     settings = {
       user.name = "Mars-Wave";
-      user.email = "tmorolias@protonmail.com";
+      user.email = "57585293+Mars-Wave@users.noreply.github.com";
       credential.helper = "store";
     };
   };

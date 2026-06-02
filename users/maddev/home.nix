@@ -14,7 +14,7 @@ in
   home.packages = with pkgs; [
     caligula
     discord
-
+    caligula
     zoxide
     ripgrep
     fzf

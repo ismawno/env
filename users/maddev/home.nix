@@ -114,7 +114,7 @@ in
       "video/mp4"
       "video/mkv"
       "video/webm"
-    ]; # (You can list more here if you want)
+    ];
   };
 
   xdg.desktopEntries.imv = {

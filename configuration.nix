@@ -17,10 +17,10 @@
         efiSupport = true;
         device = "nodev";
       };
-      
+
       grub2-theme = {
         enable = true;
-        theme = "whitesur";
+        theme = "avahi";
         footer = true;
       };
 
@@ -39,10 +39,10 @@
 
     plymouth = {
       enable = true;
-      theme = "pixels";
+      theme = "colorful_loop";
       themePackages = with pkgs; [
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "pixels" ];
+          selected_themes = [ "colorful_loop" ];
         })
       ];
     };
@@ -113,17 +113,6 @@
     alsa.enable = true;
     pulse.enable = true;
     wireplumber.enable = true;
-  };
-
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-  
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
   };
 
   # This value determines the NixOS release from which the default

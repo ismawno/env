@@ -67,6 +67,31 @@
     shell = pkgs.zsh;
   };
 
+  # Network storage shares via samba or otherwise
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  # Network storage shares via samba or otherwise
+  services.gvfs = {
+    enable = true;
+    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
+  };
+
+  boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
+  boot.plymouth.theme = lib.mkForce "pixels";
+
+  boot.plymouth.themePackages = lib.mkForce (
+    with pkgs;
+    [
+      (adi1090x-plymouth-themes.override {
+        selected_themes = [ "pixels" ];
+      })
+    ]
+  );
+
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction

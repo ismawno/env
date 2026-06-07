@@ -2,8 +2,8 @@
   description = "NixOS + Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nvim.url = "github:ismawno/nvim";
     grub2-themes.url = "github:vinceliuice/grub2-themes";
@@ -49,7 +49,7 @@
           hostConfig = ./hosts/${host}/configuration.nix;
 
           mkUser = user: {
-            home.stateVersion = "25.11";
+            home.stateVersion = "25.05";
             imports = mkUserModule {
               host = host;
               user = user;
@@ -156,4 +156,4 @@
         };
       };
     };
-}
+} 

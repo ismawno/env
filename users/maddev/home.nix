@@ -178,9 +178,9 @@ in
 
   programs.git = {
     enable = true;
-    settings = {
-      user.name = "Mars-Wave";
-      user.email = "57585293+Mars-Wave@users.noreply.github.com";
+    userName = "Mars-Wave";
+    userEmail = "57585293+Mars-Wave@users.noreply.github.com";
+    extraConfig = {
       credential.helper = "store";
     };
   };
@@ -193,7 +193,6 @@ in
 
   programs.starship.enable = true;
   programs.zsh = {
-    enable = true;
     sessionVariables = {
       MAD_ENV_PATH = "/home/maddev/env";
       MAD_NVIM_PATH = "/home/maddev/nvim";
@@ -251,7 +250,7 @@ in
     size = 24;
   };
 
-  home.username = "maddev";
+  home.username = lib.mkForce "maddev";
   home.homeDirectory = lib.mkForce "/home/maddev";
 
   xdg.configFile = {
@@ -262,13 +261,14 @@ in
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
     "backgrounds".source = "${shub}/backgrounds";
-    "ghostty".source = "${vanilla}/ghostty/.config/ghostty";
-    "zsh/.zshrc".source = "${vanilla}/zsh/.zshrc";
+    "ghostty".source = "${shub}/ghostty/.config/ghostty";
+    "zsh/.zshrc".source = "${shub}/zsh/.zshrc";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
     "nvim".source = inputs.nvim;
   };
 
   home.file = {
+    ".zshrc".source = "${shub}/zsh/.zshrc";
     ".tmux.conf".source = "${vanilla}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
@@ -293,5 +293,5 @@ in
     };
   };
 
-  home.stateVersion = "25.11";
+  home.stateVersion = "25.05";
 }

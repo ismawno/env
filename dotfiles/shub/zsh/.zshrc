@@ -125,4 +125,22 @@ command_not_found_handler() {
   return 127
 }
 
+# 1. Faster ESC switching (default is 0.4s delay, which feels laggy)
+export KEYTIMEOUT=1
+
+# 2. Fix Backspace: In some zsh versions, backspace stops working in Vi mode
+# after returning from Normal mode. This fix ensures it always works.
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+
+# 3. Restore Ctrl+R for FZF (Searching history with / is okay, but fzf is better)
+# This makes Ctrl+R work even though you are in Vi Mode
+bindkey -M viins '^R' fzf-history-widget
+bindkey -M vicmd '^R' fzf-history-widget
+
+# 4. Use 'vv' in Normal Mode to open the current command in NVIM
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd 'vv' edit-command-line
+
 eval "$(starship init zsh)"

@@ -48,6 +48,7 @@ in
     hyprpicker
     hyprshot
     copyq
+    wl-clipboard
     nwg-look
     polkit_gnome
 
@@ -210,6 +211,7 @@ in
     HYPRCURSOR_SIZE = "24";
     GTK_THEME = "Gruvbox-Light";
     THUNARX_DIRS = "$HOME/.nix-profile/lib/thunarx-3";
+    XDG_SESSION_TYPE = "wayland";
   };
 
   gtk = {

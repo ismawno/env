@@ -118,6 +118,16 @@
           host = "razor";
           users = [ "ismawno" ];
         };
+
+        bigsys = mkHost {
+          host = "bigsys";
+          users = [ "maddev" ];
+        };
+
+        smalltop = mkHost {
+          host = "smalltop";
+          users = [ "maddev" ];
+        };
       };
       homeConfigurations = {
         "ismawno@nomad" = mkHome {
@@ -134,6 +144,16 @@
           host = "razor";
           user = "ismawno";
         };
+
+        "maddev@bigsys" = mkHome {
+          host = "bigsys";
+          user = "maddev";
+        };
+
+        "maddev@smalltop" = mkHome {
+          host = "smalltop";
+          user = "maddev";
+        };
       };
     };
-}
+} 

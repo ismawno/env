@@ -2,10 +2,21 @@
   config,
   pkgs,
   inputs,
+  lib,
   ...
 }:
 
+let
+  projectdir = ../..;
+  username = "ismawno";
+  dotfiles = "${projectdir}/dotfiles/vanilla";
+  homedir = "/home/${username}";
+  userdir = "${projectdir}/users/${username}";
+in
 {
+  home.username = "${username}";
+  home.homeDirectory = "${homedir}";
+
   home.packages = with pkgs; [
     bash-language-server
     black
@@ -44,14 +55,16 @@
     vscode-langservers-extracted
     waybar
     wofi
+    zoxide
   ];
 
   programs.git = {
     enable = true;
-    userName = "Ismael Bueno";
-    userEmail = "ismaelwno@gmail.com";
-    extraConfig = {
+    settings = {
+      user.name = "Ismael Bueno";
+      user.email = "ismaelwno@gmail.com";
       credential.helper = "store";
+      push.autoSetupRemote = true;
     };
   };
   programs.vim.enable = true;
@@ -70,14 +83,24 @@
       WNO_ONYX_PATH = "/home/ismawno/onyx";
       WNO_DRIZZLE_PATH = "/home/ismawno/drizzle";
     };
+    dotDir = "${config.home.homeDirectory}/.config/zsh";
   };
 
-  home.username = "ismawno";
-  home.homeDirectory = "/home/ismawno";
+  home.activation.copyDevelop = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    echo "Copying develop directory..."
+
+    [ -d "$HOME/develop" ] && chmod -R u+rwX "$HOME/develop"
+
+    rm -f "$HOME/develop/flake.nix"
+    rm -rf "$HOME/develop/scripts"
+    mkdir -p "$HOME/develop"
+
+    cp "${userdir}/develop/flake.nix" "$HOME/develop"
+    cp -r "${userdir}/develop/scripts" "$HOME/develop"
+  '';
 
   home.file = {
-    ".zshrc".source = ../../users/ismawno/dotfiles/zsh/.zshrc;
-    ".tmux.conf".source = ../../users/ismawno/dotfiles/tmux/.tmux.conf;
+    ".tmux.conf".source = "${dotfiles}/tmux/.tmux.conf";
     ".tmux/plugins/tpm".source = pkgs.fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tpm";
@@ -85,17 +108,19 @@
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
 
-    ".config/starship.toml".source = ../../users/ismawno/dotfiles/starship/.config/sharship.toml;
+    # "develop/flake.nix".source = "${userdir}/develop/flake.nix";
+    # "develop/scripts".source = "${userdir}/develop/scripts";
+
+    ".config/zsh/.zshrc".source = "${dotfiles}/zsh/.zshrc";
+    ".config/starship.toml".source = "${dotfiles}/starship/.config/starship.toml";
     ".config/nvim".source = inputs.nvim;
-    ".config/hypr/hyprland.conf".source =
-      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprland.conf;
-    ".config/hypr/hyprpaper.conf".source =
-      ../../users/ismawno/dotfiles/hyprland/.config/hypr/hyprpaper.conf;
-    ".config/hypr/mocha.conf".source = ../../users/ismawno/dotfiles/hyprland/.config/hypr/mocha.conf;
-    ".config/ghostty".source = ../../users/ismawno/dotfiles/ghostty/.config/ghostty;
-    ".config/waybar".source = ../../users/ismawno/dotfiles/waybar/.config/waybar;
-    ".config/wofi".source = ../../users/ismawno/dotfiles/wofi/.config/wofi;
-    ".config/backgrounds".source = ../../users/ismawno/backgrounds/.config/backgrounds;
+    ".config/hypr/hyprland.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprland.conf";
+    ".config/hypr/hyprpaper.conf".source = "${dotfiles}/hyprland/.config/hypr/hyprpaper.conf";
+    ".config/hypr/mocha.conf".source = "${dotfiles}/hyprland/.config/hypr/mocha.conf";
+    ".config/ghostty".source = "${dotfiles}/ghostty/.config/ghostty";
+    ".config/waybar".source = "${dotfiles}/waybar/.config/waybar";
+    ".config/wofi".source = "${dotfiles}/wofi/.config/wofi";
+    ".config/backgrounds".source = "${dotfiles}/backgrounds/.config/backgrounds";
   };
 
   home.stateVersion = "25.05";

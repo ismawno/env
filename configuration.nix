@@ -104,7 +104,7 @@
   programs.nano.enable = false;
   programs.command-not-found.enable = false;
 
-  services.tailscale.enable = false;
+  services.tailscale.enable = true;
   services.pulseaudio.enable = false;
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;

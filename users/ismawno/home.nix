@@ -49,7 +49,6 @@ in
     shfmt
     spotify
     stylua
-    tailscale
     tmux
     unzip
     vscode-extensions.vadimcn.vscode-lldb.adapter

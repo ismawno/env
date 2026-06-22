@@ -41,6 +41,7 @@ in
     nixfmt-rfc-style
     nodePackages_latest.prettier
     nodejs_22
+    obsidian
     ollama
     pulseaudio
     pyright
@@ -49,6 +50,7 @@ in
     shfmt
     spotify
     stylua
+    syncthing
     tmux
     unzip
     vscode-extensions.vadimcn.vscode-lldb.adapter

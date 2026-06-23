@@ -12,7 +12,7 @@ let
 in
 {
   home.packages = with pkgs; [
-    caligula
+    claude-code
     discord
     caligula
     zoxide

@@ -12,9 +12,12 @@ let
 in
 {
   home.packages = with pkgs; [
+    claude-code
+    syncthing
+    obsidian
+
     caligula
     discord
-    caligula
     zoxide
     ripgrep
     fzf
@@ -98,6 +101,11 @@ in
     glsl_analyzer
     python3
   ];
+
+  services.syncthing = {
+    enable = true;
+    tray.enable = true;
+  };
 
   xdg.desktopEntries.mpv = {
     name = "mpv";

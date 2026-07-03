@@ -7,6 +7,8 @@
   ];
   nix.settings.warn-dirty = false;
 
+  nixpkgs.config.allowUnfree = true;
+
   boot = {
     loader = {
       systemd-boot.enable = false;
@@ -94,8 +96,6 @@
     enableDefaultPackages = true;
     packages = with pkgs; [ nerd-fonts.fira-code ];
   };
-
-  nixpkgs.config.allowUnfree = false;
 
   environment.systemPackages = with pkgs; [ home-manager ];
   programs.zsh.enable = true;

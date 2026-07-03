@@ -92,8 +92,8 @@ alias gdev="nix develop $HOME/develop --command $SHELL -il"
 alias lnvim="nix develop --command $SHELL -il -c 'nvim .'"
 alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
 
-alias tailscale-mount="sudo mount -t cifs //100.123.34.78/MoltenRiver /mnt/molten-river -o username=molten-river,password=MoltenRiverIsKing,vers=2.0,uid=$(id -u),gid=$(id -g)"
-alias tailscale-umount="sudo umount /mnt/molten-river"
+alias mr-mount="sudo mount -t cifs //100.123.34.78/MoltenRiver /mnt/molten-river -o username=molten-river,password=MoltenRiverIsKing,vers=2.0,uid=$(id -u),gid=$(id -g)"
+alias mr-umount="sudo umount /mnt/molten-river"
 
 alias airpods="bluetoothctl connect F0:04:E1:D5:04:DB"
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'

@@ -13,8 +13,11 @@ in
 {
   home.packages = with pkgs; [
     claude-code
-    discord
+    syncthing
+    obsidian
+
     caligula
+    discord
     zoxide
     ripgrep
     fzf

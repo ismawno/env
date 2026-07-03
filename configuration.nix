@@ -104,12 +104,6 @@
   programs.nano.enable = false;
   programs.command-not-found.enable = false;
 
-  services.tailscale.enable = true; # should maybe be kept per host. leaving this here in the meantime
-  services.syncthing = {
-    enable = true;
-    # tray.enable = true;
-  }; # should maybe be kept per host. leaving this here in the meantime
-
   services.pulseaudio.enable = false;
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;

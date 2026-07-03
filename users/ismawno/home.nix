@@ -50,7 +50,6 @@ in
     shfmt
     spotify
     stylua
-    syncthing
     tmux
     unzip
     vscode-extensions.vadimcn.vscode-lldb.adapter

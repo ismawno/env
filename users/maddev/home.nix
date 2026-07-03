@@ -102,6 +102,11 @@ in
     python3
   ];
 
+  services.syncthing = {
+    enable = true;
+    tray.enable = true;
+  };
+
   xdg.desktopEntries.mpv = {
     name = "mpv";
     genericName = "Multimedia Player";

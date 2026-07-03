@@ -27,6 +27,7 @@
         "nvidia-x11"
         "nvidia-settings"
         "discord"
+        "obsidian"
       ];
       mkUserModule =
         { host, user }:
@@ -156,4 +157,4 @@
         };
       };
     };
-} 
+}

@@ -117,6 +117,9 @@
     package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
   };
 
+  # TAILSCALE!!
+  services.tailscale.enable = true;
+
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
   boot.plymouth.theme = lib.mkForce "pixels";
 

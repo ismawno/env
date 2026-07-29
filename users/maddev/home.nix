@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-unstable,
   inputs,
   lib,
   ...
@@ -12,7 +13,7 @@ let
 in
 {
   home.packages = with pkgs; [
-    claude-code
+    pkgs-unstable.claude-code
     syncthing
     obsidian
 
@@ -286,7 +287,24 @@ in
       rev = "v3.1.0";
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
+    # LibreWolf: use system DNS (Tailscale/Pi-hole), enable captive portal detection
+    ".librewolf/librewolf.overrides.cfg".text = ''
+      // Use system DNS (respects Tailscale MagicDNS / Pi-hole)
+      pref("network.trr.mode", 5);
+      // Re-enable captive portal detection
+      pref("network.captive-portal-service.enabled", true);
+      pref("captivedetect.canonicalURL", "http://detectportal.firefox.com/canonical.html");
+    '';
   };
+
+  # Copy user.js to LibreWolf profile on activation
+  home.activation.librewolfUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for profile in "$HOME"/.librewolf/*.default*; do
+      if [ -d "$profile" ]; then
+        cp "${shub}/librewolf/user.js" "$profile/user.js"
+      fi
+    done
+  '';
 
   xdg.portal = {
     enable = true;

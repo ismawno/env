@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nvim.url = "github:ismawno/nvim";
@@ -15,6 +16,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-unstable,
       home-manager,
       grub2-themes,
       nix-index-database,
@@ -22,6 +24,10 @@
     }@inputs:
     let
       system = "x86_64-linux";
+      pkgs-unstable = import nixpkgs-unstable {
+        inherit system;
+        config.allowUnfree = true;
+      };
       unfree = [
         "spotify"
         "nvidia-x11"
@@ -55,7 +61,7 @@
               host = host;
               user = user;
             };
-            _module.args = { inherit inputs; };
+            _module.args = { inherit inputs pkgs-unstable; };
           };
 
           homeUsers = nixpkgs.lib.genAttrs users (u: mkUser u);
@@ -96,7 +102,7 @@
             host = host;
             user = user;
           };
-          extraSpecialArgs = { inherit inputs; };
+          extraSpecialArgs = { inherit inputs pkgs-unstable; };
         })
         // {
           activationPackageUserName = user;

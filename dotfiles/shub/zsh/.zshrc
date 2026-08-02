@@ -107,17 +107,6 @@ alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
-# agents defined in users/maddev/opencode.nix; y suffix = --auto (auto-approve)
-alias dc="opencode"                          # flash, default effort (high)
-alias dcy="opencode --auto"
-alias dcq="opencode --agent quick"           # flash, no thinking - fastest
-alias dcqy="opencode --agent quick --auto"
-alias dct="opencode --agent think"           # flash, low effort
-alias dcty="opencode --agent think --auto"
-alias dcd="opencode --agent deep"            # v4-pro, max effort
-alias dcdy="opencode --agent deep --auto"
-alias dcr="opencode run"                     # one-shot, non-interactive
-
 # Shell integrations
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"

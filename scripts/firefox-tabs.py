@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Dump the open tabs of a Firefox-family profile (LibreWolf, Zen, Firefox).
+"""Dump the open tabs of a Gecko profile (Zen, Firefox, any Firefox fork).
+
+Zen keeps its profile at ~/.config/zen/<id>.Default Profile.
 
 Reads sessionstore-backups/recovery.jsonlz4 (mozlz4) and writes:
   - a Netscape bookmark HTML file, importable by any browser
@@ -118,7 +120,7 @@ def write_html(groups, path):
         "<TITLE>Bookmarks</TITLE>",
         "<H1>Bookmarks</H1>",
         "<DL><p>",
-        "    <DT><H3>LibreWolf open tabs</H3>",
+        "    <DT><H3>Open tabs</H3>",
         "    <DL><p>",
     ]
     for label, tabs in groups:

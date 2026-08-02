@@ -56,7 +56,6 @@ in
     nwg-look
     polkit_gnome
 
-    librewolf
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ghostty
     mpv
@@ -152,6 +151,13 @@ in
     enable = true;
     defaultApplications = {
       "inode/directory" = [ "thunar.desktop" ];
+
+      # --- Web (Zen) ---
+      "x-scheme-handler/http" = [ "zen-beta.desktop" ];
+      "x-scheme-handler/https" = [ "zen-beta.desktop" ];
+      "text/html" = [ "zen-beta.desktop" ];
+      "application/xhtml+xml" = [ "zen-beta.desktop" ];
+
       # --- Images (imv) ---
       "image/bmp" = [ "imv.desktop" ];
       "image/gif" = [ "imv.desktop" ];
@@ -288,28 +294,11 @@ in
       rev = "v3.1.0";
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
-    # LibreWolf: use system DNS (Tailscale/Pi-hole), enable captive portal detection
-    ".librewolf/librewolf.overrides.cfg".text = ''
-      // Use system DNS (respects Tailscale MagicDNS / Pi-hole)
-      pref("network.trr.mode", 5);
-      // Re-enable captive portal detection
-      pref("network.captive-portal-service.enabled", true);
-      pref("captivedetect.canonicalURL", "http://detectportal.firefox.com/canonical.html");
-    '';
   };
 
-  # Copy user.js to LibreWolf profile on activation
-  home.activation.librewolfUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    for profile in "$HOME"/.librewolf/*.default*; do
-      if [ -d "$profile" ]; then
-        cp "${shub}/librewolf/user.js" "$profile/user.js"
-      fi
-    done
-  '';
-
-  # Same for Zen, which keeps its profiles under XDG config rather than ~/.zen.
-  # The directory name is generated at first launch, so match on the marker
-  # files every Gecko profile has instead of on the name.
+  # Copy user.js to the Zen profile on activation. Zen keeps its profiles under
+  # XDG config rather than ~/.zen, and the directory name is generated at first
+  # launch, so match on the marker files every Gecko profile has.
   home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
       for profile in "$root"/*/; do

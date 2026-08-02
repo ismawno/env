@@ -1,5 +1,5 @@
-// Zen Browser profile prefs — mirrors dotfiles/shub/librewolf/user.js so the
-// two browsers behave the same during the LibreWolf -> Zen transition.
+// Zen Browser profile prefs. Copied into the active profile on every Home
+// Manager activation (see home.activation.zenUserJs in users/maddev/home.nix).
 
 // Use system DNS (respects Tailscale MagicDNS / Pi-hole)
 user_pref("network.trr.mode", 5); // 5 = explicitly disable DoH, use system DNS only
@@ -22,6 +22,5 @@ user_pref("browser.formfill.enable", true);
 user_pref("extensions.formautofill.addresses.enabled", true);
 user_pref("extensions.formautofill.creditCards.enabled", true);
 
-// Restore the previous session on startup, so the migrated LibreWolf tabs come
-// back and stay across restarts.
+// Restore the previous session on startup.
 user_pref("browser.startup.page", 3);

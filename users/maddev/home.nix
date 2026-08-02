@@ -12,6 +12,8 @@ let
   vanilla = ../../dotfiles/vanilla;
 in
 {
+  imports = [ ./opencode.nix ];
+
   home.packages = with pkgs; [
     pkgs-unstable.claude-code
     syncthing

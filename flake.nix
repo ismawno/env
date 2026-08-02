@@ -10,6 +10,9 @@
     grub2-themes.url = "github:vinceliuice/grub2-themes";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    # Zen is not packaged in nixpkgs; this is the upstream-endorsed flake.
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =

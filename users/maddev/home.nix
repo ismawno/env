@@ -57,6 +57,7 @@ in
     polkit_gnome
 
     librewolf
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ghostty
     mpv
     spotify
@@ -303,6 +304,19 @@ in
       if [ -d "$profile" ]; then
         cp "${shub}/librewolf/user.js" "$profile/user.js"
       fi
+    done
+  '';
+
+  # Same for Zen, which keeps its profiles under XDG config rather than ~/.zen.
+  # The directory name is generated at first launch, so match on the marker
+  # files every Gecko profile has instead of on the name.
+  home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
+      for profile in "$root"/*/; do
+        if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
+          cp "${shub}/zen/user.js" "$profile/user.js"
+        fi
+      done
     done
   '';
 

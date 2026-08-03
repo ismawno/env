@@ -12,6 +12,7 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../modules/lan-discovery.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -104,18 +105,7 @@
     NIXOS_OZONE_WL = "1";
   };
 
-  # Network storage shares via samba or otherwise
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-
-  # Network storage shares via samba or otherwise
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
-  };
+  # NAS discovery, wifi powersave and LAN routing. Shared with smalltop.
 
   # TAILSCALE!!
   services.tailscale.enable = true;

@@ -153,3 +153,6 @@ zle -N edit-command-line
 bindkey -M vicmd 'vv' edit-command-line
 
 eval "$(starship init zsh)"
+
+# Moved off the launcher's `-e zsh -c`, which broke the shell integration that carries our terminfo over ssh under other identities.
+[[ -z $TMUX && $SHLVL -eq 1 ]] && fastfetch

@@ -13,6 +13,7 @@
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     ../../modules/lan-discovery.nix
+    ../../modules/ghostty-terminfo.nix
   ];
 
   boot.initrd.availableKernelModules = [

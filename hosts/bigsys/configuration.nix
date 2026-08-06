@@ -12,6 +12,8 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../modules/lan-discovery.nix
+    ../../modules/ghostty-terminfo.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -104,18 +106,10 @@
     NIXOS_OZONE_WL = "1";
   };
 
-  # Network storage shares via samba or otherwise
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
+  # NAS discovery, wifi powersave and LAN routing. Shared with smalltop.
 
-  # Network storage shares via samba or otherwise
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
-  };
+  # TAILSCALE!!
+  services.tailscale.enable = true;
 
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
   boot.plymouth.theme = lib.mkForce "pixels";

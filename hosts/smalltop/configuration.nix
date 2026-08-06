@@ -12,6 +12,8 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../modules/lan-discovery.nix
+    ../../modules/ghostty-terminfo.nix
   ];
 
   boot.initrd.availableKernelModules = [
@@ -67,18 +69,7 @@
     shell = pkgs.zsh;
   };
 
-  # Network storage shares via samba or otherwise
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    openFirewall = true;
-  };
-
-  # Network storage shares via samba or otherwise
-  services.gvfs = {
-    enable = true;
-    package = pkgs.gvfs; # Sometimes defaults to a 'light' version without SMB
-  };
+  # NAS discovery, wifi powersave and LAN routing. Shared with bigsys.
 
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
   boot.plymouth.theme = lib.mkForce "pixels";
@@ -91,6 +82,9 @@
       })
     ]
   );
+
+  # TAILSCALE!!
+  services.tailscale.enable = true;
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

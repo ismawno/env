@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  pkgs-unstable,
   inputs,
   lib,
   ...
@@ -11,8 +12,10 @@ let
   vanilla = ../../dotfiles/vanilla;
 in
 {
+  imports = [ ./opencode.nix ];
+
   home.packages = with pkgs; [
-    claude-code
+    pkgs-unstable.claude-code
     syncthing
     obsidian
 
@@ -55,7 +58,7 @@ in
     nwg-look
     polkit_gnome
 
-    librewolf
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ghostty
     mpv
     spotify
@@ -150,6 +153,13 @@ in
     enable = true;
     defaultApplications = {
       "inode/directory" = [ "thunar.desktop" ];
+
+      # --- Web (Zen) ---
+      "x-scheme-handler/http" = [ "zen-beta.desktop" ];
+      "x-scheme-handler/https" = [ "zen-beta.desktop" ];
+      "text/html" = [ "zen-beta.desktop" ];
+      "application/xhtml+xml" = [ "zen-beta.desktop" ];
+
       # --- Images (imv) ---
       "image/bmp" = [ "imv.desktop" ];
       "image/gif" = [ "imv.desktop" ];
@@ -287,6 +297,19 @@ in
       sha256 = "18i499hhxly1r2bnqp9wssh0p1v391cxf10aydxaa7mdmrd3vqh9";
     };
   };
+
+  # Copy user.js to the Zen profile on activation. Zen keeps its profiles under
+  # XDG config rather than ~/.zen, and the directory name is generated at first
+  # launch, so match on the marker files every Gecko profile has.
+  home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
+      for profile in "$root"/*/; do
+        if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
+          cp "${shub}/zen/user.js" "$profile/user.js"
+        fi
+      done
+    done
+  '';
 
   xdg.portal = {
     enable = true;

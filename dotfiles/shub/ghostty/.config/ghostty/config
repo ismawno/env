@@ -7,3 +7,6 @@ confirm-close-surface = false
 resize-overlay = never
 command = zsh -lc "neofetch; exec zsh -l"
 
+# Installs xterm-ghostty on the remote (falling back to xterm-256color) so ssh under other identities doesn't break tmux.
+shell-integration-features = ssh-env,ssh-terminfo
+

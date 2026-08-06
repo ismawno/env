@@ -14,6 +14,15 @@ if command -v fd > /dev/null 2>&1; then
 fi
 export FZF_DEFAULT_OPTS="--bind 'ctrl-j:down,ctrl-k:up' --no-mouse"
 
+# overrides EDITOR=nano from /etc/set-environment
+export EDITOR="nvim"
+export VISUAL="$EDITOR"
+
+# read from disk, not Nix: home.sessionVariables lands in the world-readable store
+if [ -r "$HOME/.config/deepseek/api_key" ]; then
+  export DEEPSEEK_API_KEY="$(<"$HOME/.config/deepseek/api_key")"
+fi
+
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 

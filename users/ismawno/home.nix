@@ -54,6 +54,7 @@ in
     stylua
     syncthing
     tmux
+    tree-sitter
     unzip
     vscode-extensions.vadimcn.vscode-lldb.adapter
     vscode-langservers-extracted

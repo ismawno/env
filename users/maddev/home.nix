@@ -28,6 +28,7 @@ in
     htop
     gdu
     imagemagick
+    tree-sitter
 
     xfce.thunar
     xfce.thunar-archive-plugin

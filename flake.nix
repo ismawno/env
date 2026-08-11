@@ -2,9 +2,9 @@
   description = "NixOS + Home Manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nvim.url = "github:ismawno/nvim";
     grub2-themes.url = "github:vinceliuice/grub2-themes";
@@ -19,7 +19,7 @@
     {
       self,
       nixpkgs,
-      nixpkgs-unstable,
+      # nixpkgs-unstable,
       home-manager,
       grub2-themes,
       nix-index-database,
@@ -27,7 +27,7 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      pkgs-unstable = import nixpkgs-unstable {
+      pkgs = import nixpkgs {
         inherit system;
         config.allowUnfree = true;
       };
@@ -64,7 +64,7 @@
               host = host;
               user = user;
             };
-            _module.args = { inherit inputs pkgs-unstable; };
+            _module.args = { inherit inputs pkgs; };
           };
 
           homeUsers = nixpkgs.lib.genAttrs users (u: mkUser u);
@@ -105,7 +105,7 @@
             host = host;
             user = user;
           };
-          extraSpecialArgs = { inherit inputs pkgs-unstable; };
+          extraSpecialArgs = { inherit inputs pkgs; };
         })
         // {
           activationPackageUserName = user;

@@ -38,8 +38,10 @@ in
     hyprpaper
     lua-language-server
     mpv
-    nixfmt-rfc-style
-    nodePackages_latest.prettier
+    # nixfmt-rfc-style
+    nixfmt
+    # nodePackages_latest.prettier
+    prettier
     nodejs_22
     obsidian
     ollama
@@ -73,6 +75,8 @@ in
   programs.neovim = {
     enable = true;
     defaultEditor = true;
+    withRuby = false;
+    withPython3 = false;
   };
   programs.starship.enable = true;
   programs.zsh = {

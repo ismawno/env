@@ -92,9 +92,11 @@ in
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
-    nixfmt-rfc-style
+    # nixfmt-rfc-style
+    nixfmt
     vscode-langservers-extracted
-    nodePackages_latest.prettier
+    # nodePackages_latest.prettier
+    prettier
     black
     pyright
     shfmt
@@ -208,6 +210,8 @@ in
   programs.neovim = {
     enable = true;
     defaultEditor = true;
+    withRuby = false;
+    withPython3 = false;
   };
 
   programs.starship.enable = true;

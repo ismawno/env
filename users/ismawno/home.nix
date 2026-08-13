@@ -18,7 +18,6 @@ in
   home.homeDirectory = "${homedir}";
 
   home.packages = with pkgs; [
-    audacity
     bash-language-server
     black
     blender
@@ -37,6 +36,7 @@ in
     htop
     hwloc
     hyprpaper
+    kdePackages.kdenlive
     lua-language-server
     mpv
     # nixfmt-rfc-style

@@ -18,6 +18,7 @@ in
   home.homeDirectory = "${homedir}";
 
   home.packages = with pkgs; [
+    audacity
     bash-language-server
     black
     blender

@@ -43,6 +43,7 @@ in
     # nodePackages_latest.prettier
     prettier
     nodejs_22
+    obs-studio
     obsidian
     ollama
     pulseaudio

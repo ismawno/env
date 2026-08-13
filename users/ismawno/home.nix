@@ -36,7 +36,6 @@ in
     htop
     hwloc
     hyprpaper
-    kdePackages.kdenlive
     lua-language-server
     mpv
     # nixfmt-rfc-style
@@ -52,6 +51,7 @@ in
     ripgrep
     shellcheck
     shfmt
+    shotcut
     spotify
     stylua
     syncthing

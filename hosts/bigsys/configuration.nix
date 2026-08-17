@@ -86,7 +86,8 @@
     powerManagement.enable = false;
     powerManagement.finegrained = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # GTX 1080 (Pascal) was dropped by the 590+ drivers; 580 is its last supported branch.
+    package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     open = false;
   };
   boot.kernelParams = [

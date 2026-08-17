@@ -109,6 +109,9 @@ alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
 # Shell integrations
 eval "$(fzf --zsh)"
+# Greet before the tool inits; zoxide wants its init to stay last. (Off the launcher: `-e zsh -c` broke the terminfo-over-ssh integration.)
+[[ -z $TMUX && $SHLVL -eq 1 ]] && fastfetch
+
 eval "$(zoxide init --cmd cd zsh)"
 
 command_not_found_handler() {
@@ -153,6 +156,3 @@ zle -N edit-command-line
 bindkey -M vicmd 'vv' edit-command-line
 
 eval "$(starship init zsh)"
-
-# Moved off the launcher's `-e zsh -c`, which broke the shell integration that carries our terminfo over ssh under other identities.
-[[ -z $TMUX && $SHLVL -eq 1 ]] && fastfetch

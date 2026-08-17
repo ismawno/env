@@ -30,10 +30,10 @@ in
     imagemagick
     tree-sitter
 
-    xfce.thunar
-    xfce.thunar-archive-plugin
-    xfce.thunar-volman
-    xfce.tumbler
+    thunar
+    thunar-archive-plugin
+    thunar-volman
+    tumbler
     file-roller
     unzip
 
@@ -88,7 +88,6 @@ in
     noto-fonts
     noto-fonts-color-emoji
 
-    neofetch
     shellcheck
     stylua
     lua-language-server
@@ -200,9 +199,9 @@ in
 
   programs.git = {
     enable = true;
-    userName = "Mars-Wave";
-    userEmail = "57585293+Mars-Wave@users.noreply.github.com";
-    extraConfig = {
+    settings = {
+      user.name = "Mars-Wave";
+      user.email = "57585293+Mars-Wave@users.noreply.github.com";
       credential.helper = "store";
     };
   };
@@ -260,10 +259,13 @@ in
         gtk-application-prefer-dark-theme=0
       '';
     };
-    gtk4.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=0
-      '';
+    gtk4 = {
+      theme = config.gtk.theme;
+      extraConfig = {
+        Settings = ''
+          gtk-application-prefer-dark-theme=0
+        '';
+      };
     };
   };
 

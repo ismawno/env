@@ -23,11 +23,10 @@
 	], 
 
 "modules-right": [
-	"wlr/taskbar",
-	"cpu", 
-	"temperature", 
-	"memory",
-	"custom/swaync",
-	"pulseaudio"
+	"custom/conn",
+	"custom/modelight",
+	"pulseaudio",
+	"custom/sysinfo",
+	"custom/swaync"
 	]
 }

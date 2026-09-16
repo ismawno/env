@@ -1,11 +1,14 @@
 theme = catppuccin-mocha.conf
 cursor-color = #7a7d92
 font-family = FiraCode Nerd Font
-font-size = 14
+# 14.25, not 14: at scale 1 the em is pt * 96/72 device px, so an integral em needs
+# a multiple of 0.75 (14 -> 18.667px, fractional). bigsys value; smalltop overrides.
+font-size = 14.25
 background-opacity = 0.9
 confirm-close-surface = false
 resize-overlay = never
-command = zsh -lc "neofetch; exec zsh -l"
+# Ghostty injects its zsh integration via ZDOTDIR, which a `command =` re-exec would drop; without it the ssh wrapper below never loads and ssh under other identities breaks tmux.
+shell-integration-features = ssh-env,ssh-terminfo
 
 # Installs xterm-ghostty on the remote (falling back to xterm-256color) so ssh under other identities doesn't break tmux.
 shell-integration-features = ssh-env,ssh-terminfo

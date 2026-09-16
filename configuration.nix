@@ -94,7 +94,30 @@
 
   fonts = {
     enableDefaultPackages = true;
-    packages = with pkgs; [ nerd-fonts.fira-code ];
+    packages = with pkgs; [
+      nerd-fonts.fira-code
+      noto-fonts
+      noto-fonts-color-emoji
+    ];
+
+    # Without defaultFonts, "monospace" resolved to DejaVu Sans Mono on bigsys and
+    # Nerd Font icons rendered as tofu. Use noto-fonts-color-emoji, never the alias.
+    fontconfig = {
+      defaultFonts = {
+        monospace = [ "FiraCode Nerd Font Mono" ];
+        sansSerif = [ "Noto Sans" ];
+        serif = [ "Noto Serif" ];
+        emoji = [ "Noto Color Emoji" ];
+      };
+      # Subpixel (rgba) is deliberately NOT set here: it is only safe at integer
+      # compositor scale and harmful on non-RGB-stripe panels. Set it per-host.
+      antialias = true;
+      hinting = {
+        enable = true;
+        style = "slight";
+      };
+      useEmbeddedBitmaps = false;
+    };
   };
 
   environment.systemPackages = with pkgs; [ home-manager ];
@@ -104,23 +127,13 @@
   programs.nano.enable = false;
   programs.command-not-found.enable = false;
 
-  services.pulseaudio.enable = false;
+  # Audio lives in modules/audio.nix, imported per host via hosts/<name>/audio.nix.
   services.xserver.enable = false;
   services.displayManager.ly.enable = true;
   services.openssh.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-    wireplumber.enable = true;
-  };
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "25.05"; # Did you read the comment?
+  # Release whose stateful-data defaults this system was built against.
+  # Leave at the first install's version; read the docs before ever changing it.
+  system.stateVersion = "25.05";
 
 }

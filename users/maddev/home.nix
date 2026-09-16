@@ -12,7 +12,10 @@ let
   vanilla = ../../dotfiles/vanilla;
 in
 {
-  imports = [ ./opencode.nix ];
+  imports = [
+    ./opencode.nix
+    ../modules/zen.nix
+  ];
 
   home.packages = with pkgs; [
     pkgs-unstable.claude-code
@@ -20,20 +23,21 @@ in
     obsidian
 
     caligula
+    bluetuith # TUI bluetooth manager, the nmtui of BT (waybar click target)
     discord
     zoxide
     ripgrep
     fzf
     unzip
-    htop
+    btop # waybar sysinfo click target; replaces htop, which duplicated it in rofi
     gdu
     imagemagick
     tree-sitter
 
-    xfce.thunar
-    xfce.thunar-archive-plugin
-    xfce.thunar-volman
-    xfce.tumbler
+    thunar
+    thunar-archive-plugin
+    thunar-volman
+    tumbler
     file-roller
     unzip
 
@@ -50,6 +54,7 @@ in
     hyprlock
     rofi
     swaynotificationcenter
+    libnotify # notify-send: the waybar middle-click info actions need it
     wlogout
     fastfetch
     hyprpicker
@@ -74,6 +79,7 @@ in
     tmux
     hwloc
     pulseaudio
+    pavucontrol # the mixer waybar's right click opens; pipewire-pulse backs it
 
     imv
     mpv
@@ -88,7 +94,6 @@ in
     noto-fonts
     noto-fonts-color-emoji
 
-    neofetch
     shellcheck
     stylua
     lua-language-server
@@ -113,43 +118,88 @@ in
     tray.enable = true;
   };
 
-  xdg.desktopEntries.mpv = {
-    name = "mpv";
-    genericName = "Multimedia Player";
-    exec = "mpv --player-operation-mode=pseudo-gui %U";
-    terminal = false;
-    categories = [
-      "AudioVideo"
-      "Audio"
-      "Video"
-      "Player"
-    ];
-    mimeType = [
-      "video/mp4"
-      "video/mkv"
-      "video/webm"
-    ];
-  };
+  # TUI tools rofi would otherwise miss (no upstream .desktop) or open tiled.
+  # Terminal=false because popup.sh dispatches its own floating ghostty.
+  xdg.desktopEntries =
+    let
+      popup = "${config.home.homeDirectory}/.config/hypr/scripts/popup.sh";
+    in
+    {
+      nmtui = {
+        name = "Network Manager (nmtui)";
+        genericName = "Network Configuration";
+        exec = "${popup} 60 60 nmtui";
+        terminal = false;
+        icon = "network-wireless";
+        categories = [
+          "System"
+          "Network"
+        ];
+      };
 
-  xdg.desktopEntries.imv = {
-    name = "imv";
-    genericName = "Image Viewer";
-    exec = "imv %f";
-    terminal = false;
-    categories = [
-      "Graphics"
-      "Viewer"
-    ];
-    mimeType = [
-      "image/bmp"
-      "image/gif"
-      "image/jpeg"
-      "image/jpg"
-      "image/png"
-      "image/tiff"
-      "image/webp"
-    ];
-  };
+      bluetuith = {
+        name = "Bluetooth (bluetuith)";
+        genericName = "Bluetooth Manager";
+        exec = "${popup} 60 60 bluetuith";
+        terminal = false;
+        icon = "bluetooth";
+        categories = [
+          "System"
+          "Network"
+        ];
+      };
+
+      # Shadows the packaged btop.desktop (same file id) to float it like the rest.
+      btop = {
+        name = "btop++";
+        genericName = "System Monitor";
+        exec = "${popup} 85 85 btop";
+        terminal = false;
+        icon = "btop";
+        categories = [
+          "System"
+          "Monitor"
+        ];
+      };
+
+      mpv = {
+        name = "mpv";
+        genericName = "Multimedia Player";
+        exec = "mpv --player-operation-mode=pseudo-gui %U";
+        terminal = false;
+        categories = [
+          "AudioVideo"
+          "Audio"
+          "Video"
+          "Player"
+        ];
+        mimeType = [
+          "video/mp4"
+          "video/mkv"
+          "video/webm"
+        ];
+      };
+
+      imv = {
+        name = "imv";
+        genericName = "Image Viewer";
+        exec = "imv %f";
+        terminal = false;
+        categories = [
+          "Graphics"
+          "Viewer"
+        ];
+        mimeType = [
+          "image/bmp"
+          "image/gif"
+          "image/jpeg"
+          "image/jpg"
+          "image/png"
+          "image/tiff"
+          "image/webp"
+        ];
+      };
+    };
 
   # Associate MIME types for video and image opening
   xdg.mimeApps = {
@@ -200,9 +250,9 @@ in
 
   programs.git = {
     enable = true;
-    userName = "Mars-Wave";
-    userEmail = "57585293+Mars-Wave@users.noreply.github.com";
-    extraConfig = {
+    settings = {
+      user.name = "Mars-Wave";
+      user.email = "57585293+Mars-Wave@users.noreply.github.com";
       credential.helper = "store";
     };
   };
@@ -260,10 +310,13 @@ in
         gtk-application-prefer-dark-theme=0
       '';
     };
-    gtk4.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=0
-      '';
+    gtk4 = {
+      theme = config.gtk.theme;
+      extraConfig = {
+        Settings = ''
+          gtk-application-prefer-dark-theme=0
+        '';
+      };
     };
   };
 
@@ -279,14 +332,32 @@ in
   home.homeDirectory = lib.mkForce "/home/maddev";
 
   xdg.configFile = {
-    "hypr".source = "${shub}/hyprland";
-    "waybar".source = "${shub}/waybar";
+    # Per-file, like waybar/ghostty below: Hyprland's `decoration {}` is global, so
+    # smalltop must be able to override hyprland.conf alone. See hosts/smalltop.
+    "hypr/hyprland.conf".source = "${shub}/hyprland/hyprland.conf";
+    "hypr/defaultPrograms.conf".source = "${shub}/hyprland/defaultPrograms.conf";
+    "hypr/startUpApps.conf".source = "${shub}/hyprland/startUpApps.conf";
+    "hypr/Envs.conf".source = "${shub}/hyprland/Envs.conf";
+    "hypr/keyBinds.conf".source = "${shub}/hyprland/keyBinds.conf";
+    "hypr/windowRules.conf".source = "${shub}/hyprland/windowRules.conf";
+    "hypr/workspaceRules.conf".source = "${shub}/hyprland/workspaceRules.conf";
+    "hypr/hyprlock".source = "${shub}/hyprland/hyprlock";
+    "hypr/hyprpaper".source = "${shub}/hyprland/hyprpaper";
+    "hypr/scripts".source = "${shub}/hyprland/scripts";
+
+    # PER FILE, not directory sources, so smalltop can override one file without
+    # forking the set. Do NOT collapse back to `"waybar".source = ...`.
+    "waybar/config".source = "${shub}/waybar/config";
+    "waybar/lumi-config".source = "${shub}/waybar/lumi-config";
+    "waybar/modules".source = "${shub}/waybar/modules";
+    "waybar/style.css".source = "${shub}/waybar/style.css";
     "rofi".source = "${shub}/rofi";
     "swaync".source = "${shub}/swaync";
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
     "backgrounds".source = "${shub}/backgrounds";
-    "ghostty".source = "${shub}/ghostty/.config/ghostty";
+    "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
+    "ghostty/themes".source = "${shub}/ghostty/.config/ghostty/themes";
     "zsh/.zshrc".source = "${shub}/zsh/.zshrc";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
     "nvim".source = inputs.nvim;
@@ -303,18 +374,7 @@ in
     };
   };
 
-  # Copy user.js to the Zen profile on activation. Zen keeps its profiles under
-  # XDG config rather than ~/.zen, and the directory name is generated at first
-  # launch, so match on the marker files every Gecko profile has.
-  home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
-      for profile in "$root"/*/; do
-        if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
-          cp "${shub}/zen/user.js" "$profile/user.js"
-        fi
-      done
-    done
-  '';
+  # Zen's user.js is wired up in ../modules/zen.nix (imported above).
 
   xdg.portal = {
     enable = true;

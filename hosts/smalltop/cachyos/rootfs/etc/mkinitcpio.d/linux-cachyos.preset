@@ -1,0 +1,9 @@
+# Pinned: no fallback image. The ESP is 2 GiB and shared with NixOS.
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-linux-cachyos"
+
+PRESETS=('default')
+
+default_image="/boot/initramfs-linux-cachyos.img"
+default_uki=""
+default_options=""

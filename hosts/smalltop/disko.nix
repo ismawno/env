@@ -94,7 +94,8 @@ in
         };
 
         root = {
-          size = "100%FREE";
+          # Not 100%: ~8 GiB stays free in the VG as lvextend headroom for the shared btrfs pool.
+          size = "99%FREE";
           content = {
             type = "btrfs";
             extraArgs = [

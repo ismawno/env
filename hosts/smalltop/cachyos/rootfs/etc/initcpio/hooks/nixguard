@@ -1,0 +1,42 @@
+#!/usr/bin/ash
+
+_nixguard_dev() {
+    if [ -b /dev/smalltop/nixos-swap ]; then
+        echo /dev/smalltop/nixos-swap
+    elif [ -b /dev/mapper/smalltop-nixos--swap ]; then
+        echo /dev/mapper/smalltop-nixos--swap
+    fi
+}
+
+run_hook() {
+    local dev magic n=0
+
+    # LVs are autoactivated in the background by udev (no lvm2 runtime hook), so poll.
+    udevadm settle --timeout=10
+    while [ -z "$(_nixguard_dev)" ] && [ "$n" -lt 30 ]; do
+        n=$((n + 1))
+        sleep 1
+    done
+
+    while :; do
+        dev="$(_nixguard_dev)"
+        magic=""
+        if [ -n "$dev" ]; then
+            magic="$(dd if="$dev" bs=1 skip=4086 count=10 2>/dev/null)"
+        fi
+
+        # Positive match only. S1SUSPEND, empty, garbage and missing device all refuse.
+        if [ "$magic" = "SWAPSPACE2" ]; then
+            msg ":: nixguard: NixOS swap idle (SWAPSPACE2) -- continuing"
+            return 0
+        fi
+
+        err "nixguard: REFUSING to mount the shared btrfs"
+        echo "  device : ${dev:-/dev/smalltop/nixos-swap  (NOT FOUND)}"
+        echo "  magic  : ${magic:-<empty or unreadable>}  (only SWAPSPACE2 permits boot)"
+        echo "  normal : boot NixOS, let it resume, shut it down cleanly"
+        echo "  abandon: mkswap ${dev:-/dev/smalltop/nixos-swap}   (destroys the NixOS image)"
+        echo "  then exit this shell to re-check."
+        launch_interactive_shell
+    done
+}

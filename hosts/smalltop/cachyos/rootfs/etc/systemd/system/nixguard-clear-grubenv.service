@@ -1,0 +1,11 @@
+[Unit]
+Description=Clear the CachyOS hibernation flag in grubenv
+After=local-fs.target
+RequiresMountsFor=/boot
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/bin/grub-editenv /boot/grub/grubenv unset cachyos_hib
+
+[Install]
+WantedBy=multi-user.target

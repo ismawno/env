@@ -28,7 +28,10 @@ in
     ./power-profiles.nix
     ./audio.nix
     ./hibernation-interlock.nix
+    ./rescue.nix
   ];
+
+  mad.interlock.enable = true;
 
   networking.hostName = "smalltop";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
@@ -53,9 +56,7 @@ in
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # GRUB core settings live in the shared ../../configuration.nix. useOSProber is
-  # host-scoped on purpose: it must never run against the other hosts' disks.
-  boot.loader.grub.useOSProber = true;
+  # GRUB core lives in ../../configuration.nix; the CachyOS entries in ./hibernation-interlock.nix.
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # BOOT-CRITICAL, DO NOT REVERT: Samsung firmware discards EFI NVRAM entries, so

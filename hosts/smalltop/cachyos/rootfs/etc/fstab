@@ -1,0 +1,18 @@
+# CachyOS side of the shared btrfs: never add @, @home, @nix or nixos-swap here.
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /                      btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@cachyos            0 0
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /home                  btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@cachyos-home       0 0
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /var/log               btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@cachyos-log        0 0
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /var/cache/pacman/pkg  btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@cachyos-pkg        0 0
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /.snapshots            btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@cachyos-snapshots  0 0
+UUID=f56c0f23-9405-47ff-b777-8feb3974ff98  /nomad                 btrfs  rw,noatime,compress=zstd:1,discard=async,subvol=@nomad              0 0
+
+# Shared ESP. No nofail/noauto: a failed ESP mount must be loud (the pacman guard depends on it).
+UUID=E0B5-66AA  /boot  vfat  rw,relatime,fmask=0077,dmask=0077,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro  0 2
+
+# The CachyOS hibernation swap. pri=10 keeps it below zram (100).
+UUID=34d80d30-ccf4-466a-99cb-d1f44e68dc6d  none  swap  defaults,pri=10,discard=once  0 0
+
+# Shared DATA, same paths as NixOS (nomadBinds in ../../configuration.nix).
+/nomad/maddev/Downloads  /home/maddev/Downloads  none  bind,nofail,x-systemd.requires-mounts-for=/nomad  0 0
+/nomad/maddev/Documents  /home/maddev/Documents  none  bind,nofail,x-systemd.requires-mounts-for=/nomad  0 0
+/nomad/maddev/Knowledge  /home/maddev/Knowledge  none  bind,nofail,x-systemd.requires-mounts-for=/nomad  0 0

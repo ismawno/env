@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Waybar: compact "cpu% ram% temp°C" with a full breakdown in the tooltip
 # (per-core, memory, every sensor, GPU). Hwmon is discovered, never hardcoded.
+# A host with a battery also gets "bat%" after the temperature and a Battery section.
 exec python3 - "$@" <<'PY'
 import os, glob, json, re, subprocess, sys
 
@@ -86,6 +87,43 @@ def gpu():
         pass
     return None
 
+def battery():
+    """First system battery as a dict, or None on a desktop (bigsys)."""
+    def rd(path, cast=str):
+        try:
+            return cast(open(path).read().strip())
+        except (OSError, ValueError):
+            return None
+    for ps in sorted(glob.glob("/sys/class/power_supply/*")):
+        # scope=Device is a mouse/headset battery, not the machine.
+        if rd(f"{ps}/type") != "Battery" or rd(f"{ps}/scope") == "Device":
+            continue
+        cap = rd(f"{ps}/capacity", int)
+        if cap is None:
+            continue
+        # Drivers expose energy_* (uWh) + power_now, or charge_* (uAh) + current_now.
+        fam = "energy" if rd(f"{ps}/energy_now", int) is not None else "charge"
+        now = rd(f"{ps}/{fam}_now", int)
+        full = rd(f"{ps}/{fam}_full", int)
+        design = rd(f"{ps}/{fam}_full_design", int)
+        rate = abs(rd(f"{ps}/power_now" if fam == "energy" else f"{ps}/current_now", int) or 0)
+        volt = (rd(f"{ps}/voltage_now", int) or 0) / 1e6
+        status = rd(f"{ps}/status") or "Unknown"
+        hours = None
+        if rate and now is not None and full:
+            if status == "Discharging":
+                hours = now / rate
+            elif status == "Charging":
+                hours = max(0, full - now) / rate
+        return {
+            "name": os.path.basename(ps), "cap": cap, "status": status, "hours": hours,
+            "watts": rate / 1e6 if fam == "energy" else rate / 1e6 * volt,
+            "health": 100.0 * full / design if full and design else None,
+            "cycles": rd(f"{ps}/cycle_count", int),
+            "limit": rd(f"{ps}/charge_control_end_threshold", int),
+        }
+    return None
+
 cpus = cpu_percentages()
 total_cpu = cpus.get("cpu", 0.0)
 mt, mu, st, su = memory()
@@ -106,6 +144,9 @@ if pkg is None:
     pkg = max(allt) if allt else 0.0
 
 text = f"{total_cpu:.0f}% {mem_pct:.0f}% {pkg:.0f}°C"
+bat = battery()
+if bat:
+    text += " {}%".format(bat["cap"])
 
 cores = sorted(((k, v) for k, v in cpus.items() if k != "cpu"),
                key=lambda kv: int(kv[0][3:]))
@@ -128,7 +169,30 @@ if g:
     lines.append("<b>GPU</b>")
     lines.append("  " + g.replace("\n", "\n  "))
 
+if bat:
+    lines.append("")
+    lines.append("<b>Battery</b>  {}%  {}".format(bat["cap"], bat["status"]))
+    row = "  {:.1f} W".format(bat["watts"])
+    if bat["hours"] is not None:
+        h = int(bat["hours"]); mnt = int((bat["hours"] - h) * 60)
+        row += "   {}h {:02d}m {}".format(h, mnt, "left" if bat["status"] == "Discharging" else "to full")
+    lines.append(row)
+    extra = []
+    if bat["health"] is not None:
+        extra.append("health {:.0f}%".format(bat["health"]))
+    if bat["cycles"] is not None:
+        extra.append("{} cycles".format(bat["cycles"]))
+    if bat["limit"] is not None:
+        extra.append("limit {}%".format(bat["limit"]))
+    if extra:
+        lines.append("  " + "   ".join(extra))
+
 cls = "critical" if pkg >= 85 else ("warning" if pkg >= 70 else "normal")
+if bat and bat["status"] == "Discharging":
+    if bat["cap"] <= 10:
+        cls = "critical"
+    elif bat["cap"] <= 20 and cls == "normal":
+        cls = "warning"
 tooltip = "\n".join(lines)
 if "info" in sys.argv[1:]:
     # Middle click: same content as the hover tooltip, as a notification.

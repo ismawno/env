@@ -33,19 +33,31 @@ let
     linux ${cachyDir}/vmlinuz-linux-cachyos ${cachyCmdline}
     initrd ${cachyDir}/initramfs-linux-cachyos.img'';
 
-  # Shown alone while CachyOS is hibernated; functions are not inherited, hence the full body.
-  hibernatedMenuName = "cachyos-hibernated.cfg";
-  hibernatedMenu = pkgs.writeText hibernatedMenuName ''
-    set default=0
-    set timeout=5
-    menuentry "CachyOS (resume the hibernated session)" --class cachyos --class gnu-linux --class os {
-    ${cachyBody}
-    }
-    menuentry "Full menu (NixOS refuses to boot until CachyOS has resumed)" --class submenu {
+  # Shown alone while a distro is hibernated; functions are not inherited, hence full bodies.
+  fullMenuEntry = ''
+    menuentry "Full Menu" --class submenu {
       set interlock_full_menu=1
       export interlock_full_menu
       configfile ''${prefix}/grub.cfg
+    }'';
+  cachyosHibernatedMenu = pkgs.writeText "cachyos-hibernated.cfg" ''
+    set default=0
+    set timeout=5
+    menuentry "CachyOS (resume from hibernation)" --class cachyos --class gnu-linux --class os {
+    ${cachyBody}
     }
+    ${fullMenuEntry}
+  '';
+  # NixOS kernel paths change per generation, so re-enter grub.cfg and auto-boot its default.
+  nixosHibernatedMenu = pkgs.writeText "nixos-hibernated.cfg" ''
+    set default=0
+    set timeout=5
+    menuentry "NixOS (resume from hibernation)" --class nixos {
+      set interlock_autoboot=1
+      export interlock_autoboot
+      configfile ''${prefix}/grub.cfg
+    }
+    ${fullMenuEntry}
   '';
 
   sysdInitrd = config.boot.initrd.systemd.enable;
@@ -228,11 +240,17 @@ in
         load_env -f ''${prefix}/grubenv nixos_hib cachyos_hib
       fi
 
-      # CachyOS hibernated: show only the two-entry menu; ESC falls through to the full one.
+      # A hibernated distro gets a two-entry menu (resume / Full Menu); ESC also falls through.
       if [ "''${cachyos_hib}" = "yes" ]; then
         set default=cachyos
-        if [ "''${interlock_full_menu}" != "1" ]; then
-          configfile ''${prefix}/${hibernatedMenuName}
+      fi
+      if [ "''${interlock_autoboot}" = "1" ]; then
+        set timeout=0
+      elif [ "''${interlock_full_menu}" != "1" ]; then
+        if [ "''${cachyos_hib}" = "yes" ]; then
+          configfile ''${prefix}/cachyos-hibernated.cfg
+        elif [ "''${nixos_hib}" = "yes" ]; then
+          configfile ''${prefix}/nixos-hibernated.cfg
         fi
       fi
     '';
@@ -248,9 +266,9 @@ in
 
     # Not extraFiles: that is copied on every rebuild; this only when it changed.
     extraPrepareConfig = ''
-      if ! cmp -s ${hibernatedMenu} /boot/grub/${hibernatedMenuName}; then
-        cp ${hibernatedMenu} /boot/grub/${hibernatedMenuName}
-      fi
+      for f in ${cachyosHibernatedMenu}:cachyos-hibernated.cfg ${nixosHibernatedMenu}:nixos-hibernated.cfg; do
+        cmp -s "''${f%%:*}" "/boot/grub/''${f##*:}" || cp "''${f%%:*}" "/boot/grub/''${f##*:}"
+      done
     '';
 
     # Advisory only, and deliberately NOT a block: install-grub.pl:517 injects this into

@@ -175,7 +175,7 @@ in
   '';
 
   boot.loader.grub.extraEntries = lib.mkAfter ''
-    menuentry "Rescue (RAM-only NixOS: cannot hibernate, mounts nothing)" --class nixos --id rescue {
+    menuentry "Rescue (RAM-Only NixOS)" --class nixos --id rescue {
       insmod part_gpt
       insmod fat
       search --no-floppy --fs-uuid --set=root ${espUuid}

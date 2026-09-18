@@ -9,6 +9,24 @@ let
   shubWaybarCss = ../../dotfiles/shub/waybar/style.css;
   shubHyprland = ../../dotfiles/shub/hyprland/hyprland.conf;
 
+  # Lid: drop the panel from the layout if another display exists, else only blank it (Hyprland needs one monitor).
+  lidScript = pkgs.writeShellScript "smalltop-lid" ''
+    panel=eDP-1
+    rule=$(grep -m1 "^monitor=$panel," "$HOME/.config/hypr/hyprland.conf" | cut -d= -f2)
+    close() {
+      if [ "$(hyprctl monitors | grep -c "^Monitor")" -gt 1 ]; then
+        hyprctl keyword monitor "$panel, disable"
+      else
+        hyprctl dispatch dpms off "$panel"
+      fi
+    }
+    case "$1" in
+      close) close ;;
+      open) hyprctl keyword monitor "$rule"; hyprctl dispatch dpms on "$panel" ;;
+      sync) grep -q closed /proc/acpi/button/lid/*/state && close ;;
+    esac
+  '';
+
   # Hyprland's `decoration {}` is GLOBAL (no per-monitor block), so these cannot live
   # in the shared hyprland.conf without also restyling bigsys. Appended; later wins.
   hyprlandOverrides = pkgs.writeText "hyprland-smalltop-overrides.conf" ''
@@ -30,9 +48,10 @@ let
         col.active_border = rgb(EBDBB2) 0deg
     }
 
-    # Lid closed on AC keeps running (power-profiles.nix), so the panel is switched by hand.
-    bindl = , switch:on:Lid Switch, exec, hyprctl dispatch dpms off eDP-1
-    bindl = , switch:off:Lid Switch, exec, hyprctl dispatch dpms on eDP-1
+    # Closed on AC keeps running (power-profiles.nix): the panel leaves the layout, and returns on open.
+    bindl = , switch:on:Lid Switch, exec, ${lidScript} close
+    bindl = , switch:off:Lid Switch, exec, ${lidScript} open
+    exec-once = ${lidScript} sync
   '';
 
   # smalltop is 2880x1800 at scale 2 (a 1440x900 logical desktop). Overrides are

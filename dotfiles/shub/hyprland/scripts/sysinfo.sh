@@ -88,20 +88,18 @@ def gpu():
     return None
 
 def battery():
-    """First system battery as a dict, or None on a desktop (bigsys)."""
+    """First system battery (scope=Device is a peripheral) as a dict, or None on a desktop."""
     def rd(path, cast=str):
         try:
             return cast(open(path).read().strip())
         except (OSError, ValueError):
             return None
     for ps in sorted(glob.glob("/sys/class/power_supply/*")):
-        # scope=Device is a mouse/headset battery, not the machine.
         if rd(f"{ps}/type") != "Battery" or rd(f"{ps}/scope") == "Device":
             continue
         cap = rd(f"{ps}/capacity", int)
         if cap is None:
             continue
-        # Drivers expose energy_* (uWh) + power_now, or charge_* (uAh) + current_now.
         fam = "energy" if rd(f"{ps}/energy_now", int) is not None else "charge"
         now = rd(f"{ps}/{fam}_now", int)
         full = rd(f"{ps}/{fam}_full", int)

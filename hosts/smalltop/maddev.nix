@@ -29,6 +29,10 @@ let
         # Explicit 0deg: a bare rgb() can be interpolated as a gradient endpoint.
         col.active_border = rgb(EBDBB2) 0deg
     }
+
+    # Lid closed on AC keeps running (power-profiles.nix), so the panel is switched by hand.
+    bindl = , switch:on:Lid Switch, exec, hyprctl dispatch dpms off eDP-1
+    bindl = , switch:off:Lid Switch, exec, hyprctl dispatch dpms on eDP-1
   '';
 
   # smalltop is 2880x1800 at scale 2 (a 1440x900 logical desktop). Overrides are

@@ -115,7 +115,7 @@ if eth:
 elif wl:
     w = wifi_info()
     sig = w.get("sig", "")
-    conn = "[WIFI %s%%]" % sig if sig else "[WIFI]"
+    conn = "[W%s%%]" % sig if sig else "[W]"
     cls = "wifi-weak" if sig.isdigit() and int(sig) < 35 else "wifi"
     ifn = wl
     lines = ["<b>Wi-Fi</b>  %s" % wl,
@@ -124,7 +124,7 @@ elif wl:
     if w.get("freq"):
         lines.append("  link    %s  %s" % (w["freq"], w.get("rate", "?")))
 else:
-    conn, cls, ifn = "[NET-OFF]", "disconnected", None
+    conn, cls, ifn = "[X]", "disconnected", None
     lines = ["<b>Network</b>  disconnected"]
 
 if ifn:

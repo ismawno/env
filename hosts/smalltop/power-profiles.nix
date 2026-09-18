@@ -11,4 +11,7 @@
 
   # Battery/AC state for PPD and the desktop.
   services.upower.enable = true;
+
+  # Lid closed on AC keeps running (remote work); on battery it still suspends.
+  services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
 }

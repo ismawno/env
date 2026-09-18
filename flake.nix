@@ -10,6 +10,10 @@
     grub2-themes.url = "github:vinceliuice/grub2-themes";
     nix-index-database.url = "github:nix-community/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
+    # Declarative disk layout. Only hosts/smalltop imports the module (via
+    # specialArgs.inputs); the other hosts keep their hand-written fileSystems.
+    disko.url = "github:nix-community/disko/latest";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
     # Zen is not packaged in nixpkgs; this is the upstream-endorsed flake.
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
@@ -72,6 +76,10 @@
         in
         nixpkgs.lib.nixosSystem {
           inherit system;
+          # Lets a host module reach the flake inputs, e.g. hosts/smalltop
+          # importing inputs.disko.nixosModules.disko. Hosts that do not use it
+          # are unaffected.
+          specialArgs = { inherit inputs; };
           modules = [
             ./configuration.nix
             hostConfig

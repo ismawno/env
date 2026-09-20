@@ -44,27 +44,19 @@ let
 
   waybarOverrides = pkgs.writeText "waybar-smalltop-overrides.css" ''
 
-    /* smalltop HiDPI overrides, appended -- see hosts/smalltop/maddev.nix.
-       Paddings are round(original * 0.75). NO font-size override: `* { font-size:
-       75% }` was tried and is wrong -- a percentage font-size compounds down the
-       tree, and Waybar's CSS sizes do not scale with the compositor the way
-       Ghostty's points do. Verified at scale 2 with the paddings alone. */
+    /* HiDPI: paddings are round(original * 0.75). A percentage font-size compounds down the tree, do not add one. */
 
     tooltip label {
       padding: 8px;
     }
 
-    #custom-lumi,
-    #custom-cava,
     #clock,
-    #cpu,
-    #memory,
     #mpris,
-    #network,
     #pulseaudio,
-    #temperature,
     #workspaces,
-    #custom-menu,
+    #custom-conn,
+    #custom-modelight,
+    #custom-sysinfo,
     #custom-swaync {
       padding-top: 2px;
       padding-bottom: 2px;
@@ -87,7 +79,6 @@ let
 in
 {
   imports = [
-    ../../users/modules/pkgs-unstable.nix
     ../../users/modules/hypr-laptop.nix
   ];
 

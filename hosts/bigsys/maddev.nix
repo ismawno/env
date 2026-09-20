@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ../../users/modules/pkgs-unstable.nix
     ../../users/modules/hypr-desktop.nix
   ];
 

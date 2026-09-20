@@ -63,7 +63,6 @@
       "networkmanager"
       "wheel"
     ];
-    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 
@@ -94,7 +93,6 @@
   hardware.graphics.enable = lib.mkForce true;
 
   environment.sessionVariables = {
-    # WLR_NO_HARDWARE_CURSORS = "1";
 
     # Direct Wayland to use NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
@@ -106,9 +104,6 @@
     MOZ_DISABLE_RDD_SANDBOX = "1";
   };
 
-  # NAS discovery, wifi powersave and LAN routing. Shared with smalltop.
-
-  # TAILSCALE!!
   services.tailscale.enable = true;
 
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";

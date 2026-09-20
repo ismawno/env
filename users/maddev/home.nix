@@ -16,6 +16,7 @@ in
     ./opencode.nix
     ../modules/zen.nix
     ../modules/hypr-host.nix
+    ../modules/pkgs-unstable.nix
   ];
 
   home.packages = with pkgs; [
@@ -52,7 +53,6 @@ in
     thunar-volman
     tumbler
     file-roller
-    unzip
 
     gvfs
 
@@ -80,6 +80,7 @@ in
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     ghostty
     mpv
+    playerctl
     spotify
     obs-studio
     cava
@@ -95,7 +96,6 @@ in
     pavucontrol # the mixer waybar's right click opens; pipewire-pulse backs it
 
     imv
-    mpv
 
     wget
     nmap
@@ -111,10 +111,8 @@ in
     stylua
     lua-language-server
     vscode-extensions.vadimcn.vscode-lldb.adapter
-    # nixfmt-rfc-style
     nixfmt
     vscode-langservers-extracted
-    # nodePackages_latest.prettier
     prettier
     black
     pyright

@@ -6,7 +6,6 @@ user_pref("network.trr.mode", 5); // 5 = explicitly disable DoH, use system DNS 
 
 // Off, as Zen ships it: its probe expects an empty reply, so Firefox's URL made every network look like a login page.
 user_pref("network.captive-portal-service.enabled", false);
-user_pref("captivedetect.canonicalURL", "http://firefox-portal-detection.com/generate_204");
 
 // Iris Xe + iHD does full hw decode (H264/HEVC/VP9/AV1, verified with vainfo).
 // The green/purple artifacting these once worked around was the OLD laptop's GPU.

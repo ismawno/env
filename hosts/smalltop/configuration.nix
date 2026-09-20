@@ -126,7 +126,6 @@ in
   # ov02c10 runs at 26 MHz, the in-tree driver demands 19.2; the out-of-tree route costs hibernation.
   hardware.ipu6 = {
     enable = false;
-    platform = "ipu6ep";
   };
 
   services.hardware.bolt.enable = true; # Thunderbolt 4 / USB4
@@ -247,7 +246,6 @@ in
       "input"
       "tss" # TPM2 access
     ];
-    packages = with pkgs; [ ];
     shell = pkgs.zsh;
   };
 

@@ -85,8 +85,7 @@
       "phone": "[S]",
       "portable": "[S]",
       "car": "[S]",
-      "default": ["[S]", "[S]", "[S]", "[S]"],
-      "ignored-sinks": ["Easy Effects Sink"]
+      "default": ["[S]", "[S]", "[S]", "[S]"]
     },
     "scroll-step": 5.0,
     // pavucontrol already picks the output, so no separate chooser is bound.

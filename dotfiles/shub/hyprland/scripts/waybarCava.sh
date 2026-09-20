@@ -11,7 +11,7 @@ for ((i = 0; i < bar_length; i++)); do
     dict+=";s/$i/${bar:$i:1}/g"
 done
 
-config_file="/tmp/bar_cava_config"
+config_file="${XDG_RUNTIME_DIR:-/tmp}/bar_cava_config"
 cat >"$config_file" <<EOF
 [general]
 bars = 10

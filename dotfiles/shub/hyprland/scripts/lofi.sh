@@ -2,8 +2,6 @@
 
 #Taken from jakoolit's hyprland dots
 
-iDIR="$HOME/.config/swaync/icons"
-
 declare -A menu_options=(
   ["Lofi Girl ☕️🎶"]="https://play.streamafrica.net/lofiradio"
   ["White Noise 📖🎶"]="https://www.youtube.com/watch?v=nMfPqeZjc2c&t=7040s&pp=ygULd2hpdGUgbm9pc2U%3D"
@@ -14,7 +12,7 @@ declare -A menu_options=(
 )
 
 notification() {
-  notify-send -u normal "Playing now: $@"
+  notify-send -u normal "Playing now: $*"
 }
 
 main() {
@@ -35,4 +33,8 @@ main() {
   fi
 }
 
-pkill mpv && notify-send -u low "Online Music stopped" || main
+if pkill mpv; then
+  notify-send -u low "Online Music stopped"
+else
+  main
+fi

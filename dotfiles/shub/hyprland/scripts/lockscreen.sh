@@ -3,6 +3,6 @@
 #Script for lockscreen
 
 sleep 2
-powerprofilesctl set power-saver
+command -v powerprofilesctl >/dev/null && powerprofilesctl set power-saver
 hyprlock -c ~/.config/hypr/hyprlock/hyprlock.conf
-powerprofilesctl set performance
+command -v powerprofilesctl >/dev/null && powerprofilesctl set performance

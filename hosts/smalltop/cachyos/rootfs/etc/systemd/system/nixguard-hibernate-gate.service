@@ -1,8 +1,0 @@
-[Unit]
-Description=Refuse hibernation while NixOS holds a hibernation image
-DefaultDependencies=no
-Before=systemd-hibernate.service systemd-hybrid-sleep.service systemd-suspend-then-hibernate.service
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/nixguard-check

@@ -19,12 +19,16 @@ in
   ];
 
   home.packages = with pkgs; [
-    # Delete in imv: ask first, then move the picture to ~/Pictures/Wallpapers-rejected and drop it from the view.
+    # Delete in imv: ask first (detached, one prompt at a time, because imv waits for what it runs), then move the picture to ~/Pictures/Wallpapers-rejected.
     (writeShellScriptBin "imv-reject" ''
-      choice=$(printf 'No\nYes' | rofi -dmenu -i -p "Remove $(basename "$1")?")
-      [ "$choice" = Yes ] || exit 0
-      mkdir -p "$HOME/Pictures/Wallpapers-rejected"
-      mv "$1" "$HOME/Pictures/Wallpapers-rejected/" && imv-msg "$2" close
+      exec 9>"$XDG_RUNTIME_DIR/imv-reject.lock"
+      flock -n 9 || exit 0
+      (
+        choice=$(printf 'No\nYes' | rofi -dmenu -i -p "Remove $(basename "$1")?")
+        [ "$choice" = Yes ] || exit 0
+        mkdir -p "$HOME/Pictures/Wallpapers-rejected"
+        mv "$1" "$HOME/Pictures/Wallpapers-rejected/" && imv-msg "$2" close
+      ) >/dev/null 2>&1 </dev/null &
     '')
 
     pkgs-unstable.claude-code

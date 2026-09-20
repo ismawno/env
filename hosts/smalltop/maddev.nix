@@ -7,51 +7,30 @@
 let
   shubGhostty = ../../dotfiles/shub/ghostty/.config/ghostty/config;
   shubWaybarCss = ../../dotfiles/shub/waybar/style.css;
-  shubHyprland = ../../dotfiles/shub/hyprland/hyprland.conf;
+
+  # SCALE 2, NOT 1.5: at 1.5 Ghostty's cell advance is 17.25px instead of 23px and GTK3 clients get downsampled.
+  panel = {
+    output = "eDP-1";
+    mode = "2880x1800@120";
+    position = "0x0";
+    scale = 2;
+  };
+  panelRule = "${panel.output},${panel.mode},${panel.position},${toString panel.scale}";
 
   # Lid: drop the panel from the layout if another display exists, else only blank it (Hyprland needs one monitor).
   lidScript = pkgs.writeShellScript "smalltop-lid" ''
-    panel=eDP-1
-    rule=$(grep -m1 "^monitor=$panel," "$HOME/.config/hypr/hyprland.conf" | cut -d= -f2)
     close() {
       if [ "$(hyprctl monitors | grep -c "^Monitor")" -gt 1 ]; then
-        hyprctl keyword monitor "$panel, disable"
+        hyprctl keyword monitor "${panel.output}, disable"
       else
-        hyprctl dispatch dpms off "$panel"
+        hyprctl dispatch dpms off "${panel.output}"
       fi
     }
     case "$1" in
       close) close ;;
-      open) hyprctl keyword monitor "$rule"; hyprctl dispatch dpms on "$panel" ;;
+      open) hyprctl keyword monitor "${panelRule}"; hyprctl dispatch dpms on "${panel.output}" ;;
       sync) grep -q closed /proc/acpi/button/lid/*/state && close ;;
     esac
-  '';
-
-  # Hyprland's `decoration {}` is GLOBAL (no per-monitor block), so these cannot live
-  # in the shared hyprland.conf without also restyling bigsys. Appended; later wins.
-  hyprlandOverrides = pkgs.writeText "hyprland-smalltop-overrides.conf" ''
-
-    # smalltop overrides (appended -- see hosts/smalltop/maddev.nix)
-    decoration {
-        # was 0.7, which dropped inactive-window text contrast 11.34:1 -> 5.70:1.
-        inactive_opacity = 1
-
-        blur {
-            # was 3 passes: resamples what is behind the window, which is the
-            # smearing this whole change set exists to remove.
-            enabled = no
-        }
-    }
-
-    general {
-        # Explicit 0deg: a bare rgb() can be interpolated as a gradient endpoint.
-        col.active_border = rgb(EBDBB2) 0deg
-    }
-
-    # Closed on AC keeps running (power-profiles.nix): the panel leaves the layout, and returns on open.
-    bindl = , switch:on:Lid Switch, exec, ${lidScript} close
-    bindl = , switch:off:Lid Switch, exec, ${lidScript} open
-    exec-once = ${lidScript} sync
   '';
 
   # smalltop is 2880x1800 at scale 2 (a 1440x900 logical desktop). Overrides are
@@ -110,21 +89,40 @@ let
   '';
 in
 {
-  imports = [ ../../users/modules/pkgs-unstable.nix ];
+  imports = [
+    ../../users/modules/pkgs-unstable.nix
+    ../../users/modules/hypr-laptop.nix
+  ];
 
   # System syncthing only -- the home-manager user unit is right for bigsys. Both
   # running means the loser cannot take the database lock and every switch fails.
   services.syncthing.enable = lib.mkForce false;
 
+  mad.hypr = {
+    monitors = [
+      panel
+      {
+        output = "desc:AOC U27B3A ZXLQ8HA002427";
+        mode = "3840x2160@60";
+        position = "0x-1080";
+        scale = 2;
+      }
+      {
+        output = "";
+        mode = "3840x2160@60";
+        position = "auto";
+        scale = 1;
+      }
+    ];
+
+    lid = {
+      switch = "Lid Switch";
+      script = "${lidScript}";
+    };
+  };
+
   # mkForce because users/maddev/home.nix defines these too; that file wires ghostty
   # and waybar PER FILE so a host can replace one file without forking the directory.
-  xdg.configFile."hypr/hyprland.conf".source = lib.mkForce (
-    pkgs.concatText "hyprland-conf-smalltop" [
-      shubHyprland
-      hyprlandOverrides
-    ]
-  );
-
   xdg.configFile."ghostty/config".source = lib.mkForce (
     pkgs.concatText "ghostty-config-smalltop" [
       shubGhostty

@@ -15,6 +15,7 @@ in
   imports = [
     ./opencode.nix
     ../modules/zen.nix
+    ../modules/hypr-host.nix
   ];
 
   home.packages = with pkgs; [
@@ -332,8 +333,12 @@ in
   home.homeDirectory = lib.mkForce "/home/maddev";
 
   xdg.configFile = {
-    # Per-file, like waybar/ghostty below: Hyprland's `decoration {}` is global, so
-    # smalltop must be able to override hyprland.conf alone. See hosts/smalltop.
+    # Hyprland takes hyprland.lua over hyprland.conf; the tree carries this host's host.lua.
+    "hypr/hyprland.lua".source = "${config.mad.hypr.tree}/hyprland.lua";
+    "hypr/host.lua".source = "${config.mad.hypr.tree}/host.lua";
+    "hypr/shub".source = "${config.mad.hypr.tree}/shub";
+
+    # The hyprlang set below is dormant, kept one edit away from being the live config again.
     "hypr/hyprland.conf".source = "${shub}/hyprland/hyprland.conf";
     "hypr/defaultPrograms.conf".source = "${shub}/hyprland/defaultPrograms.conf";
     "hypr/startUpApps.conf".source = "${shub}/hyprland/startUpApps.conf";

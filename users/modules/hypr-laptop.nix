@@ -8,7 +8,7 @@
     type = lib.types.attrsOf lib.types.str;
     example = {
       switch = "Lid Switch";
-      script = "/run/current-system/sw/bin/lid";
+      script = "/nix/store/...-smalltop-lid";
     };
     description = "Lid switch name and the script its close, open and sync binds call.";
   };

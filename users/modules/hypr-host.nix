@@ -55,5 +55,6 @@ in
 
   config.mad.hypr.facts = {
     inherit (cfg) monitors programs;
+    polkit_agent = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
   };
 }

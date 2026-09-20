@@ -26,7 +26,7 @@ local autostart = {
   "copyq --start-server",
   "hyprpaper -c " .. programs.config_dir .. "/hyprpaper/hyprpaper.conf",
   "waybar -c " .. programs.home .. "/.config/waybar/config -s " .. programs.home .. "/.config/waybar/style.css",
-  "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
+  host.polkit_agent or "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
   "/usr/libexec/xdg-desktop-portal-hyprland",
   "/usr/libexec/xdg-desktop-portal",
 }

@@ -1,6 +1,11 @@
 # Hibernation interlock: stops one distro mounting the shared btrfs read-write
 # while the other holds an unresumed image. INERT until mad.interlock.enable.
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   vg = "smalltop";
@@ -21,7 +26,7 @@ let
   # Strict: anything but SWAPSPACE2 refuses. False only while cachyos-swap is unformatted.
   strictGate = true;
 
-  cachyDir = "";   # CachyOS kernel + initramfs live at the ESP root
+  cachyDir = ""; # CachyOS kernel + initramfs live at the ESP root
   cachyCmdline =
     "cryptdevice=UUID=${luksUuid}:smalltop_crypt root=UUID=${btrfsUuid} "
     + "rootflags=subvol=@cachyos rw resume=UUID=${cachySwapUuid} quiet splash";
@@ -98,8 +103,10 @@ let
   gateScript = ''
     ${waitForOther}
     if [ ! -e "$interlockDev" ]; then
-      echo "interlock: $interlockDev ABSENT after 60s -- PASSING WITHOUT CHECK"
-      ${lib.optionalString strictGate ''exit 1''}
+      echo "interlock: $interlockDev ABSENT after 60s -- ${
+        if strictGate then "REFUSING (strict gate)" else "PASSING WITHOUT CHECK"
+      }"
+      ${lib.optionalString strictGate "exit 1"}
       exit 0
     fi
     interlockMagic=$(${readMagic})
@@ -107,8 +114,10 @@ let
       SWAPSPACE2) exit 0 ;;
       S1SUSPEND)  ${refusalText} exit 1 ;;
       *)
-        echo "interlock: $interlockDev magic is '$interlockMagic', not SWAPSPACE2 -- PASSING WITHOUT CHECK"
-        ${lib.optionalString strictGate ''exit 1''}
+        echo "interlock: $interlockDev magic is '$interlockMagic', not SWAPSPACE2 -- ${
+          if strictGate then "REFUSING (strict gate)" else "PASSING WITHOUT CHECK"
+        }"
+        ${lib.optionalString strictGate "exit 1"}
         exit 0
         ;;
     esac
@@ -120,155 +129,163 @@ in
     cachyos-swap is formatted -- before that it guards nothing and can only
     misfire'';
   config = lib.mkIf config.mad.interlock.enable {
-  assertions = [
-    {
-      assertion = config.powerManagement.enable;
-      message = "hibernation-interlock: powerManagement.enable must stay true; resumeCommands clears the layer 1 flag.";
-    }
-  ];
-
-  # Without this the initrd root shadow entry is "*" and a layer 2 refusal leaves a prompt nobody can log into.
-  boot.initrd.systemd.emergencyAccess = true;
-
-  # LAYER 3 + LAYER 1 (set): required by the hibernate services, so exit 1 aborts them.
-  systemd.services.hibernation-interlock = {
-    description = "Hibernation interlock gate (layers 3 and 1)";
-    before = [
-      "sleep-actions.service"
-      "sleep.target"
-      "systemd-hibernate.service"
-      "systemd-hybrid-sleep.service"
-      "systemd-suspend-then-hibernate.service"
+    assertions = [
+      {
+        assertion = config.powerManagement.enable;
+        message = "hibernation-interlock: powerManagement.enable must stay true; resumeCommands clears the layer 1 flag.";
+      }
     ];
-    requiredBy = [
-      "systemd-hibernate.service"
-      "systemd-hybrid-sleep.service"
-      "systemd-suspend-then-hibernate.service"
-    ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      interlockDev=${otherSwap}
-      if [ -e "$interlockDev" ]; then
-        if [ "$(${readMagic})" = S1SUSPEND ]; then
-          echo "interlock: $interlockDev holds a hibernation image; refusing to hibernate." >&2
-          exit 1
+
+    # Without this the initrd root shadow entry is "*" and a layer 2 refusal leaves a prompt nobody can log into.
+    boot.initrd.systemd.emergencyAccess = true;
+
+    # LAYER 3 + LAYER 1 (set): required by the hibernate services, so exit 1 aborts them.
+    systemd.services.hibernation-interlock = {
+      description = "Hibernation interlock gate (layers 3 and 1)";
+      before = [
+        "sleep-actions.service"
+        "sleep.target"
+        "systemd-hibernate.service"
+        "systemd-hybrid-sleep.service"
+        "systemd-suspend-then-hibernate.service"
+      ];
+      requiredBy = [
+        "systemd-hibernate.service"
+        "systemd-hybrid-sleep.service"
+        "systemd-suspend-then-hibernate.service"
+      ];
+      serviceConfig.Type = "oneshot";
+      script = ''
+        interlockDev=${otherSwap}
+        if [ -e "$interlockDev" ]; then
+          if [ "$(${readMagic})" = S1SUSPEND ]; then
+            echo "interlock: $interlockDev holds a hibernation image; refusing to hibernate." >&2
+            exit 1
+          fi
         fi
-      fi
-      # Layer 1 is UX only: a failed grubenv write must not abort an otherwise safe sleep.
-      ${editenv} ${grubenv} set nixos_hib=yes && sync -f /boot/grub \
-        || echo "interlock: could not set nixos_hib in ${grubenv}" >&2
-    '';
-  };
+        # Layer 1 is UX only: a failed grubenv write must not abort an otherwise safe sleep.
+        ${editenv} ${grubenv} set nixos_hib=yes && sync -f /boot/grub \
+          || echo "interlock: could not set nixos_hib in ${grubenv}" >&2
+      '';
+    };
 
-  # mkBefore: sleep-actions' preStop runs under set -e and the clear must not be skippable.
-  powerManagement.resumeCommands = lib.mkBefore clearFlag;
+    # mkBefore: sleep-actions' preStop runs under set -e and the clear must not be skippable.
+    powerManagement.resumeCommands = lib.mkBefore clearFlag;
 
-  # LAYER 1 (clear) on cold boot and on clean shutdown.
-  systemd.services.hibernation-interlock-clear = {
-    description = "Clear the NixOS hibernation flag in grubenv";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "local-fs.target" ];
-    restartIfChanged = false;
-    serviceConfig = { Type = "oneshot"; RemainAfterExit = true; };
-    script = clearFlag;
-    preStop = clearFlag;
-  };
-
-  # LAYER 2, systemd stage 1 (the 26.05 default). Failing it fails sysroot.mount's job.
-  boot.initrd.systemd.services = lib.optionalAttrs sysdInitrd {
-    hibernation-interlock = {
-      description = "Hibernation interlock gate (layer 2)";
-      # cryptsetup.target is the sanctioned hook; the 60s poll is the real synchronisation.
-      after = [ "cryptsetup.target" otherSwapUnit ];
-      before = [ "sysroot.mount" ];
-      requiredBy = [ "sysroot.mount" ];
-      unitConfig.DefaultDependencies = false;
+    # LAYER 1 (clear) on cold boot and on clean shutdown.
+    systemd.services.hibernation-interlock-clear = {
+      description = "Clear the NixOS hibernation flag in grubenv";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "local-fs.target" ];
+      restartIfChanged = false;
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        StandardOutput = "journal+console";
-        StandardError = "journal+console";
       };
-      script = gateScript;
+      script = clearFlag;
+      preStop = clearFlag;
+    };
+
+    # LAYER 2, systemd stage 1 (the 26.05 default). Failing it fails sysroot.mount's job.
+    boot.initrd.systemd.services = lib.optionalAttrs sysdInitrd {
+      hibernation-interlock = {
+        description = "Hibernation interlock gate (layer 2)";
+        # cryptsetup.target is the sanctioned hook; the 60s poll is the real synchronisation.
+        after = [
+          "cryptsetup.target"
+          otherSwapUnit
+        ];
+        before = [ "sysroot.mount" ];
+        requiredBy = [ "sysroot.mount" ];
+        unitConfig.DefaultDependencies = false;
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          StandardOutput = "journal+console";
+          StandardError = "journal+console";
+        };
+        script = gateScript;
+      };
+    };
+
+    # LAYER 2, scripted stage 1. Runs after `lvm vgchange -ay`, long before any root mount.
+    boot.initrd.postDeviceCommands = lib.mkIf (!sysdInitrd) (
+      lib.mkAfter ''
+        (
+        ${gateScript}
+        ) || {
+          fail
+          # fail()'s "*" branch RETURNS and would let stage 1 mount root. Never fall through.
+          echo "interlock: rebooting in 10s"
+          sleep 10
+          reboot -f
+        }
+      ''
+    );
+
+    # ---- LAYER 1 (GRUB) and the CachyOS entries ----
+
+    environment.systemPackages = [ pkgs.grub2_efi ];
+    # grub-editenv; the module contributes
+    # none of its own when device = "nodev"
+
+    boot.loader.grub = {
+      enable = true;
+      efiSupport = true;
+      efiInstallAsRemovable = true;
+      device = "nodev";
+      copyKernels = true;
+      useOSProber = false; # structurally cannot find CachyOS here -- see §1
+      configurationLimit = 10; # NixOS gens + the CachyOS pair must fit in 2 GiB
+      extraEntriesBeforeNixOS = false;
+
+      # insmods are documentation: GRUB's normal mode autoloads all of these from command.lst.
+      extraConfig = ''
+        insmod part_gpt
+        insmod fat
+        insmod search_fs_uuid
+        insmod loadenv
+        insmod test
+        insmod sleep
+
+        # Explicit about which variables are whitelisted; absent or empty means allow.
+        if [ -s ''${prefix}/grubenv ]; then
+          load_env -f ''${prefix}/grubenv nixos_hib cachyos_hib
+        fi
+
+        # A hibernated distro gets a two-entry menu (resume / Full Menu); ESC also falls through.
+        if [ "''${cachyos_hib}" = "yes" ]; then
+          set default=cachyos
+        fi
+        if [ "''${interlock_autoboot}" = "1" ]; then
+          set timeout=0
+        elif [ "''${interlock_full_menu}" != "1" ]; then
+          if [ "''${cachyos_hib}" = "yes" ]; then
+            configfile ''${prefix}/cachyos-hibernated.cfg
+          elif [ "''${nixos_hib}" = "yes" ]; then
+            configfile ''${prefix}/nixos-hibernated.cfg
+          fi
+        fi
+      '';
+
+      # Not offered while NixOS is hibernated; any NixOS boot clears a stale flag.
+      extraEntries = ''
+        if [ "''${nixos_hib}" != "yes" ]; then
+        menuentry "CachyOS" --class cachyos --class gnu-linux --class os --id cachyos {
+          ${cachyBody}
+        }
+        fi
+      '';
+
+      # Not extraFiles: that is copied on every rebuild; this only when it changed.
+      extraPrepareConfig = ''
+        for f in ${cachyosHibernatedMenu}:cachyos-hibernated.cfg ${nixosHibernatedMenu}:nixos-hibernated.cfg; do
+          cmp -s "''${f%%:*}" "/boot/grub/''${f##*:}" || cp "''${f%%:*}" "/boot/grub/''${f##*:}"
+        done
+      '';
+
+      # Advisory, never a block: install-grub.pl injects this into every entry, so a loop here deadlocks an unattended boot.
+      extraPerEntryConfig = ''if [ "''${cachyos_hib}" = "yes" ]; then echo ""; echo "  WARNING: CachyOS holds an unresumed hibernation image."; echo "  The initrd gate will refuse this boot. Press ESC to return to the menu."; sleep --interruptible 10; fi'';
     };
   };
-
-  # LAYER 2, scripted stage 1. Runs after `lvm vgchange -ay`, long before any root mount.
-  boot.initrd.postDeviceCommands = lib.mkIf (!sysdInitrd) (lib.mkAfter ''
-    (
-    ${gateScript}
-    ) || {
-      fail
-      # fail()'s "*" branch RETURNS and would let stage 1 mount root. Never fall through.
-      echo "interlock: rebooting in 10s"
-      sleep 10
-      reboot -f
-    }
-  '');
-
-  # ---- LAYER 1 (GRUB) and the CachyOS entries ----
-
-  environment.systemPackages = [ pkgs.grub2_efi ];   # grub-editenv; the module contributes
-                                                     # none of its own when device = "nodev"
-
-  boot.loader.grub = {
-    enable = true;
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-    device = "nodev";
-    copyKernels = true;
-    useOSProber = false;          # structurally cannot find CachyOS here -- see §1
-    configurationLimit = 10;      # NixOS gens + the CachyOS pair must fit in 2 GiB
-    extraEntriesBeforeNixOS = false;
-
-    # insmods are documentation: GRUB's normal mode autoloads all of these from command.lst.
-    extraConfig = ''
-      insmod part_gpt
-      insmod fat
-      insmod search_fs_uuid
-      insmod loadenv
-      insmod test
-      insmod sleep
-
-      # Explicit about which variables are whitelisted; absent or empty means allow.
-      if [ -s ''${prefix}/grubenv ]; then
-        load_env -f ''${prefix}/grubenv nixos_hib cachyos_hib
-      fi
-
-      # A hibernated distro gets a two-entry menu (resume / Full Menu); ESC also falls through.
-      if [ "''${cachyos_hib}" = "yes" ]; then
-        set default=cachyos
-      fi
-      if [ "''${interlock_autoboot}" = "1" ]; then
-        set timeout=0
-      elif [ "''${interlock_full_menu}" != "1" ]; then
-        if [ "''${cachyos_hib}" = "yes" ]; then
-          configfile ''${prefix}/cachyos-hibernated.cfg
-        elif [ "''${nixos_hib}" = "yes" ]; then
-          configfile ''${prefix}/nixos-hibernated.cfg
-        fi
-      fi
-    '';
-
-    # Not offered while NixOS is hibernated; any NixOS boot clears a stale flag.
-    extraEntries = ''
-      if [ "''${nixos_hib}" != "yes" ]; then
-      menuentry "CachyOS" --class cachyos --class gnu-linux --class os --id cachyos {
-        ${cachyBody}
-      }
-      fi
-    '';
-
-    # Not extraFiles: that is copied on every rebuild; this only when it changed.
-    extraPrepareConfig = ''
-      for f in ${cachyosHibernatedMenu}:cachyos-hibernated.cfg ${nixosHibernatedMenu}:nixos-hibernated.cfg; do
-        cmp -s "''${f%%:*}" "/boot/grub/''${f##*:}" || cp "''${f%%:*}" "/boot/grub/''${f##*:}"
-      done
-    '';
-
-    # Advisory, never a block: install-grub.pl injects this into every entry, so a loop here deadlocks an unattended boot.
-    extraPerEntryConfig = ''if [ "''${cachyos_hib}" = "yes" ]; then echo ""; echo "  WARNING: CachyOS holds an unresumed hibernation image."; echo "  The initrd gate will refuse this boot. Press ESC to return to the menu."; sleep --interruptible 10; fi'';
-  };
-  };
 }
-

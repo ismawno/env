@@ -1,4 +1,5 @@
 local host = require("host")
+local profile = require("shub." .. host.kind)
 
 for _, monitor in ipairs(host.monitors) do
   hl.monitor(monitor)
@@ -28,10 +29,10 @@ hl.config({
 
   decoration = {
     active_opacity = 1,
-    inactive_opacity = host.inactive_opacity,
+    inactive_opacity = profile.inactive_opacity,
     rounding = 0,
     blur = {
-      enabled = host.blur,
+      enabled = profile.blur,
       size = 5,
       passes = 3,
       new_optimizations = true,

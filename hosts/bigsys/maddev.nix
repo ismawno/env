@@ -1,7 +1,10 @@
 { ... }:
 
 {
-  imports = [ ../../users/modules/pkgs-unstable.nix ];
+  imports = [
+    ../../users/modules/pkgs-unstable.nix
+    ../../users/modules/hypr-desktop.nix
+  ];
 
   # Pascal has no AV1 decoder, so off pushes YouTube to VP9, which it does decode.
   # Never share: smalltop's Iris Xe decodes AV1 in hardware and would regress.

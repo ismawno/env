@@ -89,7 +89,10 @@ let
   '';
 in
 {
-  imports = [ ../../users/modules/pkgs-unstable.nix ];
+  imports = [
+    ../../users/modules/pkgs-unstable.nix
+    ../../users/modules/hypr-laptop.nix
+  ];
 
   # System syncthing only -- the home-manager user unit is right for bigsys. Both
   # running means the loser cannot take the database lock and every switch fails.
@@ -111,10 +114,6 @@ in
         scale = 1;
       }
     ];
-
-    # 0.7 dropped inactive-window text contrast from 11.34:1 to 5.70:1, and blur smears whatever is behind the window.
-    inactiveOpacity = 1.0;
-    blur = false;
 
     lid = {
       switch = "Lid Switch";

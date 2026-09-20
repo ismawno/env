@@ -1,4 +1,5 @@
 local host = require("host")
+local profile = require("shub." .. host.kind)
 local programs = require("shub.programs")
 
 for _, variable in ipairs({
@@ -30,8 +31,8 @@ local autostart = {
   "/usr/libexec/xdg-desktop-portal",
 }
 
-if host.lid then
-  autostart[#autostart + 1] = host.lid.script .. " sync"
+for _, command in ipairs(profile.autostart) do
+  autostart[#autostart + 1] = command
 end
 
 hl.on("hyprland.start", function()

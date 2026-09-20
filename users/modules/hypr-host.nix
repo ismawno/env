@@ -9,17 +9,8 @@
 let
   cfg = config.mad.hypr;
   shared = ../../dotfiles/shub/hyprland-lua;
-  facts = {
-    inherit (cfg)
-      monitors
-      blur
-      lid
-      programs
-      ;
-    inactive_opacity = cfg.inactiveOpacity;
-  };
   hostLua = pkgs.writeText "hypr-host.lua" ''
-    return ${lib.generators.toLua { } facts}
+    return ${lib.generators.toLua { } cfg.facts}
   '';
 in
 {
@@ -37,32 +28,15 @@ in
       description = "hl.monitor specs, applied in the order given.";
     };
 
-    inactiveOpacity = lib.mkOption {
-      type = lib.types.numbers.between 0.0 1.0;
-      default = 0.7;
-      description = "decoration.inactive_opacity for this host.";
-    };
-
-    blur = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "decoration.blur.enabled for this host.";
-    };
-
-    lid = lib.mkOption {
-      type = lib.types.nullOr (lib.types.attrsOf lib.types.str);
-      default = null;
-      example = {
-        switch = "Lid Switch";
-        script = "/run/current-system/sw/bin/lid";
-      };
-      description = "Lid switch name and the script its close, open and sync binds call.";
-    };
-
     programs = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
       description = "Host-only replacements for the default programs.";
+    };
+
+    facts = lib.mkOption {
+      type = lib.types.attrsOf lib.types.anything;
+      description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile.";
     };
 
     tree = lib.mkOption {
@@ -77,5 +51,9 @@ in
       '';
       description = "The shared Lua tree with this host's host.lua rendered beside it.";
     };
+  };
+
+  config.mad.hypr.facts = {
+    inherit (cfg) monitors programs;
   };
 }

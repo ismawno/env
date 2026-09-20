@@ -1,4 +1,5 @@
 local host = require("host")
+local profile = require("shub." .. host.kind)
 local programs = require("shub.programs")
 
 local dsp = hl.dsp
@@ -137,8 +138,4 @@ for _, arrow in ipairs({
   hl.bind(mod .. " + SHIFT + " .. arrow[1], win.move({ direction = arrow[1] }))
 end
 
--- Closed on AC keeps running: the panel leaves the layout and comes back when the lid opens.
-if host.lid then
-  hl.bind("switch:on:" .. host.lid.switch, dsp.exec_cmd(host.lid.script .. " close"), locked)
-  hl.bind("switch:off:" .. host.lid.switch, dsp.exec_cmd(host.lid.script .. " open"), locked)
-end
+profile.binds(locked)

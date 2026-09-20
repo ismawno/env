@@ -19,6 +19,14 @@ in
   ];
 
   home.packages = with pkgs; [
+    # Delete in imv: ask first, then move the picture to ~/Pictures/Wallpapers-rejected and drop it from the view.
+    (writeShellScriptBin "imv-reject" ''
+      choice=$(printf 'No\nYes' | rofi -dmenu -i -p "Remove $(basename "$1")?")
+      [ "$choice" = Yes ] || exit 0
+      mkdir -p "$HOME/Pictures/Wallpapers-rejected"
+      mv "$1" "$HOME/Pictures/Wallpapers-rejected/" && imv-msg "$2" close
+    '')
+
     pkgs-unstable.claude-code
     syncthing
     obsidian
@@ -267,6 +275,11 @@ in
   };
 
   programs.starship.enable = true;
+
+  programs.gh = {
+    enable = true;
+    settings.git_protocol = "https";
+  };
   programs.zsh = {
     sessionVariables = {
       MAD_ENV_PATH = "/home/maddev/env";
@@ -333,6 +346,11 @@ in
   home.homeDirectory = lib.mkForce "/home/maddev";
 
   xdg.configFile = {
+    "imv/config".text = ''
+      [binds]
+      <Delete> = exec imv-reject "$imv_current_file" "$imv_pid"
+    '';
+
     # Hyprland takes hyprland.lua over hyprland.conf; the tree carries this host's host.lua.
     "hypr/hyprland.lua".source = "${config.mad.hypr.tree}/hyprland.lua";
     "hypr/host.lua".source = "${config.mad.hypr.tree}/host.lua";

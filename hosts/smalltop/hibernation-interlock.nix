@@ -24,7 +24,7 @@ let
   cachyDir = "";   # CachyOS kernel + initramfs live at the ESP root
   cachyCmdline =
     "cryptdevice=UUID=${luksUuid}:smalltop_crypt root=UUID=${btrfsUuid} "
-    + "rootflags=subvol=@cachyos rw resume=UUID=${cachySwapUuid}";
+    + "rootflags=subvol=@cachyos rw resume=UUID=${cachySwapUuid} quiet splash";
 
   cachyBody = ''
     insmod part_gpt
@@ -42,7 +42,7 @@ let
     }'';
   cachyosHibernatedMenu = pkgs.writeText "cachyos-hibernated.cfg" ''
     set default=0
-    set timeout=5
+    set timeout=1
     menuentry "CachyOS (resume from hibernation)" --class cachyos --class gnu-linux --class os {
     ${cachyBody}
     }
@@ -51,7 +51,7 @@ let
   # NixOS kernel paths change per generation, so re-enter grub.cfg and auto-boot its default.
   nixosHibernatedMenu = pkgs.writeText "nixos-hibernated.cfg" ''
     set default=0
-    set timeout=5
+    set timeout=1
     menuentry "NixOS (resume from hibernation)" --class nixos {
       set interlock_autoboot=1
       export interlock_autoboot

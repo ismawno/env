@@ -81,6 +81,9 @@ in
     ghostty
     mpv
     playerctl
+    scrcpy
+    android-tools
+    qt6Packages.qt6ct
     spotify
     obs-studio
     cava

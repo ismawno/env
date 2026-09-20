@@ -101,7 +101,6 @@ alias gdev="nix develop $HOME/develop --command $SHELL -il"
 alias lnvim="nix develop --command $SHELL -il -c 'nvim .'"
 alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
 
-alias airpods="bluetoothctl connect F0:04:E1:D5:04:DB"
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
@@ -116,8 +115,7 @@ eval "$(zoxide init --cmd cd zsh)"
 
 command_not_found_handler() {
   if ! command -v nix-locate >/dev/null 2>&1; then
-    echo "nix-index is not installed. Install it with:"
-    echo "nix profile install nixpkgs#nix-index"
+    echo "nix-locate is missing; it comes with the system config (nix-index-database)."
     return 127
   fi
 

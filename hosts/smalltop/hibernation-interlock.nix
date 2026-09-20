@@ -127,8 +127,7 @@ in
     }
   ];
 
-  # Mandatory for testing: without it the initrd's shadow entry for root is "*" and a
-  # layer 2 refusal leaves a prompt you cannot log into. See the security note in §7.2.
+  # Without this the initrd root shadow entry is "*" and a layer 2 refusal leaves a prompt nobody can log into.
   boot.initrd.systemd.emergencyAccess = true;
 
   # LAYER 3 + LAYER 1 (set): required by the hibernate services, so exit 1 aborts them.
@@ -161,8 +160,7 @@ in
     '';
   };
 
-  # LAYER 1 (clear) on resume. mkBefore, because sleep-actions' preStop runs under set -e
-  # and the clear must not be skippable by an earlier failing command.
+  # mkBefore: sleep-actions' preStop runs under set -e and the clear must not be skippable.
   powerManagement.resumeCommands = lib.mkBefore clearFlag;
 
   # LAYER 1 (clear) on cold boot and on clean shutdown.
@@ -180,8 +178,7 @@ in
   boot.initrd.systemd.services = lib.optionalAttrs sysdInitrd {
     hibernation-interlock = {
       description = "Hibernation interlock gate (layer 2)";
-      # cryptsetup.target is the sanctioned hook (luksroot.nix:1117, target added :1227).
-      # The .device is ordering-only best effort; the 60s poll is the real synchronisation.
+      # cryptsetup.target is the sanctioned hook; the 60s poll is the real synchronisation.
       after = [ "cryptsetup.target" otherSwapUnit ];
       before = [ "sysroot.mount" ];
       requiredBy = [ "sysroot.mount" ];
@@ -224,8 +221,7 @@ in
     configurationLimit = 10;      # NixOS gens + the CachyOS pair must fit in 2 GiB
     extraEntriesBeforeNixOS = false;
 
-    # GRUB's normal mode autoloads every command below from command.lst; these insmods are
-    # explicit documentation, not a requirement. loadenv and test are listed for that reason.
+    # insmods are documentation: GRUB's normal mode autoloads all of these from command.lst.
     extraConfig = ''
       insmod part_gpt
       insmod fat
@@ -234,8 +230,7 @@ in
       insmod test
       insmod sleep
 
-      # install-grub.pl:312 already emits an unconditional load_env; this one is explicit
-      # about which variables are whitelisted. Absent or empty means "allow" -- fails open.
+      # Explicit about which variables are whitelisted; absent or empty means allow.
       if [ -s ''${prefix}/grubenv ]; then
         load_env -f ''${prefix}/grubenv nixos_hib cachyos_hib
       fi
@@ -271,9 +266,7 @@ in
       done
     '';
 
-    # Advisory only, and deliberately NOT a block: install-grub.pl:517 injects this into
-    # EVERY generated entry including the auto-booted default, so anything that loops here
-    # (e.g. `configfile $prefix/grub.cfg`) deadlocks an unattended boot with no exit.
+    # Advisory, never a block: install-grub.pl injects this into every entry, so a loop here deadlocks an unattended boot.
     extraPerEntryConfig = ''if [ "''${cachyos_hib}" = "yes" ]; then echo ""; echo "  WARNING: CachyOS holds an unresumed hibernation image."; echo "  The initrd gate will refuse this boot. Press ESC to return to the menu."; sleep --interruptible 10; fi'';
   };
   };

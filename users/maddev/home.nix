@@ -131,8 +131,7 @@ in
     tray.enable = true;
   };
 
-  # TUI tools rofi would otherwise miss (no upstream .desktop) or open tiled.
-  # Terminal=false because popup.sh dispatches its own floating ghostty.
+  # TUI tools rofi would otherwise miss; Terminal=false because popup.sh dispatches its own ghostty.
   xdg.desktopEntries =
     let
       popup = "${config.home.homeDirectory}/.config/hypr/scripts/popup.sh";
@@ -372,8 +371,7 @@ in
     "hypr/hyprpaper".source = "${shub}/hyprland/hyprpaper";
     "hypr/scripts".source = "${shub}/hyprland/scripts";
 
-    # PER FILE, not directory sources, so smalltop can override one file without
-    # forking the set. Do NOT collapse back to `"waybar".source = ...`.
+    # PER FILE, not directory sources, so a host can override one file without forking the set.
     "waybar/config".source = "${shub}/waybar/config";
     "waybar/lumi-config".source = "${shub}/waybar/lumi-config";
     "waybar/modules".source = "${shub}/waybar/modules";

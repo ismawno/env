@@ -6,8 +6,7 @@
     ../../users/modules/hypr-desktop.nix
   ];
 
-  # Pascal has no AV1 decoder, so off pushes YouTube to VP9, which it does decode.
-  # Never share: smalltop's Iris Xe decodes AV1 in hardware and would regress.
+  # Pascal has no AV1 decoder; off pushes YouTube to VP9. Never share: Iris Xe would regress.
   mad.zen.extraPrefs = ''
     user_pref("media.av1.enabled", false);
   '';

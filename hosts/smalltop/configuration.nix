@@ -10,8 +10,7 @@
 }:
 
 let
-  # DATA-only dirs on @nomad, bind-mounted into $HOME below (add a line + `mv`).
-  # App STATE (zen profile, Steam, ~/Development) stays per-distro -- never add it.
+  # DATA-only dirs on @nomad, bind-mounted into $HOME (add a line + mv); never app STATE.
   nomadBinds = {
     "/home/maddev/Downloads" = "/nomad/maddev/Downloads";
     "/home/maddev/Documents" = "/nomad/maddev/Documents";
@@ -47,8 +46,7 @@ in
   networking.hostName = "smalltop";
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # mkForce over the shared 6_12 pin: samsung_galaxybook needs >= 6.15 (kbd
-  # backlight, platform profile, charge limit). nixpkgs 26.05 removed _6_17/_6_19.
+  # samsung_galaxybook needs >= 6.15; 26.05 removed _6_17/_6_19.
   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_18;
 
   boot.initrd.availableKernelModules = [
@@ -70,13 +68,11 @@ in
   # GRUB core lives in ../../configuration.nix; the CachyOS entries in ./hibernation-interlock.nix.
   boot.loader.efi.efiSysMountPoint = "/boot";
 
-  # BOOT-CRITICAL, DO NOT REVERT: Samsung firmware discards EFI NVRAM entries, so
-  # boot lives on EFI/BOOT/BOOTX64.EFI. Reverting bricks the NEXT rebuild, not this one.
+  # BOOT-CRITICAL: Samsung firmware discards EFI NVRAM, so boot lives on EFI/BOOT/BOOTX64.EFI.
   boot.loader.grub.efiInstallAsRemovable = true;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
-  # boot.resumeDevice comes from ./disko.nix; redeclaring it here conflicts. Never
-  # point it at cachyos-swap -- see the CachyOS note in Knowledge/Infra/MadTop.
+  # boot.resumeDevice comes from ./disko.nix; never point it at cachyos-swap (vault: Infra/MadTop, "MadTop hibernation").
 
   # i915 is what binds 8086:a7a0 on 6.18; xe is present but does not claim it.
   hardware.graphics = {
@@ -90,8 +86,7 @@ in
   };
   environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
 
-  # ~215 DPI panel. rgba = "none" is deliberate: fractional scale resamples buffers
-  # into colour fringes and subpixel AA buys nothing here. Revisit only at integer scale.
+  # ~215 DPI: subpixel AA buys nothing and fringes at fractional scale.
   fonts = {
     fontconfig = {
       antialias = true;
@@ -113,8 +108,7 @@ in
     };
     packages = with pkgs; [
       noto-fonts
-      # NOT `noto-fonts-emoji`: it is an alias that throws only when forced, so it
-      # passes `nix flake check --no-build` and fails at build time.
+      # noto-fonts-color-emoji, never the noto-fonts-emoji alias: it fails at build, not at eval.
       noto-fonts-color-emoji
     ];
   };
@@ -129,8 +123,7 @@ in
 
   # Audio lives in ./audio.nix (imported above).
 
-  # Off deliberately: ov02c10 runs at 26 MHz, the in-tree driver demands 19.2 and
-  # will not probe. The out-of-tree route freezes on s2idle >=6.16 -- costs hibernation.
+  # ov02c10 runs at 26 MHz, the in-tree driver demands 19.2; the out-of-tree route costs hibernation.
   hardware.ipu6 = {
     enable = false;
     platform = "ipu6ep";
@@ -145,24 +138,17 @@ in
     tctiEnvironment.enable = true;
   };
 
-  # Power profiles live in ./power-profiles.nix (imported above);
-  # samsung_galaxybook exposes the ACPI platform_profile that PPD drives.
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
 
-  # samsung_galaxybook also gives kbd_backlight, charge_control_end_threshold and
-  # /sys/firmware/acpi/platform_profile -- no module params or acpi_osi needed.
-
-  # ./disko.nix mounts @nomad at /nomad root-owned; give maddev a place inside it.
-  # ("nomad" is the shared data subvolume, unrelated to hosts/nomad/ in this flake.)
+  # ./disko.nix mounts @nomad root-owned; give maddev a place inside it.
   systemd.tmpfiles.rules = [
     "d /nomad 0755 root root -"
     "d /nomad/maddev 0700 maddev users -"
   ]
   ++ map (src: "d ${src} 0700 maddev users -") (lib.attrValues nomadBinds);
 
-  # Bind the shared dirs into $HOME so apps see their usual paths. `nofail` is
-  # deliberate: the sources do not exist on a fresh install and must not wedge boot.
+  # nofail: the sources do not exist on a fresh install and must not wedge boot.
   fileSystems = lib.mapAttrs (_target: src: {
     device = src;
     fsType = "none";
@@ -181,8 +167,7 @@ in
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.ly.enableGnomeKeyring = true;
 
-  # Never copy bigsys's syncthing state: the device ID is the identity and two
-  # machines answering to one will fight. override* = false keeps web-UI additions.
+  # Never copy bigsys's syncthing state: the device ID is the identity.
   services.syncthing = {
     enable = true;
     user = "maddev";
@@ -252,8 +237,7 @@ in
 
   users.users.maddev = {
     isNormalUser = true;
-    # Pinned: bind mounts do not translate ownership, so NixOS and CachyOS must
-    # agree on maddev's uid or shared files on @nomad show up owned by a stranger.
+    # Pinned: bind mounts do not translate ownership, so both distros must agree on the uid.
     uid = 1000;
     description = "maddev";
     extraGroups = [

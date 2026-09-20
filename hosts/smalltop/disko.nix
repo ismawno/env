@@ -6,8 +6,7 @@ let
   # Stable by-id path. Never /dev/nvme0n1 -- enumeration order is not a contract.
   diskDevice = "/dev/disk/by-id/nvme-KINGSTON_SNV2S1000G_50026B7382E2A171";
 
-  # DRAM-less Kingston NV2, so minimise writes: zstd:1 over :3, discard=async.
-  # Deliberately not autodefrag (write amplification) nor discard=sync (stalls).
+  # Stable by-id path; enumeration order is not a contract.
   btrfsMountOptions = [
     "compress=zstd:1"
     "noatime"
@@ -22,8 +21,7 @@ in
       content = {
         type = "gpt";
         partitions = {
-          # 2 GiB, not the old 1 GiB: GRUB, several generations of kernels and
-          # initrds, plus CachyOS's loader directory later, all live here.
+          # 2 GiB: GRUB, several NixOS generations and the CachyOS kernel all live here.
           ESP = {
             priority = 1;
             name = "ESP";
@@ -47,13 +45,11 @@ in
             content = {
               type = "luks";
               name = "cryptroot"; # -> /dev/mapper/cryptroot
-              # No keyFile/passwordFile, so disko prompts interactively at format
-              # time; the passphrase is never written to the repo or to disk.
+              # No keyFile: disko prompts at format time, so the passphrase never reaches the repo.
               settings = {
                 # Lets btrfs's discard=async reach the NVMe; reveals unused blocks.
                 allowDiscards = true;
-                # Skips dm-crypt's workqueues: faster on NVMe, documented as
-                # slightly weaker against a physically present attacker.
+                # bypassWorkqueues: faster on NVMe, slightly weaker against a physically present attacker.
                 bypassWorkqueues = true;
               };
               extraFormatArgs = [
@@ -73,8 +69,7 @@ in
     lvm_vg.smalltop = {
       type = "lvm_vg";
       lvs = {
-        # 20 GiB for 16 GiB of RAM: hibernation image plus swap headroom. Named
-        # nixos-swap to mirror cachyos-swap; both double the hyphen in /dev/mapper.
+        # 20 GiB for 16 GiB of RAM: hibernation image plus swap headroom.
         nixos-swap = {
           size = "20G";
           content = {
@@ -87,8 +82,7 @@ in
           };
         };
 
-        # Reserved for CachyOS: no `content`, so disko creates the LV and leaves it
-        # unsignatured. If CachyOS never happens, lvremove and grow root online.
+        # Reserved for CachyOS: no content, so disko leaves the LV unsignatured.
         cachyos-swap = {
           size = "20G";
         };

@@ -70,8 +70,7 @@
   # Allow unfree for Discord/Spotify
   nixpkgs.config.allowUnfree = lib.mkForce true;
 
-  # schedutil ramps 1.2 -> 4.5 GHz on demand and idles at the minimum. Not
-  # "performance" (pins max clock) and not PPD (laptop-oriented).
+  # schedutil, not performance (pins max clock) and not PPD (laptop-oriented).
   powerManagement.enable = true;
   powerManagement.cpuFreqGovernor = "schedutil";
   services.thermald.enable = true; # keeps the W-2155 at sustained turbo
@@ -103,8 +102,7 @@
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     NIXOS_OZONE_WL = "1";
 
-    # nvidia_drv_video.so reads /proc/version at init and the RDD file broker denies
-    # it, so decode drops to software. Gecko 153 has no narrower pref than this.
+    # The RDD file broker denies nvidia_drv_video.so /proc/version; Gecko 153 has no narrower pref.
     MOZ_DISABLE_RDD_SANDBOX = "1";
   };
 
@@ -127,8 +125,6 @@
 
   # DHCP on every interface; the recommended form for scripted networking.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp2s0.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlp3s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;

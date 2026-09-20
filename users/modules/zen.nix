@@ -27,14 +27,12 @@ in
     description = "Host-specific user_pref lines, appended after the shared set.";
   };
 
-  # Zen keeps profiles under XDG config rather than ~/.zen, and the directory name
-  # is generated at first launch, so match on the marker files every profile has.
+  # Zen's profile directory name is generated at first launch, so match on the marker files.
   config.home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
       for profile in "$root"/*/; do
         if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
-          # `install -m`, not `cp`: cp preserves the store's 0444 mode, so the
-          # next activation hits "Permission denied" and the whole switch fails.
+          # install -m, not cp: cp preserves the store's 0444 and the next activation dies on it.
           install -m 0644 "${userJs}" "$profile/user.js"
         fi
       done

@@ -3,8 +3,7 @@
   ...
 }:
 
-# DEEPSEEK_API_KEY and aliases come from dotfiles/shub/zsh/.zshrc. `options` goes
-# straight into the request body: v4-flash takes all efforts, v4-pro only high/max.
+# options goes straight into the request body: v4-flash takes all efforts, v4-pro only high/max.
 
 {
   home.packages = [ pkgs-unstable.opencode ];

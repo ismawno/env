@@ -37,12 +37,9 @@ let
   # APPENDED to the shared dotfiles, which stay the single source of truth for bigsys.
   ghosttyOverrides = pkgs.writeText "ghostty-smalltop-overrides.conf" ''
 
-    # HiDPI overrides, appended; Ghostty takes the LAST duplicate key. At scale 2 an
-    # integral em needs a point size that is a multiple of 0.375 -- retune only to those.
+    # Ghostty takes the LAST duplicate key; at scale 2 an integral em needs a multiple of 0.375.
     font-size = 12
 
-    # No background-opacity or alpha-blending overrides. `linear` fixes light-on-dark
-    # thinning but was rejected on sight as fuzzier -- do not re-apply unasked.
   '';
 
   waybarOverrides = pkgs.writeText "waybar-smalltop-overrides.css" ''
@@ -94,8 +91,7 @@ in
     ../../users/modules/hypr-laptop.nix
   ];
 
-  # System syncthing only -- the home-manager user unit is right for bigsys. Both
-  # running means the loser cannot take the database lock and every switch fails.
+  # System syncthing only here; two daemons fight over the database lock.
   services.syncthing.enable = lib.mkForce false;
 
   mad.hypr = {
@@ -121,8 +117,7 @@ in
     };
   };
 
-  # mkForce because users/maddev/home.nix defines these too; that file wires ghostty
-  # and waybar PER FILE so a host can replace one file without forking the directory.
+  # mkForce: home.nix wires these per file so a host can replace one without forking the directory.
   xdg.configFile."ghostty/config".source = lib.mkForce (
     pkgs.concatText "ghostty-config-smalltop" [
       shubGhostty

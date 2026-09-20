@@ -7,12 +7,9 @@
   mad.audio = {
     support32Bit = true;
 
-    # No sinkPriorities: bluetooth headsets already outrank the internal
-    # speakers (1010 vs 1000), so the default auto-switch is what we want.
   };
 
-  # ALC298 4-amp quirk for 144d:c886 is upstream since 6.12; no modprobe option
-  # needed. If silent, try `model=alc298-samsung-amp-v2-4-amps` on snd-hda-intel.
+  # ALC298 4-amp quirk for 144d:c886 is upstream since 6.12.
 
   # Hibernate resume leaves the speakers silent with every register still correct;
   # only unbind+bind re-runs codec init. Verified across a real cycle 2026-09-16.

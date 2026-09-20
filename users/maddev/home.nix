@@ -183,7 +183,7 @@ in
       imv = {
         name = "imv";
         genericName = "Image Viewer";
-        exec = "imv %f";
+        exec = "imv-dir %f";
         terminal = false;
         categories = [
           "Graphics"

@@ -20,13 +20,8 @@
   # smbclient/nmblookup, for checking shares outside of Thunar.
   environment.systemPackages = with pkgs; [ samba ];
 
-  # Tailscale was sending all home-network traffic through allumeur. That made
-  # the kernel discard the NAS's announcements and slowed every local transfer.
-  #
-  # This talks straight to anything on the same network as us, and still falls
-  # back to Tailscale when we are away, so the homelab stays reachable.
-  #
-  # To undo it while running: sudo ip rule del pref 5205
+  # Tailscale routed home traffic through allumeur, so the kernel dropped the NAS's
+  # announcements. Undo while running with: sudo ip rule del pref 5205
   systemd.services.prefer-direct-lan-routes = {
     description = "Prefer directly-connected routes over Tailscale subnet routes";
     after = [

@@ -1,0 +1,52 @@
+# Foggy pine forest with a bare passphrase field; field and dots come pre-rendered at their final size, because Plymouth scales images without smoothing.
+sw = Window.GetWidth();
+sh = Window.GetHeight();
+
+bg = Image("background.png");
+s = Math.Max(sw / bg.GetWidth(), sh / bg.GetHeight());
+if (s != 1) bg = bg.Scale(bg.GetWidth() * s, bg.GetHeight() * s);
+bg_sprite = Sprite(bg);
+bg_sprite.SetPosition((sw - bg.GetWidth()) / 2, (sh - bg.GetHeight()) / 2, -100);
+
+box = Image("entry.png");
+box_w = box.GetWidth();
+box_h = box.GetHeight();
+box_y = sh * 0.40;
+box_sprite = Sprite(box);
+box_sprite.SetPosition((sw - box_w) / 2, box_y, 10);
+box_sprite.SetOpacity(0);
+
+dot = Image("dot.png");
+dot_size = dot.GetWidth();
+dot_step = dot_size * 1.9;
+max_dots = Math.Int((box_w - box_h) / dot_step);
+dots = [];
+
+message_sprite = Sprite();
+
+fun display_password_callback(prompt, bullets) {
+    box_sprite.SetOpacity(1);
+    for (i = 0; dots[i]; i++) dots[i].SetOpacity(0);
+    n = Math.Min(bullets, max_dots);
+    start = (sw - n * dot_step + (dot_step - dot_size)) / 2;
+    for (i = 0; i < n; i++) {
+        if (!dots[i]) dots[i] = Sprite(dot);
+        dots[i].SetPosition(start + i * dot_step, box_y + (box_h - dot_size) / 2, 11);
+        dots[i].SetOpacity(1);
+    }
+}
+
+fun display_normal_callback() {
+    box_sprite.SetOpacity(0);
+    for (i = 0; dots[i]; i++) dots[i].SetOpacity(0);
+}
+
+fun message_callback(text) {
+    m = Image.Text(text, 0.93, 0.93, 0.93, 1, "Sans " + Math.Int(sh / 75));
+    message_sprite.SetImage(m);
+    message_sprite.SetPosition((sw - m.GetWidth()) / 2, sh * 0.52, 10);
+}
+
+Plymouth.SetDisplayPasswordFunction(display_password_callback);
+Plymouth.SetDisplayNormalFunction(display_normal_callback);
+Plymouth.SetMessageFunction(message_callback);

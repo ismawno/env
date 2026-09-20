@@ -3,12 +3,8 @@
   ...
 }:
 
-# DEEPSEEK_API_KEY and the aliases come from dotfiles/shub/zsh/.zshrc.
-#
-# `options` is passed straight into the request body:
-#   thinking.type             "enabled" | "disabled"   (default enabled)
-#   thinking.reasoning_effort "low" | "high" | "max"   (default high)
-# v4-flash takes all three efforts; v4-pro only "high" and "max".
+# DEEPSEEK_API_KEY and aliases come from dotfiles/shub/zsh/.zshrc. `options` goes
+# straight into the request body: v4-flash takes all efforts, v4-pro only high/max.
 
 {
   home.packages = [ pkgs-unstable.opencode ];

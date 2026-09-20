@@ -4,11 +4,19 @@
   min-height: 0;
   font-size: 100%;
   font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
-  padding: 1px;
+  /* tight default cell: any module reads square-ish without being listed below */
+  padding: 0px 2px;
+  margin: 0px;
+  border: none;
+  box-shadow: none;
+  text-shadow: none;
 }
 
 window#waybar {
   background-color: #282828;
+  /* inherited by every child, so a NEW module is light-on-dark with no edits here */
+  color: #ebdbb2;
+  padding: 0px;
   transition-property: background-color;
   transition-duration: 0.5s;
 }
@@ -22,55 +30,64 @@ window#waybar.empty {
 }
 
 tooltip {
+  background-color: #282828;
+  border: 1px solid #ebdbb2;
+  border-radius: 0px;
   opacity: 1;
-  border-radius: 0px; /* Removed rounded corners */
 }
 
 tooltip label {
-  padding: 10px;
+  padding: 6px;
   color: #ebdbb2;
 }
 
-#custom-lumi,
-#custom-cava,
-#clock,
-#cpu,
-#memory,
-#mpris,
-#network,
-#pulseaudio,
-#temperature,
+/* containers: no padding of their own, their children already carry it */
 #workspaces,
-#custom-menu,
-#custom-swaync {
-  border-radius: 0px; /* Removed rounded corners */
-  color: #ebdbb2;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  padding-left: 6px;
-  padding-right: 6px;
-}
-
-#window {
-  color: #ebdbb2;
-  padding-top: 3px;
-  padding-bottom: 3px;
-  padding-right: 6px;
-  padding-left: 6px;
-  border-radius: 0px; /* Removed rounded corners */
+#taskbar,
+#tray {
+  padding: 0px;
 }
 
 #workspaces button {
   margin: 1px;
-  box-shadow: none;
-  text-shadow: none;
-  border-radius: 0px; /* Removed rounded corners */
-  padding-left: 6px;
-  padding-right: 6px;
+  padding: 0px 4px;
+  border-radius: 0px;
   background-color: #ebdbb2;
   color: #282828;
 }
 
+#workspaces button:hover {
+  background-color: #d5c4a1;
+  color: #282828;
+}
+
+#taskbar button {
+  padding: 0px 3px;
+  border-radius: 0px;
+}
+
+/* per-module tweaks are state colours only; fg and geometry come from above */
+#custom-sysinfo.warning,
+#custom-swaync.notification {
+  color: #fabd2f;
+}
+
+#custom-sysinfo.critical,
 #temperature.critical {
-  background-color: red;
+  background-color: #cc241d;
+  color: #fbf1c7;
+}
+
+#custom-sysinfo.normal,
+#custom-conn,
+#custom-modelight,
+#custom-swaync,
+#pulseaudio {
+  color: #ebdbb2;
+}
+
+#custom-conn.disconnected,
+#custom-modelight.off,
+#pulseaudio.muted {
+  color: #928374;
 }

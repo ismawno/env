@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=smalltop forest
+Description=Foggy pine forest with a minimal passphrase field
+ModuleName=script
+
+[script]
+ImageDir=@dir@
+ScriptFile=@dir@/smalltop-forest.script

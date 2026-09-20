@@ -1,146 +1,83 @@
-@define-color bgc rgba(0, 0, 0, 0.1);
-@define-color borderc #ebdbb2;
-@define-color textc #282828;
+/* swaync 0.12.6 is GTK4 and loads its own sheet too, with selectors up to 7 classes
+   deep. Theme via these vars -- @define-color feeds none of them. */
+:root {
+  --cc-bg: rgba(40, 40, 40, 0.86);
+  --noti-bg: 40, 40, 40;
+  --noti-bg-alpha: 0.94;
+  --noti-bg-darker: rgb(29, 32, 33);
+  --noti-bg-hover: rgb(60, 56, 54);
+  --noti-bg-focus: rgba(80, 73, 69, 0.9);
+  --noti-border-color: rgba(235, 219, 178, 0.55);
+  --noti-close-bg: rgba(235, 219, 178, 0.12);
+  --noti-close-bg-hover: rgb(235, 219, 178);
+  --text-color: rgb(235, 219, 178);
+  --text-color-disabled: rgb(168, 153, 132);
+  --bg-selected: rgb(215, 153, 33);
+  --border: 2px solid rgb(235, 219, 178);
+  --border-radius: 0px;
+  --notification-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+  --font-size-body: 12px;
+  --font-size-summary: 13px;
+}
 
-* {
+/* Scoped to the two toplevels: a bare `*` also hits every internal GTK box. */
+.blank-window,
+.floating-notifications {
   font-family: JetBrainsMonoNerdFontMono;
   font-weight: bold;
-  font-size: 15px;
-  border-width: 3px;
-  border-color: #ebdbb2;
 }
 
-.control-center .notification-row:focus,
-.control-center .notification-row:hover {
-  opacity: 1;
-  background: @bgc;
-}
-
-.notification-row {
-  outline: none;
-  margin: 20px;
-  padding: 0;
-}
-
-.notification {
-  background: @textc;
-  margin: 0px;
-  border-radius: 0px; /* Removed rounded corners */
-  border-width: 3px;
-  border-color: #ebdbb2;
-}
-
-.notification-content {
-  background: @textc;
-  padding: 7px;
-  margin: 0;
-}
-
-.close-button {
-  background: @textc;
-  color: @borderc;
-  text-shadow: none;
-  padding: 0;
-  border-radius: 0px; /* Removed rounded corners */
-  margin-top: 9px;
-  margin-right: 5px;
-}
-
-.close-button:hover {
-  box-shadow: none;
-  background: @borderc;
-  color: @textc;
-  transition: all 0.15s ease-in-out;
-  border: none;
-}
-
-.notification-action {
-  color: @bgc;
-  background: @textc;
-}
-
-.summary {
-  padding-top: 7px;
-  font-size: 13px;
-  color: @borderc;
-}
-
-.time {
-  font-size: 11px;
-  color: @borderc;
-  margin-right: 40px;
-}
-
-.body {
-  font-size: 12px;
-  color: @borderc;
+/* Full-screen scrim behind the panel; gruvbox gray, kept well above the
+   layerrule's ignore_alpha floor or Hyprland skips blurring it. */
+.blank-window {
+  background: rgba(168, 153, 132, 0.22);
 }
 
 .control-center {
-  background-color: @bgc;
-  border-radius: 0px; /* Removed rounded corners */
+  border: 2px solid #ebdbb2;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
-.control-center-list {
-  background: transparent;
+/* Shipped sheet sets opacity 0.5 at this exact depth; GTK opacity bakes into the
+   layer buffer before the compositor sees it, so use colour instead. */
+.control-center .control-center-list-placeholder {
+  opacity: 1;
+  color: var(--text-color-disabled);
 }
 
-.control-center-list-placeholder {
-  opacity: 0.5;
+/* Shipped close button is border-radius 100%, not var(--border-radius). */
+.close-button {
+  border-radius: 0;
 }
 
-.floating-notifications {
-  background: transparent;
-}
-
-.blank-window {
-  background: alpha(black, 0.1);
+.close-button:hover {
+  color: #282828;
 }
 
 .widget-title {
-  color: @borderc;
-  padding: 10px 10px;
+  color: #ebdbb2;
+  padding: 10px;
   margin: 10px 10px 5px 10px;
-  font-size: 1.5rem;
 }
 
-.widget-title>button {
-  font-size: 1rem;
-  color: @borderc;
+.widget-title > button {
+  color: #ebdbb2;
+  background: rgba(235, 219, 178, 0.12);
   padding: 10px;
   text-shadow: none;
-  background: @bgc;
   box-shadow: none;
-  border-radius: 0px; /* Removed rounded corners */
 }
 
-.widget-title>button:hover {
-  background: @borderc;
+.widget-title > button:hover {
+  background: #ebdbb2;
   color: #282828;
 }
 
 .widget-label {
-  margin: 10px 10px 10px 10px;
+  margin: 10px;
 }
 
-.widget-label>label {
+.widget-label > label {
   font-size: 1rem;
-  color: @textc;
+  color: #ebdbb2;
 }
-
-.widget-mpris {
-  color: @borderc;
-  padding: 5px 5px 5px 5px;
-  margin: 10px;
-  border-radius: 0px; /* Removed rounded corners */
-}
-
-.widget-mpris>box>button {
-  border-radius: 0px; /* Removed rounded corners */
-}
-
-.widget-mpris-player {
-  padding: 5px 5px;
-  margin: 10px;
-}
-

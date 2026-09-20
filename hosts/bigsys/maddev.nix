@@ -8,4 +8,20 @@
   mad.zen.extraPrefs = ''
     user_pref("media.av1.enabled", false);
   '';
+
+  # No eDP connector on this box, so smalltop's panel rule is left out.
+  mad.hypr.monitors = [
+    {
+      output = "desc:AOC U27B3A ZXLQ8HA002427";
+      mode = "3840x2160@60";
+      position = "0x-1080";
+      scale = 2;
+    }
+    {
+      output = "";
+      mode = "3840x2160@60";
+      position = "auto";
+      scale = 1;
+    }
+  ];
 }

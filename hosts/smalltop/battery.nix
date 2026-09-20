@@ -21,8 +21,8 @@ let
     fi
     [ -e ${soundDriver}/${sound} ] || echo ${sound} > ${soundDriver}/bind
     rc=1
-    for i in 1 2 3 4 5; do echo 80 > ${limit} 2>/dev/null && rc=0 && break; sleep 1; done
-    for i in 1 2 3 4 5 6 7 8 9 10; do grep -q sof-hda-dsp /proc/asound/cards && exit $rc; sleep 1; done
+    for _ in 1 2 3 4 5; do echo 80 > ${limit} 2>/dev/null && rc=0 && break; sleep 1; done
+    for _ in 1 2 3 4 5 6 7 8 9 10; do grep -q sof-hda-dsp /proc/asound/cards && exit $rc; sleep 1; done
     exit 1
   '';
 in

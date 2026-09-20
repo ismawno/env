@@ -177,6 +177,10 @@ in
   # bigsys is logged out, so there is no state to migrate -- just `tailscale up`.
   services.tailscale.enable = true;
 
+  # App tokens (gh) are kept encrypted with the login password, which ly hands to the keyring at sign-in.
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.ly.enableGnomeKeyring = true;
+
   # Never copy bigsys's syncthing state: the device ID is the identity and two
   # machines answering to one will fight. override* = false keeps web-UI additions.
   services.syncthing = {

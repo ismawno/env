@@ -18,7 +18,6 @@ stable=${MAD_WP_STABLE:?wallpaper-pick was built without the stable wallpaper pa
 conf=${MAD_WP_CONF:?wallpaper-pick was built without a hyprpaper config}
 quiet=${MAD_WP_QUIET:-}
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-pick
-theme=${MAD_WP_THEME:-${XDG_CONFIG_HOME:-$HOME/.config}/rofi/wallpapers.rasi}
 hm=${MAD_WP_HM:-home-manager}
 runtime=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
 # Held from the moment a pick touches anything until its switch is over; tmpfs, so it never outlives the login.
@@ -27,13 +26,7 @@ gcroot=$runtime/wallpaper-pick.gcroot
 tmpconf=$runtime/wallpaper-pick.conf
 log=$runtime/wallpaper-pick.log
 
-# Must match the name width wallpapers.rasi leaves beside each thumbnail, in characters of its font.
-wrap_width=60
-wrap_lines=2
-
 declare -A pretty=()
-lines=()
-wrapped=""
 commit=""
 name=""
 url=""
@@ -333,78 +326,6 @@ load_pretty_names() {
   done <"$dir/names.tsv"
 }
 
-greedy_lines() {
-  local width=$1 word line=""
-  shift
-  lines=()
-  for word in "$@"; do
-    if [ -z "$line" ]; then
-      line=$word
-    elif [ $((${#line} + 1 + ${#word})) -le "$width" ]; then
-      line+=" $word"
-    else
-      lines+=("$line")
-      line=$word
-    fi
-  done
-  [ -z "$line" ] || lines+=("$line")
-}
-
-# As few lines as wrap_width allows, then the narrowest width that still needs no more of them.
-balanced_lines() {
-  local joined="$*" count width
-  greedy_lines "$wrap_width" "$@"
-  count=${#lines[@]}
-  [ "$count" -gt 1 ] || return 0
-  width=$(((${#joined} + count - 1) / count))
-  while [ "$width" -lt "$wrap_width" ]; do
-    greedy_lines "$width" "$@"
-    [ "${#lines[@]}" -gt "$count" ] || return 0
-    width=$((width + 1))
-  done
-  greedy_lines "$wrap_width" "$@"
-}
-
-# A lone dash sticks to the word before it, so no line starts with "- ".
-words_of() {
-  local word
-  local -a raw
-  read -ra raw <<<"$1"
-  words=()
-  for word in "${raw[@]}"; do
-    if [ "$word" = - ] && [ "${#words[@]}" -gt 0 ]; then
-      words[-1]+=" -"
-    else
-      words+=("$word")
-    fi
-  done
-}
-
-# Rofi cannot wrap an element's text, so a name arrives already broken, preferably right after " - ".
-wrap_name() {
-  local LC_ALL=C.UTF-8
-  local -a words plain first
-  words_of "$1"
-  balanced_lines "${words[@]}"
-  if [ "${#lines[@]}" -gt 1 ] && [[ $1 == *" - "* ]]; then
-    plain=("${lines[@]}")
-    words_of "${1%% - *} -"
-    balanced_lines "${words[@]}"
-    first=("${lines[@]}")
-    words_of "${1#* - }"
-    balanced_lines "${words[@]}"
-    lines=("${first[@]}" "${lines[@]}")
-    if [ "${#lines[@]}" -gt "${#plain[@]}" ] || [ "${#lines[@]}" -gt "$wrap_lines" ]; then
-      lines=("${plain[@]}")
-    fi
-  fi
-  # A name too long even for all the lines ends on one long line, which rofi then ellipsizes.
-  if [ "${#lines[@]}" -gt "$wrap_lines" ]; then
-    lines=("${lines[@]:0:wrap_lines-1}" "${lines[*]:wrap_lines-1}")
-  fi
-  wrapped=$(printf '%s\n' "${lines[@]}")
-}
-
 load_pictures() {
   : >"$work/names"
   if [ -d "$collection" ]; then
@@ -434,8 +355,7 @@ rows() {
       [ -z "$icon" ] || printf '\0%s' "${icon#$'\x1f'}"
       printf '\n'
     else
-      wrap_name "$title"
-      printf '%s\0meta\x1f%s %s%s\x1e' "$wrapped" "$title" "${rel%.png}" "$icon"
+      printf '%s\0meta\x1f%s %s%s\n' "$title" "$title" "${rel%.png}" "$icon"
     fi
   done <"$work/names"
 }
@@ -502,10 +422,8 @@ if [ "$mode" != reset ]; then
   if [ "$mode" = menu ]; then
     load_pictures
     rows menu >"$work/rows"
-    theme_args=()
-    [ ! -r "$theme" ] || theme_args=(-theme "$theme")
-    pick=$(rofi -dmenu -i -no-custom -show-icons -sep $'\x1e' -eh "$wrap_lines" -format i \
-      -p "Wallpaper" "${theme_args[@]}" <"$work/rows") || exit 0
+    pick=$(rofi -dmenu -i -no-custom -show-icons -format i -p "Wallpaper" \
+      -theme-str 'element-icon { size: 5em; }' <"$work/rows") || exit 0
     [[ $pick =~ ^[0-9]+$ ]] || exit 0
     mapfile -t pictures <"$work/names"
     name=${pictures[pick]:-}

@@ -15,23 +15,6 @@ let
     position = "0x0";
     scale = 2;
   };
-  panelRule = "${panel.output},${panel.mode},${panel.position},${toString panel.scale}";
-
-  # Lid: drop the panel from the layout if another display exists, else only blank it (Hyprland needs one monitor).
-  lidScript = pkgs.writeShellScript "smalltop-lid" ''
-    close() {
-      if [ "$(hyprctl monitors | grep -c "^Monitor")" -gt 1 ]; then
-        hyprctl keyword monitor "${panel.output}, disable"
-      else
-        hyprctl dispatch dpms off "${panel.output}"
-      fi
-    }
-    case "$1" in
-      close) close ;;
-      open) hyprctl keyword monitor "${panelRule}"; hyprctl dispatch dpms on "${panel.output}" ;;
-      sync) grep -q closed /proc/acpi/button/lid/*/state && close ;;
-    esac
-  '';
 
   # smalltop is 2880x1800 at scale 2 (a 1440x900 logical desktop). Overrides are
   # APPENDED to the shared dotfiles, which stay the single source of truth for bigsys.
@@ -104,7 +87,8 @@ in
 
     lid = {
       switch = "Lid Switch";
-      script = "${lidScript}";
+      output = panel.output;
+      state = "/proc/acpi/button/lid/LID0/state";
     };
   };
 

@@ -1,4 +1,4 @@
-# Laptop profile for the shared Hyprland Lua tree: shub/laptop.lua wants the lid switch and the script it calls.
+# Laptop profile for the shared Hyprland Lua tree: shub/laptop.lua wants the lid switch, the panel it drives and the ACPI state file.
 { config, lib, ... }:
 
 {
@@ -8,9 +8,10 @@
     type = lib.types.attrsOf lib.types.str;
     example = {
       switch = "Lid Switch";
-      script = "/nix/store/...-smalltop-lid";
+      output = "eDP-1";
+      state = "/proc/acpi/button/lid/LID0/state";
     };
-    description = "Lid switch name and the script its close, open and sync binds call.";
+    description = "Lid switch name, the panel it drives, and the ACPI state file its handlers read.";
   };
 
   config.mad.hypr.facts = {

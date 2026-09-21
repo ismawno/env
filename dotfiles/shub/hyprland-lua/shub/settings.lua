@@ -43,7 +43,8 @@ hl.config({
 
   animations = { enabled = true },
   dwindle = { preserve_split = true },
-  misc = { force_default_wallpaper = 0 },
+  -- No Hyprland logo or splash: a monitor still waiting for hyprpaper clears to the wallpaper's own background.
+  misc = { disable_hyprland_logo = true, disable_splash_rendering = true, background_color = "rgb(282828)" },
   xwayland = { force_zero_scaling = true },
 })
 

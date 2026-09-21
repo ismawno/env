@@ -62,7 +62,26 @@ hl.bind(
 )
 
 hl.bind(mod .. " + F", win.fullscreen({ mode = "fullscreen" }))
-hl.bind(mod .. " + T", win.float())
+
+-- Floating a tiled window gives it 75% by 65% of its own monitor, centred; pressing again tiles it back.
+hl.bind(mod .. " + T", function()
+  local active = hl.get_active_window()
+  if not active then
+    return
+  end
+  local tiled = not active.floating
+  local monitor = active.monitor
+  hl.dispatch(win.float())
+  if not tiled or not monitor then
+    return
+  end
+  hl.dispatch(win.resize({
+    x = math.floor(monitor.width / monitor.scale * 0.75),
+    y = math.floor(monitor.height / monitor.scale * 0.65),
+  }))
+  hl.dispatch(win.center())
+end)
+
 hl.bind(mod .. " + C", win.close())
 hl.bind(mod .. " + ALT + C", win.center())
 hl.bind(mod .. " + SHIFT + V", win.pin())

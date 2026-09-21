@@ -74,11 +74,14 @@ restart_hyprpaper() {
 
 # Every failure past the write puts the old selection back, so the flake never keeps a wallpaper that did not verify.
 fail_back() {
+  local back="; the previous wallpaper is back"
   if [ -n "$saved" ]; then
     cp -f "$saved" "$selection"
-    home-manager switch --flake "$env_dir" -b backup >/dev/null 2>&1 || true
-    restart_hyprpaper || true
-    die "$1; the previous wallpaper is back"
+    home-manager switch --flake "$env_dir" -b backup >/dev/null 2>&1 ||
+      back="; $repo_path is back, but the switch that would show it failed too"
+    restart_hyprpaper ||
+      back="$back, and hyprpaper is not running: start it with Super+N"
+    die "$1$back"
   fi
   die "$1"
 }
@@ -141,6 +144,7 @@ tree_names() {
 # jpegs beside it are plain git files on main, so listing and previewing costs no Git LFS bandwidth.
 remote_names() {
   local key index name thumb out
+  [ -n "$commit" ] || resolve_commit
   key=$(printf '%s\n%s\n' "$thumb_base" "$commit" | sha1sum | cut -c 1-12)
   thumb_dir=$cache/remote/$key
   index=$thumb_dir/index.tsv
@@ -245,7 +249,6 @@ case "${1:-}" in
 esac
 
 if [ "$mode" = list ]; then
-  [ -d "$collection" ] || resolve_commit
   rows
   exit 0
 fi

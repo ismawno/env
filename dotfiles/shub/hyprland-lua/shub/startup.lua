@@ -13,6 +13,7 @@ for _, variable in ipairs({
   { "XDG_SESSION_DESKTOP", "Hyprland" },
   { "XDG_SESSION_TYPE", "wayland" },
   { "MOZ_ENABLE_WAYLAND", "1" },
+  { "NIXOS_OZONE_WL", "1" },
   { "HYPRCURSOR_THEME", "Bibata-Modern-Ice" },
   { "HYPRCURSOR_SIZE", "24" },
   { "XCURSOR_THEME", "Bibata-Modern-Ice" },

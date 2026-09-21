@@ -45,6 +45,7 @@
           "text": "Notification Center"
       },
       "mpris": {
+          "blacklist": ["playerctld"],
           "image-size": 96,
           "image-radius": 7
       }

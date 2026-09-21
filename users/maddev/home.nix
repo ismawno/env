@@ -393,6 +393,11 @@ in
       executable = true;
     };
     "swaync".source = "${shub}/swaync";
+    # gvfsd-http fetches swaync's https album art and needs glib-networking for TLS.
+    "systemd/user/gvfs-daemon.service.d/tls.conf".text = ''
+      [Service]
+      Environment=GIO_EXTRA_MODULES=${pkgs.glib-networking}/lib/gio/modules
+    '';
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
     "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";

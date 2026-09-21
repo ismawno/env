@@ -12,6 +12,7 @@ return {
   browser = browser,
   file_manager = override.file_manager or "thunar",
   menu = override.menu or ("rofi -config " .. home .. "/.config/rofi/apps.rasi"),
+  tasks_mode = home .. "/.config/rofi/tasks.sh",
   local_music = override.local_music or "spotify",
   emoji_picker = override.emoji_picker or "smile",
   video_player = override.video_player or "mpv",

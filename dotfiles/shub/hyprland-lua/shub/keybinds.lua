@@ -46,7 +46,11 @@ hl.bind(mod .. " + J", dsp.exec_cmd("pkill java"))
 hl.bind(mod .. " + I", dsp.exec_cmd("playerctl play-pause"))
 hl.bind(mod .. " + V", dsp.exec_cmd("copyq toggle"))
 hl.bind(mod .. " + X", dsp.exec_cmd("sleep 0.1 && swaync-client -t -sw"))
-hl.bind(mod .. " + SPACE", dsp.exec_cmd(programs.menu .. " -show drun"))
+-- drun and the tasks script mode in one list; the task labels start with ">", so typing it narrows to them.
+hl.bind(
+  mod .. " + SPACE",
+  dsp.exec_cmd(programs.menu .. " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks -show combi")
+)
 hl.bind(mod .. " + N", dsp.exec_cmd("hyprpaper -c " .. programs.config_dir .. "/hyprpaper/hyprpaper.conf"))
 
 -- pkill succeeding means the menu was dismissed, so only launch when nothing was killed.

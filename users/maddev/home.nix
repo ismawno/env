@@ -378,7 +378,19 @@ in
     "waybar/config-cava".source = "${shub}/waybar/config-cava";
     "waybar/modules".source = "${shub}/waybar/modules";
     "waybar/style.css".source = "${shub}/waybar/style.css";
-    "rofi".source = "${shub}/rofi";
+    "rofi/config.rasi".source = "${shub}/rofi/config.rasi";
+    "rofi/apps.rasi".source = "${shub}/rofi/apps.rasi";
+    "rofi/gruvbox-material.rasi".source = "${shub}/rofi/gruvbox-material.rasi";
+
+    # Not a directory source: a class or host module drops its own list into rofi/tasks.d.
+    "rofi/tasks.sh" = {
+      source = "${shub}/rofi/tasks.sh";
+      executable = true;
+    };
+    "rofi/tasks.d/10-radio.sh" = {
+      source = "${shub}/rofi/tasks.d/10-radio.sh";
+      executable = true;
+    };
     "swaync".source = "${shub}/swaync";
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";

@@ -1,40 +1,53 @@
 #!/usr/bin/env bash
 
-#Taken from jakoolit's hyprland dots
+# Online radio. No argument toggles the picker, as Super+Shift+A always did; "tasks", "play <station>" and "stop" are for the rofi tasks mode.
 
-declare -A menu_options=(
-  ["Lofi Girl ☕️🎶"]="https://play.streamafrica.net/lofiradio"
-  ["White Noise 📖🎶"]="https://www.youtube.com/watch?v=nMfPqeZjc2c&t=7040s&pp=ygULd2hpdGUgbm9pc2U%3D"
-  ["Wish 107.5 YT Pinoy HipHop 🎻🎶"]="https://youtube.com/playlist?list=PLkrzfEDjeYJnmgMYwCKid4XIFqUKBVWEs&si=vahW_noh4UDJ5d37"
-  ["Wish 107.5 YT Wishclusives ☕️🎶"]="https://youtube.com/playlist?list=PLkrzfEDjeYJn5B22H9HOWP3Kxxs-DkPSM&si=d_Ld2OKhGvpH48WO"
-  ["Chillhop ☕️🎶"]="http://stream.zeno.fm/fyn8eh3h5f8uv"
-  ["SmoothChill ☕️🎶"]="https://media-ssl.musicradio.com/SmoothChill"
-)
+set -u
 
-notification() {
-  notify-send -u normal "Playing now: $*"
+stations="$(dirname "$(readlink -f "$0")")/lofi-stations.tsv"
+
+list() {
+  grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$stations"
 }
 
-main() {
-  choice=$(printf "%s\n" "${!menu_options[@]}" | rofi -i -dmenu -config ~/.config/rofi/config.rasi -p "")
-
-  if [ -z "$choice" ]; then
+play() {
+  local name="$1" link
+  link=$(list | awk -F '\t' -v name="$name" '$1 == name { print $2; exit }')
+  if [ -z "$link" ]; then
+    notify-send -u critical "Online Music" "no station named $name"
     exit 1
   fi
-
-  link="${menu_options[$choice]}"
-
-  notification "$choice"
-  
-  if [[ $link == *playlist* || $link == *watch* ]]; then
-    mpv --shuffle --vid=no --volume=50 "$link"
-  else
-    mpv --volume=50 "$link"
-  fi
+  pkill mpv
+  notify-send -u normal "Playing now: $name"
+  case "$link" in
+  *playlist* | *watch*) exec mpv --shuffle --vid=no --volume=50 "$link" ;;
+  *) exec mpv --volume=50 "$link" ;;
+  esac
 }
 
-if pkill mpv; then
-  notify-send -u low "Online Music stopped"
-else
-  main
-fi
+case "${1-}" in
+tasks)
+  list | cut -f 1 | while IFS= read -r name; do
+    printf '> Radio: %s\t%s play '"'"'%s'"'"'\n' "$name" "$0" "$name"
+  done
+  printf '> Radio: Stop\t%s stop\n' "$0"
+  ;;
+play)
+  play "$2"
+  ;;
+stop)
+  pkill mpv && notify-send -u low "Online Music stopped"
+  ;;
+"")
+  if pkill mpv; then
+    notify-send -u low "Online Music stopped"
+  else
+    choice=$(list | cut -f 1 | rofi -i -dmenu -config ~/.config/rofi/config.rasi -p "")
+    [ -n "$choice" ] && play "$choice"
+  fi
+  ;;
+*)
+  echo "usage: $(basename "$0") [tasks|play <station>|stop]" >&2
+  exit 1
+  ;;
+esac

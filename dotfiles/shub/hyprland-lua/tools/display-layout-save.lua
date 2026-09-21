@@ -13,11 +13,21 @@ local function sh(value)
   return "'" .. (tostring(value):gsub("'", "'\\''")) .. "'"
 end
 
+-- LuaJIT's close() on a pipe reports success whatever the command did, so the status comes back in the output.
 local function run(command)
-  local pipe = io.popen(command .. " 2>&1")
+  local pipe = io.popen("{ " .. command .. " ; } 2>&1; printf '\\n__rc=%d' \"$?\"")
   local output = pipe:read("*a")
-  local ok = pipe:close()
-  return ok and true or false, output
+  pipe:close()
+  local code = output:match("\n__rc=(%d+)%s*$")
+  return code == "0", (output:gsub("\n__rc=%d+%s*$", ""))
+end
+
+local function last_line(text)
+  local line
+  for candidate in text:gmatch("[^\n]+") do
+    line = candidate
+  end
+  return line or ""
 end
 
 local function notify(urgency, body)
@@ -216,12 +226,16 @@ end
 local function check_layout(monitors)
   local boxes = {}
   for _, monitor in ipairs(monitors) do
+    local width, height = monitor.width, monitor.height
+    if monitor.transform % 2 == 1 then
+      width, height = height, width
+    end
     local box = {
       name = monitor.name,
       x = monitor.x,
       y = monitor.y,
-      w = monitor.width / monitor.scale,
-      h = monitor.height / monitor.scale,
+      w = width / monitor.scale,
+      h = height / monitor.scale,
     }
     for _, other in ipairs(boxes) do
       if overlap(box, other) then
@@ -310,7 +324,7 @@ end
 
 local switched, switch_output = run("home-manager switch --flake " .. sh(env_dir) .. " -b backup")
 if not switched then
-  die("home-manager switch failed: " .. (switch_output:match("[^\n]*$") or ""), previous)
+  die("home-manager switch failed: " .. last_line(switch_output), previous)
 end
 
 local reloaded_ok, reload_output = run("hyprctl reload")

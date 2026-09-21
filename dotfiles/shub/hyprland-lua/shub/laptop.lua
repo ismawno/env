@@ -24,6 +24,7 @@ local function open()
     mode = panel.mode,
     position = panel.position,
     scale = panel.scale,
+    transform = panel.transform,
     disabled = false,
   })
   dpms("on")

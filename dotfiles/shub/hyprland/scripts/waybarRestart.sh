@@ -30,7 +30,7 @@ for _ in {1..30}; do
   sleep 0.1
 done
 
-[ "${1:-}" = toggle ] && exit 0
+[ -n "${1:-}" ] && exit 0
 # swaync belongs to its systemd user unit; a hand-started copy makes that unit fail.
 systemctl --user restart swaync.service
 notify-send -u low "Waybar restarted"

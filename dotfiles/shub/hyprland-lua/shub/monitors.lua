@@ -1,16 +1,10 @@
 -- The one screen list. host.monitors_file means a pure-data monitors.lua sits next to host.lua and replaces host.monitors.
 local host = require("host")
 
-local list = {}
+local list, panel = {}, nil
 for _, monitor in ipairs(host.monitors_file and require("monitors") or host.monitors or {}) do
   list[#list + 1] = monitor
-end
-
-local panel
-for _, monitor in ipairs(list) do
-  if host.lid and monitor.output == host.lid.output then
-    panel = monitor
-  end
+  if host.lid and monitor.output == host.lid.output then panel = monitor end
 end
 
 -- An unknown screen goes right of the panel: "auto" strands waybar and hyprpaper at the old origin when the panel leaves the layout.

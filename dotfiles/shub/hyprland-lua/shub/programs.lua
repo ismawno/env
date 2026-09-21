@@ -2,7 +2,6 @@ local host = require("host")
 
 local home = os.getenv("HOME")
 local override = host.programs or {}
-
 local browser = override.browser or "zen-beta"
 
 return {
@@ -16,12 +15,11 @@ return {
   local_music = override.local_music or "spotify",
   emoji_picker = override.emoji_picker or "smile",
   video_player = override.video_player or "mpv",
+  wallpaper = "hyprpaper -c " .. home .. "/.config/hypr/hyprpaper/hyprpaper.conf",
 
   youtube = browser .. " --new-window https://youtube.com",
-  chatgpt = browser .. " --new-window https://chat.openai.com/",
   gemini = browser .. " --new-window https://aistudio.google.com/",
 
   home = home,
-  config_dir = home .. "/.config/hypr",
   scripts = home .. "/.config/hypr/scripts",
 }

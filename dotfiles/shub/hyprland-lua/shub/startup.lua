@@ -1,5 +1,4 @@
 local host = require("host")
-local profile = require("shub." .. host.kind)
 local programs = require("shub.programs")
 
 for _, variable in ipairs({
@@ -23,21 +22,13 @@ for _, variable in ipairs({
 end
 
 -- swaync is missing on purpose: its D-Bus unit starts it, and a second copy makes that unit fail.
-local autostart = {
-  "copyq --start-server",
-  "hyprpaper -c " .. programs.config_dir .. "/hyprpaper/hyprpaper.conf",
-  "waybar -c " .. programs.home .. "/.config/waybar/config -s " .. programs.home .. "/.config/waybar/style.css",
-  host.polkit_agent or "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
-  "/usr/libexec/xdg-desktop-portal-hyprland",
-  "/usr/libexec/xdg-desktop-portal",
-}
-
-for _, command in ipairs(profile.autostart) do
-  autostart[#autostart + 1] = command
-end
-
 hl.on("hyprland.start", function()
-  for _, command in ipairs(autostart) do
+  for _, command in ipairs({
+    "copyq --start-server",
+    programs.wallpaper,
+    "waybar -c " .. programs.home .. "/.config/waybar/config -s " .. programs.home .. "/.config/waybar/style.css",
+    host.polkit_agent or "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
+  }) do
     hl.exec_cmd(command)
   end
 end)

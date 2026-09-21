@@ -20,8 +20,9 @@ hl.bind(mod .. " + ALT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh
 hl.bind(mod .. " + SHIFT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh toggle"))
 
 local shots = programs.home .. "/Pictures/Screenshots"
-hl.bind("code:107", dsp.exec_cmd("mkdir -p " .. shots .. " && hyprshot -o " .. shots .. " -m region"), locked)
-hl.bind("SHIFT + code:107", dsp.exec_cmd("mkdir -p " .. shots .. " && hyprshot -o " .. shots .. " -m output -z"), locked)
+for _, shot in ipairs({ { "code:107", "region" }, { "SHIFT + code:107", "output -z" } }) do
+  hl.bind(shot[1], dsp.exec_cmd("mkdir -p " .. shots .. " && hyprshot -o " .. shots .. " -m " .. shot[2]), locked)
+end
 
 hl.bind(mod .. " + Q", dsp.exec_cmd(programs.terminal))
 hl.bind(mod .. " + SHIFT + Q", dsp.exec_cmd(programs.terminal2))
@@ -46,43 +47,27 @@ hl.bind(mod .. " + J", dsp.exec_cmd("pkill java"))
 hl.bind(mod .. " + I", dsp.exec_cmd("playerctl play-pause"))
 hl.bind(mod .. " + V", dsp.exec_cmd("copyq toggle"))
 hl.bind(mod .. " + X", dsp.exec_cmd("sleep 0.1 && swaync-client -t -sw"))
+hl.bind(mod .. " + N", dsp.exec_cmd(programs.wallpaper))
+
 -- drun and the tasks script mode in one list; the task labels start with ">", so typing it narrows to them.
-hl.bind(
-  mod .. " + SPACE",
-  dsp.exec_cmd(programs.menu .. " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks -combi-display-format '{text}' -show combi")
-)
-hl.bind(mod .. " + N", dsp.exec_cmd("hyprpaper -c " .. programs.config_dir .. "/hyprpaper/hyprpaper.conf"))
+local tasks = " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks"
+hl.bind(mod .. " + SPACE", dsp.exec_cmd(programs.menu .. tasks .. " -combi-display-format '{text}' -show combi"))
 
 -- pkill succeeding means the menu was dismissed, so only launch when nothing was killed.
-hl.bind(
-  mod .. " + L",
-  dsp.exec_cmd(
-    "pkill -x wlogout || wlogout -l "
-      .. programs.home
-      .. "/.config/wlogout/layout --css "
-      .. programs.home
-      .. "/.config/wlogout/style.css"
-  )
-)
+local dir = programs.home .. "/.config/wlogout/"
+hl.bind(mod .. " + L", dsp.exec_cmd("pkill -x wlogout || wlogout -l " .. dir .. "layout --css " .. dir .. "style.css"))
 
 hl.bind(mod .. " + F", win.fullscreen({ mode = "fullscreen" }))
 
 -- Floating a tiled window gives it 75% by 65% of its own monitor, centred; pressing again tiles it back.
 hl.bind(mod .. " + T", function()
   local active = hl.get_active_window()
-  if not active then
-    return
-  end
-  local tiled = not active.floating
-  local monitor = active.monitor
+  if not active then return end
+  local tiled, monitor = not active.floating, active.monitor
   hl.dispatch(win.float())
-  if not tiled or not monitor then
-    return
-  end
-  hl.dispatch(win.resize({
-    x = math.floor(monitor.width / monitor.scale * 0.75),
-    y = math.floor(monitor.height / monitor.scale * 0.65),
-  }))
+  if not tiled or not monitor then return end
+  local width, height = monitor.width / monitor.scale, monitor.height / monitor.scale
+  hl.dispatch(win.resize({ x = math.floor(width * 0.75), y = math.floor(height * 0.65) }))
   hl.dispatch(win.center())
 end)
 
@@ -94,17 +79,9 @@ hl.bind(mod .. " + R", dsp.layout("togglesplit"))
 -- Close every window of the focused window's process, so the app quits itself and can save its session.
 hl.bind(mod .. " + SHIFT + C", function()
   local active = hl.get_active_window()
-  if not active then
-    return
-  end
-  local addresses = {}
+  if not active then return end
   for _, window in ipairs(hl.get_windows()) do
-    if window.pid == active.pid then
-      addresses[#addresses + 1] = window.address
-    end
-  end
-  for _, address in ipairs(addresses) do
-    hl.dispatch(win.close({ window = "address:" .. address }))
+    if window.pid == active.pid then hl.dispatch(win.close({ window = "address:" .. window.address })) end
   end
 end)
 
@@ -128,9 +105,7 @@ hl.bind(mod .. " + F4", dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 local function switch_to(index)
   return function()
     local special = hl.get_active_special_workspace()
-    if special then
-      hl.dispatch(dsp.workspace.toggle_special((special.name:gsub("^special:", ""))))
-    end
+    if special then hl.dispatch(dsp.workspace.toggle_special((special.name:gsub("^special:", "")))) end
     hl.dispatch(dsp.focus({ workspace = index }))
   end
 end
@@ -152,12 +127,7 @@ hl.bind(mod .. " + mouse_up", dsp.focus({ workspace = "e-1" }))
 hl.bind(mod .. " + mouse:272", win.drag(), mouse)
 hl.bind(mod .. " + mouse:273", win.resize(), mouse)
 
-for _, arrow in ipairs({
-  { "left", -20, 0 },
-  { "right", 40, 0 },
-  { "up", 0, -20 },
-  { "down", 0, 40 },
-}) do
+for _, arrow in ipairs({ { "left", -20, 0 }, { "right", 40, 0 }, { "up", 0, -20 }, { "down", 0, 40 } }) do
   hl.bind(mod .. " + " .. arrow[1], win.resize({ x = arrow[2], y = arrow[3], relative = true }), repeating)
   hl.bind(mod .. " + SHIFT + " .. arrow[1], win.move({ direction = arrow[1] }))
 end

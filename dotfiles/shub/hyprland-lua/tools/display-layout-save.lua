@@ -1,6 +1,4 @@
--- Writes the live Hyprland layout into a host's monitors.lua, activates it and checks the result, putting the old file back if anything fails.
--- Paths and the panel's output name arrive in the environment, so nothing here knows about Nix.
-
+-- Saves the live layout to monitors.lua, activates and verifies it, else restores the old one; paths arrive via env.
 local jq = os.getenv("MAD_DISPLAYS_JQ") or "jq"
 local layout_file = os.getenv("MAD_DISPLAYS_FILE")
 local env_dir = os.getenv("MAD_DISPLAYS_ENV")
@@ -16,18 +14,9 @@ end
 -- LuaJIT's close() on a pipe reports success whatever the command did, so the status comes back in the output.
 local function run(command)
   local pipe = io.popen("{ " .. command .. " ; } 2>&1; printf '\\n__rc=%d' \"$?\"")
-  local output = pipe:read("*a")
+  local output, code = pipe:read("*a"):match("^(.*)\n__rc=(%d+)%s*$")
   pipe:close()
-  local code = output:match("\n__rc=(%d+)%s*$")
-  return code == "0", (output:gsub("\n__rc=%d+%s*$", ""))
-end
-
-local function last_line(text)
-  local line
-  for candidate in text:gmatch("[^\n]+") do
-    line = candidate
-  end
-  return line or ""
+  return code == "0", output or ""
 end
 
 local function notify(urgency, body)
@@ -36,12 +25,9 @@ end
 
 local function write(path, text)
   local file, err = io.open(path, "w")
-  if not file then
-    return nil, err
-  end
+  if not file then return nil, err end
   file:write(text)
-  file:close()
-  return true
+  return file:close()
 end
 
 -- Every failure past the write puts the old file back, so the session never keeps a layout that did not verify.
@@ -59,9 +45,7 @@ end
 
 local function query(program)
   local ok, output = run("hyprctl monitors all -j | " .. jq .. " -r " .. sh(program))
-  if not ok then
-    die("hyprctl monitors failed: " .. output)
-  end
+  if not ok then die("hyprctl monitors failed: " .. output) end
   return output
 end
 
@@ -75,14 +59,11 @@ end
 
 -- Hyprland reports 120.00100 for a 120Hz mode and prints 2880x1800@120.00Hz in availableModes; both land on "120".
 local function refresh(hz)
-  local text = (string.format("%.2f", hz):gsub("0+$", ""))
-  return (text:gsub("%.$", ""))
+  return (string.format("%.2f", hz):gsub("0+$", ""):gsub("%.$", ""))
 end
 
 local function number(value)
-  if value == math.floor(value) then
-    return string.format("%d", value)
-  end
+  if value == math.floor(value) then return string.format("%d", value) end
   return (string.format("%.4f", value):gsub("0+$", ""))
 end
 
@@ -93,46 +74,33 @@ end
 
 local function load_entries(path)
   local chunk, err = loadfile(path)
-  if not chunk then
-    return nil, err
-  end
-  setfenv(chunk, {})
-  local ok, value = pcall(chunk)
-  if not ok then
-    return nil, value
-  end
-  return value
+  if not chunk then return nil, err end
+  local ok, value = pcall(setfenv(chunk, {}))
+  if ok then return value end
+  return nil, value
 end
 
 local function shape_error(entries)
-  if type(entries) ~= "table" or #entries == 0 then
-    return "the file does not return a non-empty list"
-  end
+  if type(entries) ~= "table" or #entries == 0 then return "the file does not return a non-empty list" end
   for index, entry in ipairs(entries) do
-    local where = "entry " .. index
-    if type(entry.output) ~= "string" or entry.output == "" then
-      return where .. " has no output"
-    end
+    if type(entry.output) ~= "string" or entry.output == "" then return "entry " .. index .. " has no output" end
+    local where = "entry " .. index .. " (" .. entry.output .. ")"
     if type(entry.mode) ~= "string" or not entry.mode:match("^%d+x%d+@[%d%.]+$") then
-      return where .. " (" .. entry.output .. ") has no WxH@R mode"
+      return where .. " has no WxH@R mode"
     end
     if type(entry.position) ~= "string" or not entry.position:match("^%-?%d+x%-?%d+$") then
-      return where .. " (" .. entry.output .. ") has no XxY position"
+      return where .. " has no XxY position"
     end
-    if type(entry.scale) ~= "number" or entry.scale <= 0 then
-      return where .. " (" .. entry.output .. ") has no scale"
-    end
+    if type(entry.scale) ~= "number" or entry.scale <= 0 then return where .. " has no scale" end
     if entry.transform ~= nil and type(entry.transform) ~= "number" then
-      return where .. " (" .. entry.output .. ") has a non-numeric transform"
+      return where .. " has a non-numeric transform"
     end
   end
 end
 
 local function serialise(entries)
   table.sort(entries, function(a, b)
-    if (a.output == panel) ~= (b.output == panel) then
-      return a.output == panel
-    end
+    if (a.output == panel) ~= (b.output == panel) then return a.output == panel end
     return a.output < b.output
   end)
   local lines = { header, "return {" }
@@ -166,49 +134,30 @@ local function live()
   local monitors = {}
   for line in query(program):gmatch("[^\n]+") do
     local row = fields(line)
-    monitors[#monitors + 1] = {
-      name = row[1],
-      description = row[2],
-      width = tonumber(row[3]),
-      height = tonumber(row[4]),
-      rate = tonumber(row[5]),
-      x = tonumber(row[6]),
-      y = tonumber(row[7]),
-      scale = tonumber(row[8]),
-      transform = tonumber(row[9]),
-      disabled = row[10] == "true",
-      modes = modes[row[1]] or {},
-    }
+    local monitor = { name = row[1], description = row[2], disabled = row[10] == "true", modes = modes[row[1]] or {} }
+    for column, key in ipairs({ "width", "height", "rate", "x", "y", "scale", "transform" }) do
+      monitor[key] = tonumber(row[column + 2])
+    end
+    monitors[#monitors + 1] = monitor
   end
   return monitors
 end
 
 -- The external is keyed by description so it comes back on any port; the panel by its own name, which never moves.
 local function key_of(monitor)
-  if monitor.name == panel then
-    return monitor.name
-  end
+  if monitor.name == panel then return monitor.name end
   return "desc:" .. monitor.description
 end
 
 local function entry_of(monitor)
-  local straight = monitor.width .. "x" .. monitor.height .. "@" .. refresh(monitor.rate)
+  local size = monitor.width .. "x" .. monitor.height
+  local straight = size .. "@" .. refresh(monitor.rate)
   local turned = monitor.height .. "x" .. monitor.width .. "@" .. refresh(monitor.rate)
   local mode = (monitor.modes[straight] and straight) or (monitor.modes[turned] and turned)
-  if not mode then
-    die(monitor.name .. " is running " .. straight .. ", which is not one of the modes it reports")
-  end
+  if not mode then die(monitor.name .. " is running " .. straight .. ", which is not one of the modes it reports") end
   if not integral(monitor.width, monitor.scale) or not integral(monitor.height, monitor.scale) then
-    die(
-      monitor.name
-        .. " is at scale "
-        .. number(monitor.scale)
-        .. ", which does not divide "
-        .. monitor.width
-        .. "x"
-        .. monitor.height
-        .. " into whole logical pixels"
-    )
+    local scale = number(monitor.scale)
+    die(monitor.name .. " is at scale " .. scale .. ", which does not divide " .. size .. " into whole logical pixels")
   end
   return {
     output = key_of(monitor),
@@ -226,17 +175,11 @@ end
 local function check_layout(monitors)
   local boxes = {}
   for _, monitor in ipairs(monitors) do
-    local width, height = monitor.width, monitor.height
+    local w, h = monitor.width / monitor.scale, monitor.height / monitor.scale
     if monitor.transform % 2 == 1 then
-      width, height = height, width
+      w, h = h, w
     end
-    local box = {
-      name = monitor.name,
-      x = monitor.x,
-      y = monitor.y,
-      w = width / monitor.scale,
-      h = height / monitor.scale,
-    }
+    local box = { name = monitor.name, x = monitor.x, y = monitor.y, w = w, h = h }
     for _, other in ipairs(boxes) do
       if overlap(box, other) then
         die(box.name .. " and " .. other.name .. " overlap; move one of them apart before saving")
@@ -246,36 +189,31 @@ local function check_layout(monitors)
   end
 end
 
+local function describe(entry)
+  return entry.mode .. " at " .. entry.position .. " scale " .. number(entry.scale)
+end
+
 if not (layout_file and env_dir and repo_path and panel) then
   die("display-layout-save was built without a layout file to write")
 end
 
-local tracked = run("git -C " .. sh(env_dir) .. " ls-files --error-unmatch -- " .. sh(repo_path))
-if not tracked then
+if not run("git -C " .. sh(env_dir) .. " ls-files --error-unmatch -- " .. sh(repo_path)) then
   die(repo_path .. " is not tracked by git, so the flake would not see it")
 end
 
 local handle = io.open(layout_file, "r")
-if not handle then
-  die("cannot read " .. layout_file)
-end
+if not handle then die("cannot read " .. layout_file) end
 local previous = handle:read("*a")
 handle:close()
 
 local existing, load_error = load_entries(layout_file)
-if not existing then
-  die(repo_path .. " does not load as Lua: " .. tostring(load_error))
-end
+if not existing then die(repo_path .. " does not load as Lua: " .. tostring(load_error)) end
 
 local enabled = {}
 for _, monitor in ipairs(live()) do
-  if not monitor.disabled then
-    enabled[#enabled + 1] = monitor
-  end
+  if not monitor.disabled then enabled[#enabled + 1] = monitor end
 end
-if #enabled == 0 then
-  die("Hyprland reports no enabled monitor")
-end
+if #enabled == 0 then die("Hyprland reports no enabled monitor") end
 check_layout(enabled)
 
 -- A screen that is not attached right now keeps the entry it already had; the lid closed keeps the panel's.
@@ -301,45 +239,31 @@ end
 
 local temporary = layout_file .. ".new"
 local written, write_error = write(temporary, text)
-if not written then
-  die("cannot write " .. temporary .. ": " .. tostring(write_error))
+if not written then die("cannot write " .. temporary .. ": " .. tostring(write_error)) end
+
+local function abandon(message)
+  os.remove(temporary)
+  die(message)
 end
 
 local reloaded, reload_error = load_entries(temporary)
-if not reloaded then
-  os.remove(temporary)
-  die("the file just written does not load as Lua: " .. tostring(reload_error))
-end
+if not reloaded then abandon("the file just written does not load as Lua: " .. tostring(reload_error)) end
 local bad_shape = shape_error(reloaded)
-if bad_shape then
-  os.remove(temporary)
-  die("the file just written is malformed: " .. bad_shape)
-end
-
+if bad_shape then abandon("the file just written is malformed: " .. bad_shape) end
 local renamed, rename_error = os.rename(temporary, layout_file)
-if not renamed then
-  os.remove(temporary)
-  die("cannot replace " .. layout_file .. ": " .. tostring(rename_error))
-end
+if not renamed then abandon("cannot replace " .. layout_file .. ": " .. tostring(rename_error)) end
 
 local switched, switch_output = run("home-manager switch --flake " .. sh(env_dir) .. " -b backup")
-if not switched then
-  die("home-manager switch failed: " .. last_line(switch_output), previous)
-end
+if not switched then die("home-manager switch failed: " .. switch_output:match("([^\n]*)\n*$"), previous) end
 
 local reloaded_ok, reload_output = run("hyprctl reload")
-if not reloaded_ok then
-  die("hyprctl reload failed: " .. reload_output, previous)
-end
+if not reloaded_ok then die("hyprctl reload failed: " .. reload_output, previous) end
 os.execute("sleep 1")
 
 -- A clean tree prints nothing at all here, not "no errors".
 local _, errors = run("hyprctl configerrors")
-local trimmed = (errors:gsub("^%s+", ""))
-trimmed = (trimmed:gsub("%s+$", ""))
-if trimmed ~= "" and not trimmed:match("^[Nn]o errors") then
-  die("hyprctl configerrors: " .. trimmed, previous)
-end
+local trimmed = errors:match("^%s*(.-)%s*$")
+if trimmed ~= "" and not trimmed:match("^[Nn]o errors") then die("hyprctl configerrors: " .. trimmed, previous) end
 
 local saved = {}
 for _, entry in ipairs(reloaded) do
@@ -347,28 +271,10 @@ for _, entry in ipairs(reloaded) do
 end
 for _, monitor in ipairs(live()) do
   if not monitor.disabled then
-    local entry = saved[key_of(monitor)]
-    local now = entry_of(monitor)
-    if not entry then
-      die(monitor.name .. " came back without an entry of its own", previous)
-    end
+    local entry, now = saved[key_of(monitor)], entry_of(monitor)
+    if not entry then die(monitor.name .. " came back without an entry of its own", previous) end
     if entry.mode ~= now.mode or entry.position ~= now.position or entry.scale ~= now.scale then
-      die(
-        monitor.name
-          .. " came back as "
-          .. now.mode
-          .. " at "
-          .. now.position
-          .. " scale "
-          .. number(now.scale)
-          .. ", not "
-          .. entry.mode
-          .. " at "
-          .. entry.position
-          .. " scale "
-          .. number(entry.scale),
-        previous
-      )
+      die(monitor.name .. " came back as " .. describe(now) .. ", not " .. describe(entry), previous)
     end
   end
 end

@@ -14,6 +14,8 @@ let
   '';
 in
 {
+  imports = [ ./hypr-wallpaper.nix ];
+
   options.mad.hypr = {
     monitors = lib.mkOption {
       type = lib.types.listOf (lib.types.attrsOf lib.types.anything);

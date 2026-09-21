@@ -394,7 +394,6 @@ in
     "swaync".source = "${shub}/swaync";
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
-    "backgrounds".source = "${shub}/backgrounds";
     "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
     "ghostty/themes".source = "${shub}/ghostty/.config/ghostty/themes";
     "zsh/.zshrc".source = "${shub}/zsh/.zshrc";

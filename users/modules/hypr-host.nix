@@ -28,6 +28,12 @@ in
       description = "hl.monitor specs, applied in the order given. A laptop wants an explicit position on every monitor: Hyprland does not re-arrange layer surfaces for a monitor it moves, so an auto-positioned one strands waybar and hyprpaper when the panel leaves the layout.";
     };
 
+    monitorsFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "A tracked, pure-data Lua file of hl.monitor specs, installed beside host.lua and read instead of mad.hypr.monitors.";
+    };
+
     programs = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
@@ -48,6 +54,7 @@ in
         cp ${shared}/hyprland.lua $out/hyprland.lua
         cp -r ${shared}/shub $out/shub
         cp ${hostLua} $out/host.lua
+        ${lib.optionalString (cfg.monitorsFile != null) "cp ${cfg.monitorsFile} $out/monitors.lua"}
       '';
       description = "The shared Lua tree with this host's host.lua rendered beside it.";
     };
@@ -55,6 +62,7 @@ in
 
   config.mad.hypr.facts = {
     inherit (cfg) monitors programs;
+    monitors_file = cfg.monitorsFile != null;
     polkit_agent = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
   };
 }

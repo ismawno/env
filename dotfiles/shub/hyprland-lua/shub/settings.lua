@@ -1,7 +1,7 @@
 local host = require("host")
 local profile = require("shub." .. host.kind)
 
-for _, monitor in ipairs(host.monitors) do
+for _, monitor in ipairs(require("shub.monitors").list) do
   hl.monitor(monitor)
 end
 

@@ -2,13 +2,8 @@
 local host = require("host")
 local lid = host.lid
 
-local panel
-for _, monitor in ipairs(host.monitors) do
-  if monitor.output == lid.output then
-    panel = monitor
-  end
-end
-assert(panel, "host.lid.output names no monitor in host.monitors")
+local panel = require("shub.monitors").panel
+assert(panel, "host.lid.output names no monitor in the screen list")
 
 local function dpms(action)
   hl.dispatch(hl.dsp.dpms({ action = action, monitor = panel.output }))

@@ -1,3 +1,4 @@
+[ -r "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh" ] && source "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 [ -e "$HOME/vulkan/1.4.321.1/setup-env.sh" ] && source "$HOME/vulkan/1.4.321.1/setup-env.sh"
 
 command -v fd >/dev/null 2>&1 && export FZF_DEFAULT_COMMAND='fd --type f --hidden --no-ignore'

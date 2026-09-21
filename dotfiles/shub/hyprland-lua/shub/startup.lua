@@ -20,6 +20,9 @@ for _, variable in ipairs({
 }) do
   hl.env(variable[1], variable[2])
 end
+for name, value in pairs(host.env or {}) do
+  hl.env(name, value)
+end
 
 -- swaync is missing on purpose: its D-Bus unit starts it, and a second copy makes that unit fail.
 hl.on("hyprland.start", function()

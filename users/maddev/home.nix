@@ -10,6 +10,11 @@
 let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
+  # Writable checkout for lazy.nvim's lock file; switch the url to move to a fork.
+  nvimCheckout = {
+    path = "${config.home.homeDirectory}/nvim";
+    url = "https://github.com/ismawno/nvim";
+  };
 in
 {
   imports = [
@@ -282,20 +287,22 @@ in
     enable = true;
     settings.git_protocol = "https";
   };
-  programs.zsh.sessionVariables = {
-    MAD_ENV_PATH = "/home/maddev/env";
-    MAD_NVIM_PATH = "/home/maddev/nvim";
-    MAD_CONVOY_PATH = "/home/maddev/convoy";
-    MAD_TOOLKIT_PATH = "/home/maddev/toolkit";
-    MAD_ONYX_PATH = "/home/maddev/onyx";
-    MAD_DRIZZLE_PATH = "/home/maddev/drizzle";
-  };
 
   home.sessionVariables = {
     GTK_THEME = "Gruvbox-Light";
     THUNARX_DIRS = "$HOME/.nix-profile/lib/thunarx-3";
     XDG_SESSION_TYPE = "wayland";
+    WNO_NVIM_PATH = nvimCheckout.path;
   };
+  mad.hypr.facts.env = { inherit (config.home.sessionVariables) WNO_NVIM_PATH; };
+
+  home.activation.nvimCheckout = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ ! -e ${lib.escapeShellArg nvimCheckout.path} ]; then
+      run env GIT_TERMINAL_PROMPT=0 ${lib.getExe config.programs.git.package} clone --quiet \
+        ${nvimCheckout.url} ${lib.escapeShellArg nvimCheckout.path} \
+        || warnEcho "Could not clone ${nvimCheckout.url} into ${nvimCheckout.path}; the next activation retries."
+    fi
+  '';
 
   gtk = {
     enable = true;

@@ -2,7 +2,10 @@
 { config, lib, ... }:
 
 {
-  imports = [ ./hypr-host.nix ];
+  imports = [
+    ./hypr-host.nix
+    ./hypr-laptop-displays.nix
+  ];
 
   options.mad.hypr.lid = lib.mkOption {
     type = lib.types.attrsOf lib.types.str;

@@ -8,14 +8,6 @@ let
   shubGhostty = ../../dotfiles/shub/ghostty/.config/ghostty/config;
   shubWaybarCss = ../../dotfiles/shub/waybar/style.css;
 
-  # SCALE 2, NOT 1.5: at 1.5 Ghostty's cell advance is 17.25px instead of 23px and GTK3 clients get downsampled.
-  panel = {
-    output = "eDP-1";
-    mode = "2880x1800@120";
-    position = "0x0";
-    scale = 2;
-  };
-
   # smalltop is 2880x1800 at scale 2 (a 1440x900 logical desktop). Overrides are
   # APPENDED to the shared dotfiles, which stay the single source of truth for bigsys.
   ghosttyOverrides = pkgs.writeText "ghostty-smalltop-overrides.conf" ''
@@ -69,26 +61,15 @@ in
   services.syncthing.enable = lib.mkForce false;
 
   mad.hypr = {
-    monitors = [
-      panel
-      {
-        output = "desc:AOC U27B3A ZXLQ8HA002427";
-        mode = "3840x2160@60";
-        position = "0x-1080";
-        scale = 2;
-      }
-      # Explicit, not "auto": Hyprland moves an auto monitor when the panel leaves the layout but leaves waybar and hyprpaper at the old origin. 1440 is the panel's logical width.
-      {
-        output = "";
-        mode = "3840x2160@60";
-        position = "1440x0";
-        scale = 1;
-      }
-    ];
+    # SCALE 2, NOT 1.5, for the panel in there: at 1.5 Ghostty's cell advance is 17.25px instead of 23px and GTK3 clients get downsampled.
+    displays = {
+      layoutFile = ./monitors.lua;
+      repoPath = "hosts/smalltop/monitors.lua";
+    };
 
     lid = {
       switch = "Lid Switch";
-      output = panel.output;
+      output = "eDP-1";
       state = "/proc/acpi/button/lid/LID0/state";
     };
   };

@@ -25,7 +25,6 @@ user_pref("media.hardware-video-decoding-vulkan.enabled", false);
 // Gecko 153 blocklists VA-API on the NVIDIA proprietary driver without even running vaapitest.
 user_pref("media.hardware-video-decoding.force-enabled", true);
 
-// Form autofill and password saving.
 user_pref("signon.rememberSignons", true);
 user_pref("signon.autofillForms", true);
 user_pref("browser.formfill.enable", true);

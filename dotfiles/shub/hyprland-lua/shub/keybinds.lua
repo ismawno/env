@@ -49,7 +49,7 @@ hl.bind(mod .. " + X", dsp.exec_cmd("sleep 0.1 && swaync-client -t -sw"))
 -- drun and the tasks script mode in one list; the task labels start with ">", so typing it narrows to them.
 hl.bind(
   mod .. " + SPACE",
-  dsp.exec_cmd(programs.menu .. " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks -show combi")
+  dsp.exec_cmd(programs.menu .. " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks -combi-display-format '{text}' -show combi")
 )
 hl.bind(mod .. " + N", dsp.exec_cmd("hyprpaper -c " .. programs.config_dir .. "/hyprpaper/hyprpaper.conf"))
 

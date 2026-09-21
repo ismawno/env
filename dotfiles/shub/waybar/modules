@@ -75,7 +75,6 @@
     "smooth-scrolling-threshold": 1
   },
 
-  // Power profile + night light in one, "--" without PPD; refresh with `pkill -RTMIN+10 waybar`.
   "custom/modelight": {
     "exec": "~/.config/hypr/scripts/modelight.sh status",
     "return-type": "json",
@@ -111,7 +110,6 @@
     "exec": "~/.config/hypr/scripts/waybarCava.sh"
   },
 
-  // cpu% ram% temp°C, with the per-core/sensor/GPU breakdown in the tooltip.
   "custom/sysinfo": {
     "exec": "~/.config/hypr/scripts/sysinfo.sh",
     "return-type": "json",
@@ -121,7 +119,6 @@
     "on-click-middle": "~/.config/hypr/scripts/sysinfo.sh info"
   },
 
-  // Network + bluetooth ("[ETH]/B1") from sysfs; never bluetoothctl, which hangs without an adapter.
   "custom/conn": {
     "exec": "~/.config/hypr/scripts/conn.sh",
     "return-type": "json",

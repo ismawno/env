@@ -164,7 +164,6 @@ if bat and bat["status"] == "Discharging":
         cls = "warning"
 tooltip = "\n".join(lines)
 if "info" in sys.argv[1:]:
-    # Middle click: same content as the hover tooltip, as a notification.
     try:
         subprocess.run(["notify-send", "-a", "waybar", "System", re.sub(r"<[^>]*>", "", tooltip)], check=False)
     except FileNotFoundError:

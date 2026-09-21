@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # One lock, or two quick presses both find the bar already gone and both start one.
 exec 9>"${XDG_RUNTIME_DIR:-/tmp}/waybar-restart.lock"
 flock 9

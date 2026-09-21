@@ -54,14 +54,9 @@ inputbar {
   border-radius: 0px;
 }
 
-entry,
-prompt,
-case-indicator {
+entry {
   text-font: inherit;
   text-color: inherit;
-}
-
-entry {
   horizontal-align: 0.5;
 }
 
@@ -114,19 +109,4 @@ element-icon {
   margin: 0 10 0 0;
   vertical-align: 0.5;
   text-color: @gruv6;
-}
-
-button {
-  padding: 6px;
-  color: @foreground;
-  horizontal-align: 0.5;
-
-  border: 2px 0px 2px 2px;
-  border-radius: 0px;
-  border-color: @foreground;
-}
-
-button.selected.normal {
-  border: 2px 0px 2px 2px;
-  border-color: @foreground;
 }

@@ -79,7 +79,6 @@ tooltip label {
 }
 
 #custom-conn.disconnected,
-#custom-modelight.off,
 #pulseaudio.muted {
   color: #928374;
 }

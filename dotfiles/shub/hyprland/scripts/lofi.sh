@@ -1,14 +1,9 @@
 #!/usr/bin/env bash
-
 # Online radio. No argument toggles the picker, as Super+Shift+A always did; "tasks", "pick" and "stop" are for the rofi tasks mode.
-
 set -u
 
 stations="$(dirname "$(readlink -f "$0")")/lofi-stations.tsv"
-
-list() {
-  grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$stations"
-}
+list() { grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$stations"; }
 
 play() {
   local name="$1" link

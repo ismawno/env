@@ -13,10 +13,7 @@ export VISUAL="$EDITOR"
 
 # Zinit and its plugins, cloned on first start
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-if [ ! -d "$ZINIT_HOME" ]; then
-   mkdir -p "$(dirname $ZINIT_HOME)"
-   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
+[ -d "$ZINIT_HOME" ] || git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 source "${ZINIT_HOME}/zinit.zsh"
 
 zinit light zsh-users/zsh-syntax-highlighting
@@ -27,16 +24,21 @@ zinit light Aloxaf/fzf-tab
 zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
-zinit snippet OMZP::command-not-found
 
 autoload -Uz compinit && compinit -u
 zinit cdreplay -q
 
-autoload -U up-line-or-beginning-search down-line-or-beginning-search
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
+zle -N edit-command-line
 
+# Vi mode: no ESC delay, backspace keeps deleting after a trip through normal mode, 'vv' edits the line in nvim.
 bindkey -v
+export KEYTIMEOUT=1
+bindkey '^?' backward-delete-char
+bindkey '^h' backward-delete-char
+bindkey -M vicmd 'vv' edit-command-line
 bindkey '^p' up-line-or-beginning-search
 bindkey '^n' down-line-or-beginning-search
 bindkey '^y' autosuggest-accept
@@ -59,7 +61,6 @@ alias ldev="nix develop --command $SHELL -il"
 alias gdev="nix develop $HOME/develop --command $SHELL -il"
 alias lnvim="nix develop --command $SHELL -il -c 'nvim .'"
 alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
-alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
@@ -83,15 +84,5 @@ command_not_found_handler() {
   fi
   return 127
 }
-
-# Vi mode: no ESC delay, and backspace keeps deleting after a trip through normal mode.
-export KEYTIMEOUT=1
-bindkey '^?' backward-delete-char
-bindkey '^h' backward-delete-char
-
-# 'vv' in normal mode edits the command line in nvim
-autoload -Uz edit-command-line
-zle -N edit-command-line
-bindkey -M vicmd 'vv' edit-command-line
 
 eval "$(starship init zsh)"

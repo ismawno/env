@@ -137,7 +137,6 @@ lines += [""] + btlines
 
 tooltip = "\n".join(lines)
 if "info" in sys.argv[1:]:
-    # Middle click: same content as the hover tooltip, as a notification.
     try:
         subprocess.run(["notify-send", "-a", "waybar", "Connectivity",
                         re.sub(r"<[^>]*>", "", tooltip)], check=False)

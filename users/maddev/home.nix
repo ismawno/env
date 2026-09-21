@@ -82,6 +82,7 @@ in
     mpv
     playerctl
     scrcpy
+    wdisplays
     android-tools
     qt6Packages.qt6ct
     spotify

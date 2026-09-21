@@ -374,7 +374,7 @@ in
 
     # PER FILE, not directory sources, so a host can override one file without forking the set.
     "waybar/config".source = "${shub}/waybar/config";
-    "waybar/lumi-config".source = "${shub}/waybar/lumi-config";
+    "waybar/config-cava".source = "${shub}/waybar/config-cava";
     "waybar/modules".source = "${shub}/waybar/modules";
     "waybar/style.css".source = "${shub}/waybar/style.css";
     "rofi".source = "${shub}/rofi";

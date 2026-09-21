@@ -17,7 +17,7 @@ local half = { silent = true, float = true, size = "(monitor_w*0.5) (monitor_h*0
 local mid = { float = true, size = "(monitor_w*0.6) (monitor_h*0.6)", center = true }
 
 hl.bind(mod .. " + ALT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh"))
-hl.bind(mod .. " + SHIFT + W", dsp.exec_cmd(programs.scripts .. "/waybarLumi.sh"))
+hl.bind(mod .. " + SHIFT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh toggle"))
 
 local shots = programs.home .. "/Pictures/Screenshots"
 hl.bind("code:107", dsp.exec_cmd("mkdir -p " .. shots .. " && hyprshot -o " .. shots .. " -m region"), locked)

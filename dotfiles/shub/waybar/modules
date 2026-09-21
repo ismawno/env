@@ -135,8 +135,7 @@
 
   "custom/cava": {
     "exec": "~/.config/hypr/scripts/waybarCava.sh",
-    "format": "{}",
-    "on-click": "kitty -c ~/.config/kitty/kitty.conf nvim -c cd ~/.config/"
+    "format": "{}"
   },
 
   // One module replacing cpu+memory+temperature: "cpu% ram% temp°C" with the
@@ -151,10 +150,6 @@
     "on-click-middle": "~/.config/hypr/scripts/sysinfo.sh info"
   },
 
-  "custom/lumi": {
-    "exec": "~/.cargo/bin/lumi",
-    "format": "{}"
-  },
 
   // Combined network + bluetooth: "[ETH]/B1". Sysfs-first, so bigsys never shells
   // out at all; bluetoothctl is never used (it hangs when no adapter exists).

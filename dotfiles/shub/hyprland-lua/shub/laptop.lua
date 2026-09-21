@@ -38,11 +38,7 @@ end
 
 hl.on("hyprland.start", sync)
 hl.on("config.reloaded", sync)
+hl.bind("switch:on:" .. lid.switch, close, { locked = true })
+hl.bind("switch:off:" .. lid.switch, open, { locked = true })
 
-return {
-  inactive_opacity = 1.0,
-  binds = function(locked)
-    hl.bind("switch:on:" .. lid.switch, close, locked)
-    hl.bind("switch:off:" .. lid.switch, open, locked)
-  end,
-}
+return { inactive_opacity = 1.0 }

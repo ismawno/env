@@ -1,11 +1,11 @@
-local host = require("host")
-local profile = require("shub." .. host.kind)
 local programs = require("shub.programs")
 
 local dsp = hl.dsp
 local win = hl.dsp.window
 
 local mod = "SUPER"
+local terminal = "ghostty"
+local browser = "zen-beta"
 
 local locked = { locked = true }
 local repeating = { repeating = true }
@@ -24,22 +24,22 @@ for _, shot in ipairs({ { "code:107", "region" }, { "SHIFT + code:107", "output 
   hl.bind(shot[1], dsp.exec_cmd("mkdir -p " .. shots .. " && hyprshot -o " .. shots .. " -m " .. shot[2]), locked)
 end
 
-hl.bind(mod .. " + Q", dsp.exec_cmd(programs.terminal))
-hl.bind(mod .. " + SHIFT + Q", dsp.exec_cmd(programs.terminal2))
-hl.bind(mod .. " + ALT + Q", dsp.exec_cmd(programs.terminal, half))
-hl.bind(mod .. " + E", dsp.exec_cmd(programs.editor))
-hl.bind(mod .. " + W", dsp.exec_cmd(programs.file_manager))
-hl.bind(mod .. " + Z", dsp.exec_cmd(programs.browser))
-hl.bind(mod .. " + SHIFT + Z", dsp.exec_cmd(programs.browser .. " --private-window"))
-hl.bind(mod .. " + Y", dsp.exec_cmd(programs.youtube))
-hl.bind(mod .. " + G", dsp.exec_cmd(programs.browser .. " --new-window https://github.com/"))
-hl.bind(mod .. " + ALT + T", dsp.exec_cmd(programs.gemini))
-hl.bind(mod .. " + D", dsp.exec_cmd(programs.emoji_picker))
-hl.bind(mod .. " + P", dsp.exec_cmd(programs.video_player))
-hl.bind(mod .. " + A", dsp.exec_cmd(programs.local_music))
+hl.bind(mod .. " + Q", dsp.exec_cmd(terminal))
+hl.bind(mod .. " + SHIFT + Q", dsp.exec_cmd(terminal))
+hl.bind(mod .. " + ALT + Q", dsp.exec_cmd(terminal, half))
+hl.bind(mod .. " + E", dsp.exec_cmd(terminal .. " -e nvim"))
+hl.bind(mod .. " + W", dsp.exec_cmd("thunar"))
+hl.bind(mod .. " + Z", dsp.exec_cmd(browser))
+hl.bind(mod .. " + SHIFT + Z", dsp.exec_cmd(browser .. " --private-window"))
+hl.bind(mod .. " + Y", dsp.exec_cmd(browser .. " --new-window https://youtube.com"))
+hl.bind(mod .. " + G", dsp.exec_cmd(browser .. " --new-window https://github.com/"))
+hl.bind(mod .. " + ALT + T", dsp.exec_cmd(browser .. " --new-window https://aistudio.google.com/"))
+hl.bind(mod .. " + D", dsp.exec_cmd("smile"))
+hl.bind(mod .. " + P", dsp.exec_cmd("mpv"))
+hl.bind(mod .. " + A", dsp.exec_cmd("spotify"))
 hl.bind(mod .. " + SHIFT + A", dsp.exec_cmd(programs.scripts .. "/lofi.sh"))
-hl.bind(mod .. " + CTRL + A", dsp.exec_cmd(programs.terminal .. " -e cava", half))
-hl.bind(mod .. " + M", dsp.exec_cmd(programs.terminal .. " -e nmtui", mid))
+hl.bind(mod .. " + CTRL + A", dsp.exec_cmd(terminal .. " -e cava", half))
+hl.bind(mod .. " + M", dsp.exec_cmd(terminal .. " -e nmtui", mid))
 hl.bind(mod .. " + O", dsp.exec_cmd(programs.scripts .. "/scrcpy.sh", centred))
 hl.bind(mod .. " + B", dsp.exec_cmd(programs.scripts .. "/hyprsunset.sh"))
 hl.bind(mod .. " + H", dsp.exec_cmd("hyprpicker -a"))
@@ -50,8 +50,9 @@ hl.bind(mod .. " + X", dsp.exec_cmd("sleep 0.1 && swaync-client -t -sw"))
 hl.bind(mod .. " + N", dsp.exec_cmd(programs.wallpaper))
 
 -- drun and the tasks script mode in one list; the task labels start with ">", so typing it narrows to them.
-local tasks = " -modes drun,tasks:" .. programs.tasks_mode .. " -combi-modes drun,tasks"
-hl.bind(mod .. " + SPACE", dsp.exec_cmd(programs.menu .. tasks .. " -combi-display-format '{text}' -show combi"))
+local rofi = programs.home .. "/.config/rofi/"
+local combi = " -modes drun,tasks:" .. rofi .. "tasks.sh -combi-modes drun,tasks -combi-display-format '{text}'"
+hl.bind(mod .. " + SPACE", dsp.exec_cmd("rofi -config " .. rofi .. "apps.rasi" .. combi .. " -show combi"))
 
 -- pkill succeeding means the menu was dismissed, so only launch when nothing was killed.
 local dir = programs.home .. "/.config/wlogout/"
@@ -131,5 +132,3 @@ for _, arrow in ipairs({ { "left", -20, 0 }, { "right", 40, 0 }, { "up", 0, -20 
   hl.bind(mod .. " + " .. arrow[1], win.resize({ x = arrow[2], y = arrow[3], relative = true }), repeating)
   hl.bind(mod .. " + SHIFT + " .. arrow[1], win.move({ direction = arrow[1] }))
 end
-
-profile.binds(locked)

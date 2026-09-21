@@ -118,7 +118,7 @@ local function serialise(entries)
   return table.concat(lines, "\n") .. "\n"
 end
 
-local function live()
+local function enabled_monitors()
   local modes = {}
   for line in query(".[] | .name as $n | (.availableModes // [])[] | [$n, .] | @tsv"):gmatch("[^\n]+") do
     local row = fields(line)
@@ -130,11 +130,11 @@ local function live()
   end
 
   local program =
-    ".[] | [.name,.description,.width,.height,.refreshRate,.x,.y,.scale,.transform,(.disabled|tostring)] | @tsv"
+    ".[] | select(.disabled | not) | [.name,.description,.width,.height,.refreshRate,.x,.y,.scale,.transform] | @tsv"
   local monitors = {}
   for line in query(program):gmatch("[^\n]+") do
     local row = fields(line)
-    local monitor = { name = row[1], description = row[2], disabled = row[10] == "true", modes = modes[row[1]] or {} }
+    local monitor = { name = row[1], description = row[2], modes = modes[row[1]] or {} }
     for column, key in ipairs({ "width", "height", "rate", "x", "y", "scale", "transform" }) do
       monitor[key] = tonumber(row[column + 2])
     end
@@ -209,10 +209,7 @@ handle:close()
 local existing, load_error = load_entries(layout_file)
 if not existing then die(repo_path .. " does not load as Lua: " .. tostring(load_error)) end
 
-local enabled = {}
-for _, monitor in ipairs(live()) do
-  if not monitor.disabled then enabled[#enabled + 1] = monitor end
-end
+local enabled = enabled_monitors()
 if #enabled == 0 then die("Hyprland reports no enabled monitor") end
 check_layout(enabled)
 
@@ -269,13 +266,11 @@ local saved = {}
 for _, entry in ipairs(reloaded) do
   saved[entry.output] = entry
 end
-for _, monitor in ipairs(live()) do
-  if not monitor.disabled then
-    local entry, now = saved[key_of(monitor)], entry_of(monitor)
-    if not entry then die(monitor.name .. " came back without an entry of its own", previous) end
-    if entry.mode ~= now.mode or entry.position ~= now.position or entry.scale ~= now.scale then
-      die(monitor.name .. " came back as " .. describe(now) .. ", not " .. describe(entry), previous)
-    end
+for _, monitor in ipairs(enabled_monitors()) do
+  local entry, now = saved[key_of(monitor)], entry_of(monitor)
+  if not entry then die(monitor.name .. " came back without an entry of its own", previous) end
+  if entry.mode ~= now.mode or entry.position ~= now.position or entry.scale ~= now.scale then
+    die(monitor.name .. " came back as " .. describe(now) .. ", not " .. describe(entry), previous)
   end
 end
 

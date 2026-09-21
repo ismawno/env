@@ -38,7 +38,7 @@ in
 
     facts = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
-      description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile, and facts.programs replaces default programs.";
+      description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile.";
     };
 
     tree = lib.mkOption {

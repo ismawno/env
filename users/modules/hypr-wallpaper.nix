@@ -24,7 +24,7 @@ let
   backgrounds = pkgs.runCommand "backgrounds-with-current" { } ''
     cp -r ${shub}/backgrounds $out
     chmod u+w $out
-    ln -s ${if chosen then "${picture}" else "1.png"} $out/current
+    ln -sfn ${if chosen then "${picture}" else "1.png"} $out/current
   '';
 
   picker = pkgs.writeShellApplication {

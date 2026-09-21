@@ -54,6 +54,8 @@ hyprpaper_pids() {
 # picture changes by restarting it exactly the way startup.lua starts it.
 restart_hyprpaper() {
   local pids count
+  # Without a session to start it in, the running hyprpaper stays: better the old picture than none.
+  hyprctl version >/dev/null 2>&1 || [ -n "${WAYLAND_DISPLAY:-}" ] || return 1
   pids=$(hyprpaper_pids)
   if [ -n "$pids" ]; then
     printf '%s\n' "$pids" | xargs -r kill
@@ -63,7 +65,9 @@ restart_hyprpaper() {
     done
     printf '%s\n' "$(hyprpaper_pids)" | xargs -r kill -9
   fi
-  setsid -f hyprpaper -c "$conf" >/dev/null 2>&1 </dev/null
+  if ! hyprctl eval "hl.exec_cmd('hyprpaper -c $conf')" >/dev/null 2>&1; then
+    setsid -f hyprpaper -c "$conf" >/dev/null 2>&1 </dev/null
+  fi
   for _ in $(seq 40); do
     [ -z "$(hyprpaper_pids)" ] || break
     sleep 0.1
@@ -79,8 +83,13 @@ fail_back() {
     cp -f "$saved" "$selection"
     home-manager switch --flake "$env_dir" -b backup >/dev/null 2>&1 ||
       back="; $repo_path is back, but the switch that would show it failed too"
-    restart_hyprpaper ||
-      back="$back, and hyprpaper is not running: start it with Super+N"
+    if ! restart_hyprpaper; then
+      if [ -n "$(hyprpaper_pids)" ]; then
+        back="$back, and hyprpaper was left as it was: Super+N starts it again"
+      else
+        back="$back, and hyprpaper is not running: start it with Super+N"
+      fi
+    fi
     die "$1$back"
   fi
   die "$1"

@@ -28,7 +28,7 @@ end
 
 -- ignore_alpha is a floor: pixels below it are skipped, and order breaks the z-tie on the overlay layer.
 for _, rule in ipairs({
-  { match = { namespace = "waybar" }, blur = true },
+  { match = { namespace = "waybar" }, blur = true, xray = true },
   { match = { namespace = "logout_dialog" }, blur = true },
   { match = { namespace = "rofi" }, blur = true, ignore_alpha = 0 },
   { match = { namespace = "swaync-control-center" }, blur = true, ignore_alpha = 0.05, order = 3 },

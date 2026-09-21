@@ -344,19 +344,9 @@ in
       <Delete> = exec imv-reject "$imv_current_file" "$imv_pid"
     '';
 
-    # Hyprland takes hyprland.lua over hyprland.conf; the tree carries this host's host.lua.
     "hypr/hyprland.lua".source = "${config.mad.hypr.tree}/hyprland.lua";
     "hypr/host.lua".source = "${config.mad.hypr.tree}/host.lua";
     "hypr/shub".source = "${config.mad.hypr.tree}/shub";
-
-    # The hyprlang set below is dormant, kept one edit away from being the live config again.
-    "hypr/hyprland.conf".source = "${shub}/hyprland/hyprland.conf";
-    "hypr/defaultPrograms.conf".source = "${shub}/hyprland/defaultPrograms.conf";
-    "hypr/startUpApps.conf".source = "${shub}/hyprland/startUpApps.conf";
-    "hypr/Envs.conf".source = "${shub}/hyprland/Envs.conf";
-    "hypr/keyBinds.conf".source = "${shub}/hyprland/keyBinds.conf";
-    "hypr/windowRules.conf".source = "${shub}/hyprland/windowRules.conf";
-    "hypr/workspaceRules.conf".source = "${shub}/hyprland/workspaceRules.conf";
     "hypr/hyprlock".source = "${shub}/hyprland/hyprlock";
     "hypr/hyprpaper".source = "${shub}/hyprland/hyprpaper";
     "hypr/scripts".source = "${shub}/hyprland/scripts";

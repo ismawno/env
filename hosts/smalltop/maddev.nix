@@ -77,10 +77,11 @@ in
         position = "0x-1080";
         scale = 2;
       }
+      # Explicit, not "auto": Hyprland moves an auto monitor when the panel leaves the layout but leaves waybar and hyprpaper at the old origin. 1440 is the panel's logical width.
       {
         output = "";
         mode = "3840x2160@60";
-        position = "auto";
+        position = "1440x0";
         scale = 1;
       }
     ];

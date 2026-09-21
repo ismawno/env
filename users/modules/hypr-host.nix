@@ -25,7 +25,7 @@ in
           scale = 1;
         }
       ];
-      description = "hl.monitor specs, applied in the order given.";
+      description = "hl.monitor specs, applied in the order given. A laptop wants an explicit position on every monitor: Hyprland does not re-arrange layer surfaces for a monitor it moves, so an auto-positioned one strands waybar and hyprpaper when the panel leaves the layout.";
     };
 
     programs = lib.mkOption {

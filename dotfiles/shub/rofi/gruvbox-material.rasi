@@ -58,6 +58,7 @@ message {
 }
 
 inputbar {
+  children: [entry];
   color: @gruv6;
   padding: 14px;
   background-color: @transparent;
@@ -74,9 +75,6 @@ case-indicator {
   text-color: inherit;
 }
 
-prompt {
-  margin: 0px 1em 0em 0em;
-}
 
 listview {
   padding: 8px;
@@ -144,3 +142,7 @@ button.selected.normal {
   border-color: @foreground;
 }
 
+
+entry {
+  horizontal-align: 0.5;
+}

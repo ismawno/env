@@ -9,9 +9,10 @@ configuration {
     display-run:    "󱓞 run:";
     display-drun:   "󰣖 drun:";
     display-window: "󱂬 window:";
-    display-combi:  "󰣖 drun:";
+    display-combi:  "󰕘 combi:";
     display-filebrowser: "󰉋 filebrowser:";
 
+    drun-display-format: "{name} [<span alpha='55%' size='small'><i>{generic}</i></span>]";
     dpi: 110;
 }
 

@@ -50,9 +50,10 @@ let
       export MAD_WP_PREFIX=${lib.escapeShellArg cfg.repoPrefix}
       export MAD_WP_STABLE=${lib.escapeShellArg "${config.xdg.configHome}/backgrounds/current"}
       export MAD_WP_CONF=${lib.escapeShellArg "${config.xdg.configHome}/hypr/hyprpaper/hyprpaper.conf"}
-      # These two are the test seams: a run may aim the picker at another collection or thumbnail source.
+      # The test seams: a run may aim the picker at another collection, thumbnail source or home-manager.
       export MAD_WP_COLLECTION=''${MAD_WP_COLLECTION:-${lib.escapeShellArg cfg.collectionDir}}
       export MAD_WP_THUMB_BASE=''${MAD_WP_THUMB_BASE:-${lib.escapeShellArg cfg.thumbnailBase}}
+      export MAD_WP_HM=''${MAD_WP_HM:-home-manager}
       exec ${pkgs.bash}/bin/bash ${tool} "$@"
     '';
   };

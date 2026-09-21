@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Pins one picture of the public wallpaper repo into the flake and puts it on screen.
+# Puts one picture of the public wallpaper repo on screen at once, then pins it into the flake in the background.
 # No argument opens a rofi picker, "<folder>/<file>.png" runs headless, --reset goes back to the
 # stock background, --list prints "<folder>/<file>.png TAB <pretty name>" per picture without opening rofi.
 # Paths, the repo slug and the quiet switch arrive in the environment, so nothing here knows about Nix.
@@ -19,6 +19,13 @@ conf=${MAD_WP_CONF:?wallpaper-pick was built without a hyprpaper config}
 quiet=${MAD_WP_QUIET:-}
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-pick
 theme=${MAD_WP_THEME:-${XDG_CONFIG_HOME:-$HOME/.config}/rofi/wallpapers.rasi}
+hm=${MAD_WP_HM:-home-manager}
+runtime=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+# Held from the moment a pick touches anything until its switch is over; tmpfs, so it never outlives the login.
+lock=$runtime/wallpaper-pick.lock
+gcroot=$runtime/wallpaper-pick.gcroot
+tmpconf=$runtime/wallpaper-pick.conf
+log=$runtime/wallpaper-pick.log
 
 # Must match the name width wallpapers.rasi leaves under each thumbnail, in characters of its font.
 wrap_width=33
@@ -33,6 +40,10 @@ url=""
 hash=""
 color=""
 saved=""
+store=""
+switching=""
+hm_pid=""
+failing=""
 thumb_dir=""
 
 work=$(mktemp -d)
@@ -61,7 +72,9 @@ hyprpaper_pids() {
 # hyprpaper 0.8.4 answers "invalid hyprpaper request" to its IPC verbs under this setup, so the
 # picture changes by restarting it exactly the way startup.lua starts it.
 restart_hyprpaper() {
-  local pids count
+  local config=${1:-$conf} escaped pids count
+  # hyprctl refuses any eval that contains "/hyprpaper", so the path's slashes travel as Lua escapes.
+  escaped=$(printf '%s' "$config" | sed 's|/|\\047|g')
   # Without a session to start it in, the running hyprpaper stays: better the old picture than none.
   hyprctl version >/dev/null 2>&1 || [ -n "${WAYLAND_DISPLAY:-}" ] || return 1
   pids=$(hyprpaper_pids)
@@ -73,8 +86,8 @@ restart_hyprpaper() {
     done
     printf '%s\n' "$(hyprpaper_pids)" | xargs -r kill -9
   fi
-  if ! hyprctl eval "hl.exec_cmd('hyprpaper -c $conf')" >/dev/null 2>&1; then
-    setsid -f hyprpaper -c "$conf" >/dev/null 2>&1 </dev/null
+  if ! hyprctl eval "hl.exec_cmd('hyprpaper -c $escaped')" >/dev/null 2>&1; then
+    setsid -f hyprpaper -c "$config" >/dev/null 2>&1 </dev/null 9>&-
   fi
   for _ in $(seq 40); do
     [ -z "$(hyprpaper_pids)" ] || break
@@ -84,23 +97,104 @@ restart_hyprpaper() {
   [ "$count" = 1 ]
 }
 
-# Every failure past the write puts the old selection back, so the flake never keeps a wallpaper that did not verify.
+busy() {
+  notify normal "still pinning the previous pick into the flake; try again in a moment"
+  printf 'wallpaper-pick: %s\n' "still pinning the previous pick into the flake; try again in a moment" >&2
+  if [ "$mode" = menu ]; then exit 0; fi
+  exit 75
+}
+
+# Every failure of the background pin puts the old selection and the old picture back, so the flake never keeps a wallpaper that did not verify.
 fail_back() {
   local back="; the previous wallpaper is back"
+  failing=1
   if [ -n "$saved" ]; then
-    cp -f "$saved" "$selection"
-    home-manager switch --flake "$env_dir" -b backup >/dev/null 2>&1 ||
-      back="; $repo_path is back, but the switch that would show it failed too"
-    if ! restart_hyprpaper; then
-      if [ -n "$(hyprpaper_pids)" ]; then
-        back="$back, and hyprpaper was left as it was: Super+N starts it again"
-      else
-        back="$back, and hyprpaper is not running: start it with Super+N"
-      fi
+    cp -f "$saved" "$selection.new"
+    mv -f "$selection.new" "$selection"
+    if [ -n "$switching" ]; then
+      "$hm" switch --flake "$env_dir" -b backup >/dev/null 2>&1 ||
+        back="; $repo_path is back, but the switch that would show it failed too"
     fi
-    die "$1$back"
   fi
-  die "$1"
+  if ! restart_hyprpaper "$conf"; then
+    if [ -n "$(hyprpaper_pids)" ]; then
+      back="$back, and hyprpaper was left as it was: Super+N starts it again"
+    else
+      back="$back, and hyprpaper is not running: start it with Super+N"
+    fi
+  fi
+  rm -f "$gcroot" "$tmpconf"
+  die "$1$back"
+}
+
+# shellcheck disable=SC2329 # invoked by the trap in pin
+on_signal() {
+  [ -z "$failing" ] || return 0
+  if [ -n "$hm_pid" ]; then
+    pkill -TERM -P "$hm_pid" 2>/dev/null || true
+    kill "$hm_pid" 2>/dev/null || true
+    wait "$hm_pid" 2>/dev/null || true
+  fi
+  fail_back "interrupted"
+}
+
+# Same name as the module's fetchurl, so the prefetched file is the very store path the switch pins.
+store_name() {
+  printf '%s' "wallpaper-$1" | LC_ALL=C sed -E 's/[^A-Za-z0-9+._?=-]+/-/g; s/^\.+//' | tail -c 207
+}
+
+# A monitor still waiting for hyprpaper clears to this colour; the picture's own average beats a fixed grey under an AMOLED wallpaper.
+sample_color() {
+  printf 'rgb(%s)' "$(magick "$1[0]" -alpha off -depth 8 -resize '1x1!' -format '%[hex:p{0,0}]' info: | tr 'A-F' 'a-f')"
+}
+
+# The picture is already on screen when this runs, detached and holding the lock on fd 9 until the flake agrees.
+pin() {
+  mode=$1 name=$2 url=$3 hash=$4 store=$5 commit=$6
+  flock -n 9 2>/dev/null || die "--pin only runs from a pick that holds $lock"
+  # The switch runs as a waited-for job, so a signal stops it at once instead of after it ends on its own.
+  trap on_signal TERM INT HUP
+
+  saved="$work/previous"
+  cp -f "$selection" "$saved"
+  if [ "$mode" != reset ]; then
+    color=$(sample_color "$store") || fail_back "cannot sample the colour of $name"
+  fi
+  render_selection "$mode" >"$selection.new"
+  mv -f "$selection.new" "$selection"
+
+  git -C "$env_dir" ls-files --error-unmatch -- "$repo_path" >/dev/null 2>&1 ||
+    fail_back "$repo_path is not tracked by git, so the flake would not see it"
+  nix-instantiate --eval --strict -- "$selection" >/dev/null 2>&1 ||
+    fail_back "the selection just written does not evaluate as Nix"
+
+  switching=1
+  "$hm" switch --flake "$env_dir" -b backup >"$work/switch" 2>&1 &
+  hm_pid=$!
+  wait "$hm_pid" || fail_back "home-manager switch failed: $(tail -1 "$work/switch")"
+  hm_pid=""
+
+  target=$(readlink -f "$stable" || true)
+  [ -n "$target" ] && [ -f "$target" ] || fail_back "$stable does not resolve to a file"
+  if [ "$mode" = reset ]; then
+    [ "$(basename "$target")" = "1.png" ] || fail_back "$stable resolves to $target, not the stock background"
+  else
+    [ "$(nix hash file --sri --type sha256 "$target")" = "$hash" ] ||
+      fail_back "$stable resolves to $target, which is not the picture that was fetched"
+  fi
+  # Only a store name that drifted from the module's needs a restart; otherwise the screen already shows this file.
+  if [ "$target" != "$store" ] && ! cmp -s "$target" "$store"; then
+    restart_hyprpaper "$conf" || fail_back "hyprpaper did not come back as exactly one process"
+  fi
+
+  saved=""
+  rm -f "$gcroot" "$tmpconf"
+  if [ "$mode" = reset ]; then
+    notify normal "back to the stock background; $repo_path changed, review the diff and commit it"
+  else
+    notify normal "$name is up, pinned at ${commit:0:12}; $repo_path changed, review the diff and commit it"
+  fi
+  exit 0
 }
 
 nix_string() {
@@ -367,12 +461,16 @@ case "${1:-}" in
     ;;
 esac
 
-for binary in curl find git home-manager identify jq magick nix nix-instantiate pgrep setsid sha1sum; do
+for binary in cmp curl find flock git "$hm" identify jq magick nix nix-instantiate nix-store pgrep setsid sha1sum; do
   need "$binary"
 done
 
 mode="set"
 case "${1:-}" in
+  --pin)
+    shift
+    pin "$@"
+    ;;
   --reset) mode=reset ;;
   --list) mode=list ;;
   -h | --help)
@@ -393,6 +491,11 @@ fi
 git -C "$env_dir" ls-files --error-unmatch -- "$repo_path" >/dev/null 2>&1 ||
   die "$repo_path is not tracked by git, so the flake would not see it"
 [ -r "$selection" ] || die "cannot read $selection"
+
+# Refused before rofi opens rather than after browsing; the lock is not kept while the picker is open.
+exec 9>>"$lock"
+flock -n 9 || busy
+exec 9>&-
 
 if [ "$mode" != reset ]; then
   resolve_commit
@@ -416,7 +519,7 @@ if [ "$mode" != reset ]; then
   encoded=$(jq -rn --arg s "$prefix/$name" '$s | split("/") | map(@uri) | join("/")')
   url="https://media.githubusercontent.com/media/$slug/$commit/$encoded"
 
-  fetched=$(nix store prefetch-file --json --name wallpaper-pick-probe "$url" 2>"$work/prefetch") ||
+  fetched=$(nix store prefetch-file --json --name "$(store_name "$name")" "$url" 2>"$work/prefetch") ||
     die "$name is not in $slug at ${commit:0:12}: $(tail -1 "$work/prefetch")"
   hash=$(printf '%s' "$fetched" | jq -r .hash)
   store=$(printf '%s' "$fetched" | jq -r .storePath)
@@ -428,43 +531,36 @@ if [ "$mode" != reset ]; then
     die "$name came back as something that is not an image"
   read -r format width _ <"$work/image" || true
   [ "${width:-0}" -gt 0 ] || die "$name came back as a ${format:-file} with no pixels"
-
-  # A monitor still waiting for hyprpaper clears to this colour; the picture's own average beats a fixed grey under an AMOLED wallpaper.
-  color="rgb($(magick "${store}[0]" -alpha off -depth 8 -resize '1x1!' -format '%[hex:p{0,0}]' info: | tr 'A-F' 'a-f'))"
+else
+  store=$(readlink -f "$(dirname -- "$stable")")/1.png
+  [ -f "$store" ] || die "$store, the stock background, is missing"
 fi
 
-render_selection "$mode" >"$work/new"
-if cmp -s "$work/new" "$selection" && [ -e "$stable" ]; then
+# Taken again now: two pickers may both have passed the probe, and only one may touch the screen.
+exec 9>>"$lock"
+flock -n 9 || busy
+
+# The colour is only sampled later, so it cannot tell two selections apart here.
+render_selection "$mode" | grep -v '^  color = ' >"$work/new"
+if grep -v '^  color = ' "$selection" | cmp -s - "$work/new" && [ -e "$stable" ]; then
   notify low "already showing what $repo_path says"
   exit 0
 fi
 
-saved="$work/previous"
-cp -f "$selection" "$saved"
-cp -f "$work/new" "$selection.new"
-mv -f "$selection.new" "$selection"
+if [ "$mode" != reset ]; then
+  nix-store --add-root "$gcroot" --indirect --realise "$store" >/dev/null 2>&1 ||
+    die "cannot keep $name in the Nix store while it is being pinned"
+fi
+sed -E "s|^([[:space:]]*path[[:space:]]*=).*|\1 $store|" "$conf" >"$tmpconf"
+grep -qF "= $store" "$tmpconf" || die "$conf has no path line to point at $store"
 
-nix-instantiate --eval --strict -- "$selection" >/dev/null 2>&1 ||
-  fail_back "the selection just written does not evaluate as Nix"
-
-home-manager switch --flake "$env_dir" -b backup >"$work/switch" 2>&1 ||
-  fail_back "home-manager switch failed: $(tail -1 "$work/switch")"
-
-restart_hyprpaper || fail_back "hyprpaper did not come back as exactly one process"
-
-target=$(readlink -f "$stable" || true)
-[ -n "$target" ] && [ -f "$target" ] || fail_back "$stable does not resolve to a file"
-
-if [ "$mode" = reset ]; then
-  [ "$(basename "$target")" = "1.png" ] || fail_back "$stable resolves to $target, not the stock background"
-else
-  [ "$(nix hash file --sri --type sha256 "$target")" = "$hash" ] ||
-    fail_back "$stable resolves to $target, which is not the picture that was fetched"
+if ! restart_hyprpaper "$tmpconf"; then
+  rm -f "$gcroot" "$tmpconf"
+  restart_hyprpaper "$conf" || true
+  die "could not put $name on screen; nothing was pinned"
 fi
 
-saved=""
-if [ "$mode" = reset ]; then
-  notify normal "back to the stock background; $repo_path changed, review the diff and commit it"
-else
-  notify normal "$name is up, pinned at ${commit:0:12}; $repo_path changed, review the diff and commit it"
-fi
+# The switch takes its time behind the picture; the detached pin inherits fd 9 and with it the lock.
+: >"$log"
+setsid -f "$BASH" "$0" --pin "$mode" "$name" "$url" "$hash" "$store" "$commit" </dev/null >>"$log" 2>&1
+exit 0

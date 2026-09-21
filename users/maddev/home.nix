@@ -381,6 +381,7 @@ in
     "rofi/config.rasi".source = "${shub}/rofi/config.rasi";
     "rofi/apps.rasi".source = "${shub}/rofi/apps.rasi";
     "rofi/gruvbox-material.rasi".source = "${shub}/rofi/gruvbox-material.rasi";
+    "rofi/wallpapers.rasi".source = "${shub}/rofi/wallpapers.rasi";
 
     # Not a directory source: a class or host module drops its own list into rofi/tasks.d.
     "rofi/tasks.sh" = {

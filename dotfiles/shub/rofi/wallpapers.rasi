@@ -1,0 +1,52 @@
+// The wallpaper picker: the usual theme, laid out as a grid of thumbnails with their full names under them.
+
+@import "~/.config/rofi/gruvbox-material.rasi"
+
+// A zero height lets the window hug the three rows instead of the usual fixed 560px.
+window {
+  width: 1280px;
+  height: 0px;
+}
+
+entry {
+  placeholder: "Search wallpapers";
+  placeholder-color: @gruv8;
+}
+
+listview {
+  columns: 4;
+  lines: 3;
+  fixed-columns: true;
+  fixed-height: true;
+  flow: horizontal;
+  spacing: 8px;
+  scrollbar: false;
+}
+
+element {
+  orientation: vertical;
+  padding: 10px;
+  spacing: 6px;
+  border: 2px;
+  border-color: transparent;
+}
+
+element.selected.normal {
+  border-color: @gruv6;
+}
+
+// wallpaper-pick breaks names to fit this width: its wrap_width counts characters of this font.
+element-text {
+  font: "JetBrainsMono 10";
+  horizontal-align: 0.5;
+  vertical-align: 0.5;
+  margin: 0;
+  text-color: inherit;
+}
+
+// The icon box is always square; the thumbnails are all 16:10, so this trims the 45px bands above and below them.
+element-icon {
+  size: 240px;
+  padding: -45px 0px;
+  margin: 0;
+}

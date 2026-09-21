@@ -2,7 +2,7 @@
 
 # Pins one picture of the public wallpaper repo into the flake and puts it on screen.
 # No argument opens a rofi picker, "<folder>/<file>.png" runs headless, --reset goes back to the
-# stock background, --list prints the picker's rows without opening rofi.
+# stock background, --list prints "<folder>/<file>.png TAB <pretty name>" per picture without opening rofi.
 # Paths, the repo slug and the quiet switch arrive in the environment, so nothing here knows about Nix.
 
 set -euo pipefail
@@ -18,7 +18,15 @@ stable=${MAD_WP_STABLE:?wallpaper-pick was built without the stable wallpaper pa
 conf=${MAD_WP_CONF:?wallpaper-pick was built without a hyprpaper config}
 quiet=${MAD_WP_QUIET:-}
 cache=${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-pick
+theme=${MAD_WP_THEME:-${XDG_CONFIG_HOME:-$HOME/.config}/rofi/wallpapers.rasi}
 
+# Must match the name width wallpapers.rasi leaves under each thumbnail, in characters of its font.
+wrap_width=33
+wrap_lines=3
+
+declare -A pretty=()
+lines=()
+wrapped=""
 commit=""
 name=""
 url=""
@@ -195,9 +203,112 @@ remote_names() {
   cut -f 1 <"$work/index" | LC_ALL=C sort
 }
 
-# A rofi dmenu row shows a picture when it carries "\0icon\x1f<path>"; a thumbnail that is missing just loses its icon.
-rows() {
-  local rel thumb
+# names.tsv at the repo root maps "<folder>/<file>.png" TAB "<pretty name>", cached per main commit like index.tsv.
+load_pretty_names() {
+  local head key dir path title code
+  dir=$cache/names
+  head=$commit
+  if [ -z "$head" ]; then
+    head=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$slug" refs/heads/main 2>/dev/null | cut -f 1) || head=""
+  fi
+  key=$(printf '%s\n%s\n' "$thumb_base" "$head" | sha1sum | cut -c 1-12)
+  mkdir -p "$dir"
+  if [ -n "$head" ] && [ "$(cat "$dir/key" 2>/dev/null)" != "$key" ]; then
+    code=0
+    curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$thumb_base/names.tsv" || code=$?
+    case $code in
+      0) mv -f "$dir/names.tsv.part" "$dir/names.tsv" ;;
+      # 22 is an HTTP error and 37 a missing file:// path: main has no map, so every name falls back.
+      22 | 37) : >"$dir/names.tsv" ;;
+    esac
+    rm -f "$dir/names.tsv.part"
+    case $code in
+      0 | 22 | 37) printf '%s\n' "$key" >"$dir/key" ;;
+    esac
+  fi
+  [ -s "$dir/names.tsv" ] || return 0
+  while IFS=$'\t' read -r path title || [ -n "$path" ]; do
+    title=${title%$'\r'}
+    case $path in
+      '' | '#'*) continue ;;
+    esac
+    [ -z "$title" ] || pretty[$path]=$title
+  done <"$dir/names.tsv"
+}
+
+greedy_lines() {
+  local width=$1 word line=""
+  shift
+  lines=()
+  for word in "$@"; do
+    if [ -z "$line" ]; then
+      line=$word
+    elif [ $((${#line} + 1 + ${#word})) -le "$width" ]; then
+      line+=" $word"
+    else
+      lines+=("$line")
+      line=$word
+    fi
+  done
+  [ -z "$line" ] || lines+=("$line")
+}
+
+# As few lines as wrap_width allows, then the narrowest width that still needs no more of them.
+balanced_lines() {
+  local joined="$*" count width
+  greedy_lines "$wrap_width" "$@"
+  count=${#lines[@]}
+  [ "$count" -gt 1 ] || return 0
+  width=$(((${#joined} + count - 1) / count))
+  while [ "$width" -lt "$wrap_width" ]; do
+    greedy_lines "$width" "$@"
+    [ "${#lines[@]}" -gt "$count" ] || return 0
+    width=$((width + 1))
+  done
+  greedy_lines "$wrap_width" "$@"
+}
+
+# A lone dash sticks to the word before it, so no line starts with "- ".
+words_of() {
+  local word
+  local -a raw
+  read -ra raw <<<"$1"
+  words=()
+  for word in "${raw[@]}"; do
+    if [ "$word" = - ] && [ "${#words[@]}" -gt 0 ]; then
+      words[-1]+=" -"
+    else
+      words+=("$word")
+    fi
+  done
+}
+
+# Rofi cannot wrap an element's text, so a name arrives already broken, preferably right after " - ".
+wrap_name() {
+  local LC_ALL=C.UTF-8
+  local -a words plain first
+  words_of "$1"
+  balanced_lines "${words[@]}"
+  if [ "${#lines[@]}" -gt 1 ] && [[ $1 == *" - "* ]]; then
+    plain=("${lines[@]}")
+    words_of "${1%% - *} -"
+    balanced_lines "${words[@]}"
+    first=("${lines[@]}")
+    words_of "${1#* - }"
+    balanced_lines "${words[@]}"
+    lines=("${first[@]}" "${lines[@]}")
+    if [ "${#lines[@]}" -gt "${#plain[@]}" ] || [ "${#lines[@]}" -gt "$wrap_lines" ]; then
+      lines=("${plain[@]}")
+    fi
+  fi
+  # A name too long even for all the lines ends on one long line, which rofi then ellipsizes.
+  if [ "${#lines[@]}" -gt "$wrap_lines" ]; then
+    lines=("${lines[@]:0:wrap_lines-1}" "${lines[*]:wrap_lines-1}")
+  fi
+  wrapped=$(printf '%s\n' "${lines[@]}")
+}
+
+load_pictures() {
   : >"$work/names"
   if [ -d "$collection" ]; then
     collection_names >"$work/names" || true
@@ -209,12 +320,25 @@ rows() {
     remote_names >"$work/names"
     [ -s "$work/names" ] || die "neither $collection nor $slug main lists a picture"
   fi
+  load_pretty_names
+}
+
+# Rows follow $work/names line for line, so the index rofi prints (-format i) names the file.
+rows() {
+  local rel title thumb icon
   while IFS= read -r rel; do
+    title=${rel##*/}
+    title=${pretty[$rel]:-${title%.png}}
     thumb=$thumb_dir/${rel%.png}.jpg
-    if [ -f "$thumb" ]; then
-      printf '%s\0icon\x1f%s\n' "$rel" "$thumb"
+    icon=""
+    [ ! -f "$thumb" ] || icon=$'\x1f'icon$'\x1f'$thumb
+    if [ "$1" = list ]; then
+      printf '%s\t%s' "$rel" "$title"
+      [ -z "$icon" ] || printf '\0%s' "${icon#$'\x1f'}"
+      printf '\n'
     else
-      printf '%s\n' "$rel"
+      wrap_name "$title"
+      printf '%s\0meta\x1f%s %s%s\x1e' "$wrapped" "$title" "${rel%.png}" "$icon"
     fi
   done <"$work/names"
 }
@@ -224,7 +348,7 @@ usage() {
 wallpaper-pick                       pick a wallpaper in rofi and pin it in the flake
 wallpaper-pick <folder>/<file>.png   pin that picture without asking
 wallpaper-pick --reset               go back to the stock background
-wallpaper-pick --list                print the picker's rows and stop
+wallpaper-pick --list                print every picture with its pretty name and stop
 USAGE
 }
 
@@ -258,7 +382,8 @@ case "${1:-}" in
 esac
 
 if [ "$mode" = list ]; then
-  rows
+  load_pictures
+  rows list
   exit 0
 fi
 
@@ -269,7 +394,15 @@ git -C "$env_dir" ls-files --error-unmatch -- "$repo_path" >/dev/null 2>&1 ||
 if [ "$mode" != reset ]; then
   resolve_commit
   if [ "$mode" = menu ]; then
-    name=$(rows | rofi -dmenu -i -show-icons -p "Wallpaper" -theme-str 'element-icon { size: 5em; }') || exit 0
+    load_pictures
+    rows menu >"$work/rows"
+    theme_args=()
+    [ ! -r "$theme" ] || theme_args=(-theme "$theme")
+    pick=$(rofi -dmenu -i -no-custom -show-icons -sep $'\x1e' -eh "$wrap_lines" -format i \
+      -p "Wallpaper" "${theme_args[@]}" <"$work/rows") || exit 0
+    [[ $pick =~ ^[0-9]+$ ]] || exit 0
+    mapfile -t pictures <"$work/names"
+    name=${pictures[pick]:-}
     [ -n "$name" ] || exit 0
   fi
   [[ $name =~ ^[^/]+/[^/]+\.png$ ]] || die "pick a picture as \"<folder>/<file>.png\", not \"$name\""

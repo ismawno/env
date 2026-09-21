@@ -62,7 +62,7 @@ in
 
     wakeonlan
 
-    # Drop once a waybar release with PR #5013 is in nixpkgs.
+    # Drop this override and waybar-hyprland-lua.patch once a waybar release with PR #5013 is in nixpkgs.
     (waybar.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [ ./waybar-hyprland-lua.patch ];
     }))
@@ -136,7 +136,7 @@ in
     tray.enable = true;
   };
 
-  # TUI tools rofi would otherwise miss; Terminal=false because popup.sh dispatches its own ghostty.
+  # TUI tools rofi would otherwise miss, each floated in its own ghostty by popup.sh.
   xdg.desktopEntries =
     let
       popup = "${config.home.homeDirectory}/.config/hypr/scripts/popup.sh";
@@ -146,7 +146,6 @@ in
         name = "Network Manager (nmtui)";
         genericName = "Network Configuration";
         exec = "${popup} 60 60 nmtui";
-        terminal = false;
         icon = "network-wireless";
         categories = [
           "System"
@@ -158,7 +157,6 @@ in
         name = "Bluetooth (bluetuith)";
         genericName = "Bluetooth Manager";
         exec = "${popup} 60 60 bluetuith";
-        terminal = false;
         icon = "bluetooth";
         categories = [
           "System"
@@ -171,7 +169,6 @@ in
         name = "btop++";
         genericName = "System Monitor";
         exec = "${popup} 85 85 btop";
-        terminal = false;
         icon = "btop";
         categories = [
           "System"
@@ -183,7 +180,6 @@ in
         name = "mpv";
         genericName = "Multimedia Player";
         exec = "mpv --player-operation-mode=pseudo-gui %U";
-        terminal = false;
         categories = [
           "AudioVideo"
           "Audio"
@@ -201,7 +197,6 @@ in
         name = "imv";
         genericName = "Image Viewer";
         exec = "imv-dir %f";
-        terminal = false;
         categories = [
           "Graphics"
           "Viewer"
@@ -218,7 +213,6 @@ in
       };
     };
 
-  # Associate MIME types for video and image opening
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
@@ -288,22 +282,16 @@ in
     enable = true;
     settings.git_protocol = "https";
   };
-  programs.zsh = {
-    sessionVariables = {
-      MAD_ENV_PATH = "/home/maddev/env";
-      MAD_NVIM_PATH = "/home/maddev/nvim";
-      MAD_CONVOY_PATH = "/home/maddev/convoy";
-      MAD_TOOLKIT_PATH = "/home/maddev/toolkit";
-      MAD_ONYX_PATH = "/home/maddev/onyx";
-      MAD_DRIZZLE_PATH = "/home/maddev/drizzle";
-    };
+  programs.zsh.sessionVariables = {
+    MAD_ENV_PATH = "/home/maddev/env";
+    MAD_NVIM_PATH = "/home/maddev/nvim";
+    MAD_CONVOY_PATH = "/home/maddev/convoy";
+    MAD_TOOLKIT_PATH = "/home/maddev/toolkit";
+    MAD_ONYX_PATH = "/home/maddev/onyx";
+    MAD_DRIZZLE_PATH = "/home/maddev/drizzle";
   };
 
   home.sessionVariables = {
-    XCURSOR_THEME = "Bibata-Modern-Ice";
-    XCURSOR_SIZE = "24";
-    HYPRCURSOR_THEME = "Bibata-Modern-Ice";
-    HYPRCURSOR_SIZE = "24";
     GTK_THEME = "Gruvbox-Light";
     THUNARX_DIRS = "$HOME/.nix-profile/lib/thunarx-3";
     XDG_SESSION_TYPE = "wayland";
@@ -327,24 +315,14 @@ in
       name = "Bibata-Modern-Ice";
       package = pkgs.bibata-cursors;
     };
-    gtk3.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=0
-      '';
-    };
-    gtk4 = {
-      theme = config.gtk.theme;
-      extraConfig = {
-        Settings = ''
-          gtk-application-prefer-dark-theme=0
-        '';
-      };
-    };
+    gtk4.theme = config.gtk.theme;
   };
 
+  # Also sets XCURSOR_* and HYPRCURSOR_*.
   home.pointerCursor = {
     gtk.enable = true;
     x11.enable = true;
+    hyprcursor.enable = true;
     name = "Bibata-Modern-Ice";
     package = pkgs.bibata-cursors;
     size = 24;
@@ -376,7 +354,7 @@ in
     "hypr/hyprpaper".source = "${shub}/hyprland/hyprpaper";
     "hypr/scripts".source = "${shub}/hyprland/scripts";
 
-    # PER FILE, not directory sources, so a host can override one file without forking the set.
+    # PER FILE, not directory sources, so a host can override one file and a module can add to rofi/tasks.d.
     "waybar/config".source = "${shub}/waybar/config";
     "waybar/config-cava".source = "${shub}/waybar/config-cava";
     "waybar/modules".source = "${shub}/waybar/modules";
@@ -385,29 +363,22 @@ in
     "rofi/apps.rasi".source = "${shub}/rofi/apps.rasi";
     "rofi/gruvbox-material.rasi".source = "${shub}/rofi/gruvbox-material.rasi";
     "rofi/wallpapers.rasi".source = "${shub}/rofi/wallpapers.rasi";
+    "rofi/tasks.sh".source = "${shub}/rofi/tasks.sh";
+    "rofi/tasks.d/10-radio.sh".source = "${shub}/rofi/tasks.d/10-radio.sh";
 
-    # Not a directory source: a class or host module drops its own list into rofi/tasks.d.
-    "rofi/tasks.sh" = {
-      source = "${shub}/rofi/tasks.sh";
-      executable = true;
-    };
-    "rofi/tasks.d/10-radio.sh" = {
-      source = "${shub}/rofi/tasks.d/10-radio.sh";
-      executable = true;
-    };
     "swaync".source = "${shub}/swaync";
+    "wlogout".source = "${shub}/wlogout";
+    "fastfetch".source = "${shub}/fastfetch";
+    "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
+    "ghostty/themes".source = "${shub}/ghostty/.config/ghostty/themes";
+    "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
+    "nvim".source = inputs.nvim;
+
     # gvfsd-http fetches swaync's https album art and needs glib-networking for TLS.
     "systemd/user/gvfs-daemon.service.d/tls.conf".text = ''
       [Service]
       Environment=GIO_EXTRA_MODULES=${pkgs.glib-networking}/lib/gio/modules
     '';
-    "wlogout".source = "${shub}/wlogout";
-    "fastfetch".source = "${shub}/fastfetch";
-    "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
-    "ghostty/themes".source = "${shub}/ghostty/.config/ghostty/themes";
-    "zsh/.zshrc".source = "${shub}/zsh/.zshrc";
-    "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
-    "nvim".source = inputs.nvim;
   };
 
   home.file = {
@@ -421,20 +392,16 @@ in
     };
   };
 
-  # Zen's user.js is wired up in ../modules/zen.nix (imported above).
-
   xdg.portal = {
     enable = true;
     extraPortals = [
       pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
-    config = {
-      common = {
-        default = [ "gtk" ];
-        "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
-        "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
-      };
+    config.common = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "hyprland" ];
+      "org.freedesktop.impl.portal.Screenshot" = [ "hyprland" ];
     };
   };
 

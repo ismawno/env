@@ -1,5 +1,4 @@
-# Hibernation interlock: stops one distro mounting the shared btrfs read-write
-# while the other holds an unresumed image. INERT until mad.interlock.enable.
+# Hibernation interlock: stops one distro mounting the shared btrfs read-write while the other holds an unresumed image.
 {
   config,
   lib,
@@ -223,11 +222,8 @@ in
       ''
     );
 
-    # ---- LAYER 1 (GRUB) and the CachyOS entries ----
-
+    # LAYER 1 (GRUB) and the CachyOS entries. grub2_efi for grub-editenv: the module ships none with device = "nodev".
     environment.systemPackages = [ pkgs.grub2_efi ];
-    # grub-editenv; the module contributes
-    # none of its own when device = "nodev"
 
     boot.loader.grub = {
       enable = true;

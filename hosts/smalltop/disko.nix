@@ -1,12 +1,10 @@
-# Disk layout for smalltop. RUNNING DISKO AGAINST THIS DESTROYS THE DISK.
-# ESP 2G; LUKS2 -> vg smalltop -> swap 20G, cachyos-swap 20G, root btrfs.
+# smalltop disk layout (ESP 2G; LUKS2 -> vg smalltop -> swap 20G, cachyos-swap 20G, root btrfs). RUNNING DISKO AGAINST THIS DESTROYS THE DISK.
 { ... }:
 
 let
   # Stable by-id path. Never /dev/nvme0n1 -- enumeration order is not a contract.
   diskDevice = "/dev/disk/by-id/nvme-KINGSTON_SNV2S1000G_50026B7382E2A171";
 
-  # Stable by-id path; enumeration order is not a contract.
   btrfsMountOptions = [
     "compress=zstd:1"
     "noatime"

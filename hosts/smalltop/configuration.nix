@@ -1,5 +1,4 @@
-# smalltop -- Samsung Galaxy Book 3 Pro (NP960XFG-KC2IT, board P07RGU). i7-1360P,
-# 16 GB, Iris Xe, CNVi wlo1 (no ethernet), ALC298 audio, IPU6+ov02c10, TPM 2.0.
+# smalltop -- Samsung Galaxy Book 3 Pro (NP960XFG-KC2IT, board P07RGU): i7-1360P, 16 GB, Iris Xe, CNVi wlo1 (no ethernet), ALC298, IPU6+ov02c10, TPM 2.0.
 {
   config,
   lib,
@@ -108,8 +107,7 @@ in
     };
     packages = with pkgs; [
       noto-fonts
-      # noto-fonts-color-emoji, never the noto-fonts-emoji alias: it fails at build, not at eval.
-      noto-fonts-color-emoji
+      noto-fonts-color-emoji # never the noto-fonts-emoji alias: it fails at build, not at eval
     ];
   };
 
@@ -121,12 +119,8 @@ in
 
   networking.useDHCP = lib.mkDefault true;
 
-  # Audio lives in ./audio.nix (imported above).
-
   # ov02c10 runs at 26 MHz, the in-tree driver demands 19.2; the out-of-tree route costs hibernation.
-  hardware.ipu6 = {
-    enable = false;
-  };
+  hardware.ipu6.enable = false;
 
   services.hardware.bolt.enable = true; # Thunderbolt 4 / USB4
 
@@ -176,8 +170,8 @@ in
     overrideDevices = false;
     overrideFolders = false;
     settings = {
+      # Device IDs are public keys, not secrets.
       devices = {
-        # Public device IDs. These are public keys, not secrets.
         Atmosphere.id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
         WorkPC.id = "MUXVN5R-FEXPENP-4XNQPG7-XHCQEUH-E6MYV74-LQFFMMZ-ED3IBRT-RJALVQC";
         FairCaly.id = "M555SO5-7CSX6PN-GHNILWD-7Q7MW4R-DRJUIB4-WYOOMUH-NRIYBZK-PMYRIA5";
@@ -187,11 +181,9 @@ in
         madsystem-skandal.id = "ZTX4L66-KQSPHNX-J2OVFZT-3BFEDHL-E47MEM6-N4XGPAJ-MYLMKTC-CFFONQC";
         FP5.id = "4MQOIMD-JX4EUOA-ZF7ONSM-ZKBBDHX-PAT37XD-EBQEQFC-4Y2DCIU-PFZK3QG";
       };
+      # The names are the folder IDs (and default labels); they must match the peers' exactly or nothing pairs up.
       folders = {
-        # Folder IDs must match the peers' exactly or nothing pairs up.
         "ObsidianVault" = {
-          id = "ObsidianVault";
-          label = "ObsidianVault";
           path = "/nomad/maddev/Knowledge/ObsidianVault";
           type = "sendreceive";
           devices = [
@@ -206,7 +198,6 @@ in
           ];
         };
         "molten-river-knowledge" = {
-          id = "molten-river-knowledge";
           path = "/nomad/maddev/Knowledge/molten-river";
           type = "sendreceive";
           devices = [

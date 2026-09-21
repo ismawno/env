@@ -1,5 +1,4 @@
-# bigsys -- Xeon W-2155, GTX 1080 (Pascal, 580 is its last driver branch).
-# Originally from nixos-generate-config; hand-maintained since.
+# bigsys -- Xeon W-2155, GTX 1080; from nixos-generate-config, hand-maintained since.
 {
   config,
   lib,
@@ -23,7 +22,6 @@
     "usb_storage"
     "sd_mod"
   ];
-  boot.initrd.kernelModules = [ ];
   boot.kernelModules = [
     "kvm-intel"
     "nct6775"
@@ -32,7 +30,6 @@
 
   programs.coolercontrol.enable = true;
 
-  boot.extraModulePackages = [ ];
   boot.loader.grub.useOSProber = true;
 
   fileSystems."/" = {
@@ -51,8 +48,6 @@
       "dmask=0077"
     ];
   };
-
-  swapDevices = [ ];
 
   networking.hostName = "bigsys";
 
@@ -74,13 +69,9 @@
   powerManagement.cpuFreqGovernor = "schedutil";
   services.thermald.enable = true; # keeps the W-2155 at sustained turbo
 
-  # Enable the NVIDIA driver
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
     modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
-    nvidiaSettings = true;
     # GTX 1080 (Pascal) was dropped by the 590+ drivers; 580 is its last supported branch.
     package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     open = false;
@@ -89,11 +80,9 @@
     "nvidia_drm.modeset=1"
     "nvidia_drm.fbdev=1"
   ];
-  # GPU acceleration on wayland
   hardware.graphics.enable = lib.mkForce true;
 
   environment.sessionVariables = {
-
     # Direct Wayland to use NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
@@ -108,15 +97,9 @@
 
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
   boot.plymouth.theme = lib.mkForce "pixels";
-
-  boot.plymouth.themePackages = lib.mkForce (
-    with pkgs;
-    [
-      (adi1090x-plymouth-themes.override {
-        selected_themes = [ "pixels" ];
-      })
-    ]
-  );
+  boot.plymouth.themePackages = lib.mkForce [
+    (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "pixels" ]; })
+  ];
 
   # DHCP on every interface; the recommended form for scripted networking.
   networking.useDHCP = lib.mkDefault true;

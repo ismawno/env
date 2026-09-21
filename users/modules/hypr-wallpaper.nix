@@ -7,12 +7,13 @@
 }:
 
 let
-  cfg = config.mad.hypr.wallpaper;
   shub = ../../dotfiles/shub;
-  tool = ../../dotfiles/shub/hyprland-lua/tools/wallpaper-pick.sh;
+  envDir = "${config.home.homeDirectory}/env";
+  repo = "Mars-Wave/caelestia-wallpapers-AMOLED";
+  # An empty set in this file keeps the stock background.
+  repoPath = "users/maddev/wallpaper.nix";
 
-  selection = import cfg.selectionFile;
-  chosen = selection ? url;
+  selection = import (../.. + "/${repoPath}");
 
   picture = pkgs.fetchurl {
     inherit (selection) url hash;
@@ -24,7 +25,7 @@ let
   backgrounds = pkgs.runCommand "backgrounds-with-current" { } ''
     cp -r ${shub}/backgrounds $out
     chmod u+w $out
-    ln -sfn ${if chosen then "${picture}" else "1.png"} $out/current
+    ln -sfn ${if selection ? url then "${picture}" else "1.png"} $out/current
   '';
 
   picker = pkgs.writeShellApplication {
@@ -43,74 +44,28 @@ let
       util-linux
     ];
     text = ''
-      export MAD_WP_ENV=${lib.escapeShellArg cfg.envDir}
-      export MAD_WP_SELECTION=${lib.escapeShellArg "${cfg.envDir}/${cfg.repoPath}"}
-      export MAD_WP_REPO_PATH=${lib.escapeShellArg cfg.repoPath}
-      export MAD_WP_SLUG=${lib.escapeShellArg cfg.repo}
-      export MAD_WP_PREFIX=${lib.escapeShellArg cfg.repoPrefix}
+      export MAD_WP_ENV=${lib.escapeShellArg envDir}
+      export MAD_WP_SELECTION=${lib.escapeShellArg "${envDir}/${repoPath}"}
+      export MAD_WP_REPO_PATH=${lib.escapeShellArg repoPath}
+      export MAD_WP_SLUG=${lib.escapeShellArg repo}
+      export MAD_WP_PREFIX=wallpapers
       export MAD_WP_STABLE=${lib.escapeShellArg "${config.xdg.configHome}/backgrounds/current"}
       export MAD_WP_CONF=${lib.escapeShellArg "${config.xdg.configHome}/hypr/hyprpaper/hyprpaper.conf"}
       # The test seams: a run may aim the picker at another collection, thumbnail source or home-manager.
-      export MAD_WP_COLLECTION=''${MAD_WP_COLLECTION:-${lib.escapeShellArg cfg.collectionDir}}
-      export MAD_WP_THUMB_BASE=''${MAD_WP_THUMB_BASE:-${lib.escapeShellArg cfg.thumbnailBase}}
+      export MAD_WP_COLLECTION=''${MAD_WP_COLLECTION:-${lib.escapeShellArg "${config.home.homeDirectory}/Pictures/Wallpapers"}}
+      export MAD_WP_THUMB_BASE=''${MAD_WP_THUMB_BASE:-${lib.escapeShellArg "https://raw.githubusercontent.com/${repo}/main"}}
       export MAD_WP_HM=''${MAD_WP_HM:-home-manager}
-      exec ${pkgs.bash}/bin/bash ${tool} "$@"
+      exec ${pkgs.bash}/bin/bash ${../../dotfiles/shub/hyprland-lua/tools/wallpaper-pick.sh} "$@"
     '';
   };
 in
 {
-  options.mad.hypr.wallpaper = {
-    selectionFile = lib.mkOption {
-      type = lib.types.path;
-      default = ../maddev/wallpaper.nix;
-      description = "The tracked Nix data file holding the chosen picture; an empty set there keeps the stock background.";
-    };
+  home.packages = [ picker ];
 
-    repoPath = lib.mkOption {
-      type = lib.types.str;
-      default = "users/maddev/wallpaper.nix";
-      description = "Where selectionFile lives inside envDir; that working copy is what the picker rewrites.";
-    };
+  # home.nix cannot link the whole directory any more: "current" has to be added to it.
+  xdg.configFile."backgrounds".source = backgrounds;
 
-    envDir = lib.mkOption {
-      type = lib.types.str;
-      default = "${config.home.homeDirectory}/env";
-      description = "The flake checkout the picker writes into and then activates.";
-    };
+  xdg.configFile."rofi/tasks.d/30-wallpaper.tsv".text = "> Change Wallpaper\twallpaper-pick\n";
 
-    repo = lib.mkOption {
-      type = lib.types.str;
-      default = "Mars-Wave/caelestia-wallpapers-AMOLED";
-      description = "The public GitHub repository the pictures are pinned from.";
-    };
-
-    repoPrefix = lib.mkOption {
-      type = lib.types.str;
-      default = "wallpapers";
-      description = "The directory inside that repository the picture names are relative to.";
-    };
-
-    collectionDir = lib.mkOption {
-      type = lib.types.str;
-      default = "${config.home.homeDirectory}/Pictures/Wallpapers";
-      description = "The same pictures on disk; a host without them browses the repo's thumbnails instead.";
-    };
-
-    thumbnailBase = lib.mkOption {
-      type = lib.types.str;
-      default = "https://raw.githubusercontent.com/${cfg.repo}/main";
-      description = "Where the picker reads thumbnails/index.tsv and the small jpegs beside it, for a host with no local collection. Plain git files, so browsing costs no Git LFS bandwidth.";
-    };
-  };
-
-  config = {
-    home.packages = [ picker ];
-
-    # home.nix cannot link the whole directory any more: "current" has to be added to it.
-    xdg.configFile."backgrounds".source = backgrounds;
-
-    xdg.configFile."rofi/tasks.d/30-wallpaper.tsv".text = "> Change Wallpaper\twallpaper-pick\n";
-
-    mad.hypr.facts = lib.optionalAttrs (selection ? color) { background_color = selection.color; };
-  };
+  mad.hypr.facts = lib.optionalAttrs (selection ? color) { background_color = selection.color; };
 }

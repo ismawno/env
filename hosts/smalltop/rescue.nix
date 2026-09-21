@@ -6,7 +6,7 @@ let
   espUuid = "E0B5-66AA";
   vg = "smalltop";
 
-  # Only this machines iwlwifi blobs: all of linux-firmware would not fit the shared ESP.
+  # Only this machine's iwlwifi blobs: all of linux-firmware would not fit the shared ESP.
   wifiFirmware = pkgs.runCommand "smalltop-rescue-wifi-firmware" { } ''
     cd ${pkgs.linux-firmware}/lib/firmware
     find -L . -type f \( -name 'iwlwifi-so-a0-gf-a0-89.ucode*' -o -name 'iwlwifi-so-a0-gf-a0.pnvm*' \) \

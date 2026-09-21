@@ -36,15 +36,9 @@ in
       description = "A tracked, pure-data Lua file of hl.monitor specs, installed beside host.lua and read instead of mad.hypr.monitors.";
     };
 
-    programs = lib.mkOption {
-      type = lib.types.attrsOf lib.types.str;
-      default = { };
-      description = "Host-only replacements for the default programs.";
-    };
-
     facts = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
-      description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile.";
+      description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile, and facts.programs replaces default programs.";
     };
 
     tree = lib.mkOption {
@@ -63,7 +57,7 @@ in
   };
 
   config.mad.hypr.facts = {
-    inherit (cfg) monitors programs;
+    inherit (cfg) monitors;
     monitors_file = cfg.monitorsFile != null;
     polkit_agent = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
   };

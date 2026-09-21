@@ -97,7 +97,7 @@ in
     tmux
     hwloc
     pulseaudio
-    pavucontrol # the mixer waybar's right click opens; pipewire-pulse backs it
+    pavucontrol # the mixer waybar's left click opens; pipewire-pulse backs it
 
     imv
 

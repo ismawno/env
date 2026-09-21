@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Float a command centred, sized to the focused monitor; Hyprland ignores percent.
+# Float a command centred at a share of the focused monitor (waybar clicks, rofi entries).
 # popup.sh btop | popup.sh 60 60 nmtui | popup.sh -g 60 60 pavucontrol
 set -uo pipefail
 
@@ -13,16 +13,7 @@ else
 fi
 [ $# -gt 0 ] || { echo "usage: popup.sh [-g] [w% h%] <command...>" >&2; exit 1; }
 
-read -r MW MH < <(hyprctl monitors -j 2>/dev/null | python3 -c '
-import json,sys
-try: ms=json.load(sys.stdin)
-except Exception: print("1920 1080"); raise SystemExit
-m=next((x for x in ms if x.get("focused")), ms[0] if ms else None)
-if not m: print("1920 1080"); raise SystemExit
-s=m.get("scale",1) or 1
-print(int(m["width"]/s), int(m["height"]/s))
-' 2>/dev/null) || { MW=1920; MH=1080; }
-
-W=$(( MW * PW / 100 )); H=$(( MH * PH / 100 ))
 [ "$GUI" -eq 1 ] && CMD="$*" || CMD="ghostty -e $*"
-hyprctl dispatch exec "[float;size $W $H;centerwindow] $CMD" >/dev/null 2>&1
+# hyprctl dispatch does nothing under the Lua config, so the launch goes through eval.
+out=$(hyprctl eval "hl.exec_cmd([==[$CMD]==], { float = true, center = true, size = \"(monitor_w*$PW/100) (monitor_h*$PH/100)\" })" 2>&1)
+[ "$out" = "ok" ] || { echo "popup.sh: $out" >&2; exit 1; }

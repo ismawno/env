@@ -1,0 +1,66 @@
+--- a/src/modules/hyprland/workspace.cpp
++++ b/src/modules/hyprland/workspace.cpp
+@@ -66,25 +66,51 @@
+   return std::nullopt;
+ }
+ 
++namespace {
++
++std::string luaString(const std::string& s) {
++  std::string out = "\"";
++  for (char c : s) {
++    if (c == '\\' || c == '"') {
++      out += '\\';
++    } else if (c == '\n') {
++      out += "\\n";
++      continue;
++    }
++    out += c;
++  }
++  return out + "\"";
++}
++
++// A Lua-config Hyprland evaluates "dispatch X" as "return hl.dispatch(X)", so hyprlang syntax fails there.
++void dispatch(const std::string& legacy, const std::string& lua) {
++  if (IPC::getSocket1Reply("dispatch " + legacy) != "ok") {
++    IPC::getSocket1Reply("dispatch " + lua);
++  }
++}
++
++std::string luaFocus(const std::string& workspace, bool onCurrentMonitor) {
++  return "hl.dsp.focus({ workspace = " + luaString(workspace) +
++         (onCurrentMonitor ? ", on_current_monitor = true })" : " })");
++}
++
++}  // namespace
++
+ bool Workspace::handleClicked(GdkEventButton* bt) const {
+   if (bt->type == GDK_BUTTON_PRESS) {
+     try {
++      bool const onCurrent = m_workspaceManager.moveToMonitor();
++      std::string const legacyFocus =
++          onCurrent ? "focusworkspaceoncurrentmonitor " : "workspace ";
+       if (id() > 0) {  // normal
+-        if (m_workspaceManager.moveToMonitor()) {
+-          m_ipc.getSocket1Reply("dispatch focusworkspaceoncurrentmonitor " + std::to_string(id()));
+-        } else {
+-          m_ipc.getSocket1Reply("dispatch workspace " + std::to_string(id()));
+-        }
++        dispatch(legacyFocus + std::to_string(id()), luaFocus(std::to_string(id()), onCurrent));
+       } else if (!isSpecial()) {  // named (this includes persistent)
+-        if (m_workspaceManager.moveToMonitor()) {
+-          m_ipc.getSocket1Reply("dispatch focusworkspaceoncurrentmonitor name:" + name());
+-        } else {
+-          m_ipc.getSocket1Reply("dispatch workspace name:" + name());
+-        }
++        dispatch(legacyFocus + "name:" + name(), luaFocus("name:" + name(), onCurrent));
+       } else if (id() != -99) {  // named special
+-        m_ipc.getSocket1Reply("dispatch togglespecialworkspace " + name());
++        dispatch("togglespecialworkspace " + name(),
++                 "hl.dsp.workspace.toggle_special(" + luaString(name()) + ")");
+       } else {  // special
+-        m_ipc.getSocket1Reply("dispatch togglespecialworkspace");
++        dispatch("togglespecialworkspace", "hl.dsp.workspace.toggle_special()");
+       }
+       return true;
+     } catch (const std::exception& e) {

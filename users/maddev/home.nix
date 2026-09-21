@@ -62,7 +62,10 @@ in
 
     wakeonlan
 
-    waybar
+    # Drop once a waybar release with PR #5013 is in nixpkgs.
+    (waybar.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./waybar-hyprland-lua.patch ];
+    }))
     hyprpaper
     hyprlock
     rofi

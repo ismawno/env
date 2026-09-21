@@ -9,7 +9,7 @@ configuration {
     display-run:    "󱓞 run:";
     display-drun:   "󰣖 drun:";
     display-window: "󱂬 window:";
-    display-combi:  "󰕘 combi:";
+    display-combi:  "󰣖 drun:";
     display-filebrowser: "󰉋 filebrowser:";
 
     dpi: 110;

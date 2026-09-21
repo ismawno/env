@@ -19,14 +19,7 @@ in
   options.mad.hypr = {
     monitors = lib.mkOption {
       type = lib.types.listOf (lib.types.attrsOf lib.types.anything);
-      default = [
-        {
-          output = "";
-          mode = "3840x2160@60";
-          position = "auto";
-          scale = 1;
-        }
-      ];
+      default = [ ];
       description = "hl.monitor specs, applied in the order given. A laptop wants an explicit position on every monitor: Hyprland does not re-arrange layer surfaces for a monitor it moves, so an auto-positioned one strands waybar and hyprpaper when the panel leaves the layout.";
     };
 

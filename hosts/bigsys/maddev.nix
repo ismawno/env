@@ -1,9 +1,7 @@
 { ... }:
 
 {
-  imports = [
-    ../../users/modules/hypr-desktop.nix
-  ];
+  imports = [ ../../users/modules/hypr-desktop.nix ];
 
   # Pascal has no AV1 decoder; off pushes YouTube to VP9. Never share: Iris Xe would regress.
   mad.zen.extraPrefs = ''

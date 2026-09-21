@@ -62,7 +62,6 @@ in
 {
   home.packages = [ picker ];
 
-  # home.nix cannot link the whole directory any more: "current" has to be added to it.
   xdg.configFile."backgrounds".source = backgrounds;
 
   xdg.configFile."rofi/tasks.d/30-wallpaper.tsv".text = "> Change Wallpaper\twallpaper-pick\n";

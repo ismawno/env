@@ -30,7 +30,6 @@ in
   config = lib.mkIf (repoPath != null) {
     mad.hypr = {
       monitorsFile = ../.. + "/${repoPath}";
-      monitors = [ ];
       # A screen with no entry of its own; the shared Lua puts it right of the panel.
       facts.catchall = {
         mode = "3840x2160@60";

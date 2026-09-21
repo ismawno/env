@@ -45,9 +45,8 @@ in
               name = "cryptroot"; # -> /dev/mapper/cryptroot
               # No keyFile: disko prompts at format time, so the passphrase never reaches the repo.
               settings = {
-                # Lets btrfs's discard=async reach the NVMe; reveals unused blocks.
+                # allowDiscards lets btrfs's discard=async reach the NVMe (reveals unused blocks); bypassWorkqueues is faster there, slightly weaker against a physically present attacker.
                 allowDiscards = true;
-                # bypassWorkqueues: faster on NVMe, slightly weaker against a physically present attacker.
                 bypassWorkqueues = true;
               };
               extraFormatArgs = [
@@ -72,9 +71,8 @@ in
           size = "20G";
           content = {
             type = "swap";
-            # A real LV, not a btrfs swapfile: disko computes no resume_offset for those.
+            # A real LV, not a btrfs swapfile (disko computes no resume_offset for those); per-page discard is churn on a DRAM-less drive.
             resumeDevice = true;
-            # Discard once at swapon; per-page discard is churn on a DRAM-less drive.
             discardPolicy = "once";
             priority = 100;
           };

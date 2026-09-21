@@ -48,7 +48,7 @@ in
     ripgrep
     fzf
     unzip
-    btop # waybar sysinfo click target; replaces htop, which duplicated it in rofi
+    btop # waybar sysinfo click target
     gdu
     imagemagick
     tree-sitter
@@ -223,13 +223,11 @@ in
     defaultApplications = {
       "inode/directory" = [ "thunar.desktop" ];
 
-      # --- Web (Zen) ---
       "x-scheme-handler/http" = [ "zen-beta.desktop" ];
       "x-scheme-handler/https" = [ "zen-beta.desktop" ];
       "text/html" = [ "zen-beta.desktop" ];
       "application/xhtml+xml" = [ "zen-beta.desktop" ];
 
-      # --- Images (imv) ---
       "image/bmp" = [ "imv.desktop" ];
       "image/gif" = [ "imv.desktop" ];
       "image/jpeg" = [ "imv.desktop" ];
@@ -249,13 +247,12 @@ in
       "image/x-xbitmap" = [ "imv.desktop" ];
       "image/heic" = [ "imv.desktop" ];
 
-      # --- Videos (mpv) ---
       "video/mp4" = [ "mpv.desktop" ];
       "video/mkv" = [ "mpv.desktop" ];
       "video/x-matroska" = [ "mpv.desktop" ];
       "video/webm" = [ "mpv.desktop" ];
-      "video/quicktime" = [ "mpv.desktop" ]; # .mov files
-      "video/x-msvideo" = [ "mpv.desktop" ]; # .avi files
+      "video/quicktime" = [ "mpv.desktop" ];
+      "video/x-msvideo" = [ "mpv.desktop" ];
       "video/x-flv" = [ "mpv.desktop" ];
       "video/mpeg" = [ "mpv.desktop" ];
       "video/ogg" = [ "mpv.desktop" ];

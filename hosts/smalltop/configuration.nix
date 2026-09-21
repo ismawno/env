@@ -170,7 +170,6 @@ in
     overrideDevices = false;
     overrideFolders = false;
     settings = {
-      # Device IDs are public keys, not secrets.
       devices = {
         Atmosphere.id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
         WorkPC.id = "MUXVN5R-FEXPENP-4XNQPG7-XHCQEUH-E6MYV74-LQFFMMZ-ED3IBRT-RJALVQC";

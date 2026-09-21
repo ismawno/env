@@ -83,12 +83,10 @@
   hardware.graphics.enable = lib.mkForce true;
 
   environment.sessionVariables = {
-    # Direct Wayland to use NVIDIA
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     NIXOS_OZONE_WL = "1";
-
     # The RDD file broker denies nvidia_drv_video.so /proc/version; Gecko 153 has no narrower pref.
     MOZ_DISABLE_RDD_SANDBOX = "1";
   };
@@ -101,9 +99,7 @@
     (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "pixels" ]; })
   ];
 
-  # DHCP on every interface; the recommended form for scripted networking.
   networking.useDHCP = lib.mkDefault true;
-
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

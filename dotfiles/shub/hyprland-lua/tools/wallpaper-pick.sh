@@ -205,17 +205,20 @@ remote_names() {
 
 # names.tsv at the repo root maps "<folder>/<file>.png" TAB "<pretty name>", cached per main commit like index.tsv.
 load_pretty_names() {
-  local head key dir path title code
+  local head key dir path title code source
   dir=$cache/names
   head=$commit
   if [ -z "$head" ]; then
     head=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$slug" refs/heads/main 2>/dev/null | cut -f 1) || head=""
   fi
   key=$(printf '%s\n%s\n' "$thumb_base" "$head" | sha1sum | cut -c 1-12)
+  # raw.githubusercontent.com serves .../main from a cache for minutes after a push; a commit URL is never stale.
+  source=$thumb_base/names.tsv
+  [[ $thumb_base != */main ]] || source=${thumb_base%/main}/$head/names.tsv
   mkdir -p "$dir"
   if [ -n "$head" ] && [ "$(cat "$dir/key" 2>/dev/null)" != "$key" ]; then
     code=0
-    curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$thumb_base/names.tsv" || code=$?
+    curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$source" || code=$?
     case $code in
       0) mv -f "$dir/names.tsv.part" "$dir/names.tsv" ;;
       # 22 is an HTTP error and 37 a missing file:// path: main has no map, so every name falls back.

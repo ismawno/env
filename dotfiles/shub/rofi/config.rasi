@@ -13,6 +13,10 @@ configuration {
     display-filebrowser: "󰉋 filebrowser:";
 
     drun-display-format: "{name} [<span alpha='55%' size='small'><i>{generic}</i></span>]";
+    matching: "fuzzy";
+    case-sensitive: false;
+    sort: true;
+    sorting-method: "fzf";
     dpi: 110;
 }
 

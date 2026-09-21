@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
 # Puts one picture of the public wallpaper repo on screen at once, then pins it into the flake in the background.
-# No argument opens a rofi picker, "<folder>/<file>.png" runs headless, --reset goes back to the
-# stock background, --list prints "<folder>/<file>.png TAB <pretty name>" per picture without opening rofi.
-# Paths, the repo slug and the quiet switch arrive in the environment, so nothing here knows about Nix.
 
 set -euo pipefail
 
@@ -62,8 +59,7 @@ hyprpaper_pids() {
   pgrep -u "$(id -u)" -f 'hyprpaper -c' || true
 }
 
-# hyprpaper 0.8.4 answers "invalid hyprpaper request" to its IPC verbs under this setup, so the
-# picture changes by restarting it exactly the way startup.lua starts it.
+# hyprpaper 0.8.4 answers "invalid hyprpaper request" to its IPC verbs here, so it restarts the way startup.lua starts it.
 restart_hyprpaper() {
   local config=${1:-$conf} escaped pids count
   # hyprctl refuses any eval that contains "/hyprpaper", so the path's slashes travel as Lua escapes.
@@ -244,8 +240,7 @@ tree_names() {
     LC_ALL=C sort
 }
 
-# Without the collection on disk the rows still carry pictures: thumbnails/index.tsv and the small
-# jpegs beside it are plain git files on main, so listing and previewing costs no Git LFS bandwidth.
+# Without the collection on disk, thumbnails/index.tsv and its jpegs are plain git files on main: no Git LFS bandwidth.
 remote_names() {
   local key index name thumb out
   [ -n "$commit" ] || resolve_commit

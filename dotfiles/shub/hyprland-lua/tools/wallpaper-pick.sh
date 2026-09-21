@@ -27,9 +27,9 @@ gcroot=$runtime/wallpaper-pick.gcroot
 tmpconf=$runtime/wallpaper-pick.conf
 log=$runtime/wallpaper-pick.log
 
-# Must match the name width wallpapers.rasi leaves under each thumbnail, in characters of its font.
-wrap_width=33
-wrap_lines=3
+# Must match the name width wallpapers.rasi leaves beside each thumbnail, in characters of its font.
+wrap_width=60
+wrap_lines=2
 
 declare -A pretty=()
 lines=()

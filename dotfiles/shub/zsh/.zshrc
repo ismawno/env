@@ -1,17 +1,6 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-# fi
+[ -e "$HOME/vulkan/1.4.321.1/setup-env.sh" ] && source "$HOME/vulkan/1.4.321.1/setup-env.sh"
 
-if [ -e "$HOME/vulkan/1.4.321.1/setup-env.sh" ]; then
-    source "$HOME/vulkan/1.4.321.1/setup-env.sh"
-fi
-
-if command -v fd > /dev/null 2>&1; then
-  export FZF_DEFAULT_COMMAND='fd --type f --hidden --no-ignore'
-fi
+command -v fd >/dev/null 2>&1 && export FZF_DEFAULT_COMMAND='fd --type f --hidden --no-ignore'
 export FZF_DEFAULT_OPTS="--bind 'ctrl-j:down,ctrl-k:up' --no-mouse"
 
 # overrides EDITOR=nano from /etc/set-environment
@@ -19,94 +8,60 @@ export EDITOR="nvim"
 export VISUAL="$EDITOR"
 
 # read from disk, not Nix: home.sessionVariables lands in the world-readable store
-if [ -r "$HOME/.config/deepseek/api_key" ]; then
-  export DEEPSEEK_API_KEY="$(<"$HOME/.config/deepseek/api_key")"
-fi
+[ -r "$HOME/.config/deepseek/api_key" ] && export DEEPSEEK_API_KEY="$(<"$HOME/.config/deepseek/api_key")"
 
-# Set the directory we want to store zinit and plugins
+# Zinit and its plugins, cloned on first start
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-
-# Download Zinit, if it's not there yet
 if [ ! -d "$ZINIT_HOME" ]; then
    mkdir -p "$(dirname $ZINIT_HOME)"
    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
-
-# Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Add in zsh plugins
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 
-# Add in snippets
 zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
 zinit snippet OMZP::command-not-found
 
-# Load completions
 autoload -Uz compinit && compinit -u
-
 zinit cdreplay -q
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-autoload -U up-line-or-beginning-search
-autoload -U down-line-or-beginning-search
+autoload -U up-line-or-beginning-search down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 
 bindkey -v
-
-bindkey '^p' up-line-or-beginning-search   # Ctrl-P
-bindkey '^n' down-line-or-beginning-search # Ctrl-N
-
-# bindkey '^p' history-search-backward
-# bindkey '^n' history-search-forward
-
+bindkey '^p' up-line-or-beginning-search
+bindkey '^n' down-line-or-beginning-search
 bindkey '^y' autosuggest-accept
 bindkey '^u' forward-word
 
-# History
 HISTSIZE=5000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
+setopt appendhistory sharehistory hist_ignore_space hist_ignore_all_dups hist_save_no_dups hist_ignore_dups hist_find_no_dups
 
-# Completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
 
-# Aliases
 alias ls="ls --color"
 alias c="clear"
-
 alias ldev="nix develop --command $SHELL -il"
 alias gdev="nix develop $HOME/develop --command $SHELL -il"
-
 alias lnvim="nix develop --command $SHELL -il -c 'nvim .'"
 alias gnvim="nix develop $HOME/develop --command $SHELL -il -c 'nvim .'"
-
 alias cpploc='cloc --include-lang="C","C++","C/C++ Header" --exclude-dir=build'
-
 alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
-# Shell integrations
 eval "$(fzf --zsh)"
 # Greet before the tool inits; zoxide wants its init to stay last. (Off the launcher: `-e zsh -c` broke the terminfo-over-ssh integration.)
 [[ -z $TMUX && $SHLVL -eq 1 ]] && fastfetch
@@ -118,14 +73,7 @@ command_not_found_handler() {
     echo "nix-locate is missing; it comes with the system config (nix-index-database)."
     return 127
   fi
-
-  # nix-index --fetch || {
-  #     echo "nix-index --fetch failed, trying full build..."
-  #     nix-index
-  #   }
-
   local results=$(nix-locate --whole-name "/bin/$1" 2>/dev/null | head -n 10)
-
   if [ -z "$results" ]; then
     echo "Command '$1' not found in nixpkgs index."
   else
@@ -135,20 +83,12 @@ command_not_found_handler() {
   return 127
 }
 
-# 1. Faster ESC switching (default is 0.4s delay, which feels laggy)
+# Vi mode: no ESC delay, and backspace keeps deleting after a trip through normal mode.
 export KEYTIMEOUT=1
-
-# 2. Fix Backspace: In some zsh versions, backspace stops working in Vi mode
-# after returning from Normal mode. This fix ensures it always works.
 bindkey '^?' backward-delete-char
 bindkey '^h' backward-delete-char
 
-# 3. Restore Ctrl+R for FZF (Searching history with / is okay, but fzf is better)
-# This makes Ctrl+R work even though you are in Vi Mode
-bindkey -M viins '^R' fzf-history-widget
-bindkey -M vicmd '^R' fzf-history-widget
-
-# 4. Use 'vv' in Normal Mode to open the current command in NVIM
+# 'vv' in normal mode edits the command line in nvim
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'vv' edit-command-line

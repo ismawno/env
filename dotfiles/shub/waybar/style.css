@@ -41,10 +41,8 @@ tooltip label {
   color: #ebdbb2;
 }
 
-/* containers: no padding of their own, their children already carry it */
-#workspaces,
-#taskbar,
-#tray {
+/* the container has no padding of its own, its buttons already carry it */
+#workspaces {
   padding: 0px;
 }
 
@@ -61,19 +59,13 @@ tooltip label {
   color: #282828;
 }
 
-#taskbar button {
-  padding: 0px 3px;
-  border-radius: 0px;
-}
-
 /* per-module tweaks are state colours only; fg and geometry come from above */
 #custom-sysinfo.warning,
 #custom-swaync.notification {
   color: #fabd2f;
 }
 
-#custom-sysinfo.critical,
-#temperature.critical {
+#custom-sysinfo.critical {
   background-color: #cc241d;
   color: #fbf1c7;
 }

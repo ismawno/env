@@ -1,24 +1,7 @@
-// config for rofi, the menu for apps, lofi and scrcpy
+// The app menu: the default config with icons.
+
+@import "~/.config/rofi/config.rasi"
 
 configuration {
     show-icons: true;
-    font: "JetBrainsMono 12";
-    icon-theme: "Gruvbox-Plus-Dark";
-
-    display-ssh:    "󰣀 ssh:";
-    display-run:    "󱓞 run:";
-    display-drun:   "󰣖 drun:";
-    display-window: "󱂬 window:";
-    display-combi:  "󰕘 combi:";
-    display-filebrowser: "󰉋 filebrowser:";
-
-    drun-display-format: "{name} [<span alpha='55%' size='small'><i>{generic}</i></span>]";
-    matching: "fuzzy";
-    case-sensitive: false;
-    sort: true;
-    sorting-method: "fzf";
-    dpi: 110;
 }
-
-
-@theme "~/.config/rofi/gruvbox-material.rasi"

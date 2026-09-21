@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-# Waybar: power profile + night light in one module, rendered "[MODE/LIGHT]".
-# Light toggling defers to hyprsunset.sh (also $mainMod+B) so state cannot diverge.
+# Waybar: power profile + night light in one module, rendered "[MODE/LIGHT]"; light toggling defers to hyprsunset.sh.
 
 here=$(dirname "$(readlink -f "$0")")
 sig=10   # waybar "signal": 10  ->  pkill -RTMIN+10 waybar
 cmd=${1:-status}
 
-# PPD is absent on bigsys; fall back to the firmware profile, which anyone can
-# read but only root can set, so it is shown without being cycled.
+# PPD is absent on bigsys; the firmware profile is shown instead, read-only because only root can set it.
 have_ppd=0
 current=""
 profiles=()
@@ -32,14 +30,12 @@ mode_label() {
 
 night_on() { pgrep -x hyprsunset >/dev/null 2>&1; }
 
-# --- tooltip -----------------------------------------------------------------
 # Emits literal \n two-char sequences; printf %s passes them into the JSON as-is.
 build_tooltip() {
-  local tt="<b>Power profile</b>\n" p mark
+  local tt="<b>Power profile</b>\n" p
   if [ "$have_ppd" -eq 1 ]; then
     for p in "${profiles[@]}"; do
-      mark="   "; [ "$p" = "$current" ] && mark=" * "
-      tt+="${mark}${p}\n"
+      if [ "$p" = "$current" ]; then tt+=" * ${p}\n"; else tt+="   ${p}\n"; fi
     done
   elif [ -n "$current" ]; then
     tt+="   ${current}  (firmware, read-only)\n   power-profiles-daemon not running\n"
@@ -60,10 +56,7 @@ case "$cmd" in
     if [ "$have_ppd" -eq 1 ]; then
       next=${profiles[0]}
       for i in "${!profiles[@]}"; do
-        if [ "${profiles[$i]}" = "$current" ]; then
-          next=${profiles[$(( (i + 1) % ${#profiles[@]} ))]}
-          break
-        fi
+        [ "${profiles[$i]}" = "$current" ] && { next=${profiles[$(( (i + 1) % ${#profiles[@]} ))]}; break; }
       done
       powerprofilesctl set "$next" 2>/dev/null
     elif command -v notify-send >/dev/null 2>&1; then

@@ -32,28 +32,11 @@ pick() {
 }
 
 case "${1-}" in
-tasks)
-  printf '> Radio	%s pick
-' "$0"
-  printf '> Radio: Stop	%s stop
-' "$0"
-  ;;
-play)
-  play "$2"
-  ;;
-stop)
-  pkill mpv && notify-send -u low "Online Music stopped"
-  ;;
-pick)
-  pick
-  ;;
-"")
-  if pkill mpv; then
-    notify-send -u low "Online Music stopped"
-  else
-    pick
-  fi
-  ;;
+tasks) printf '> Radio\t%s pick\n> Radio: Stop\t%s stop\n' "$0" "$0" ;;
+play) play "$2" ;;
+stop) pkill mpv && notify-send -u low "Online Music stopped" ;;
+pick) pick ;;
+"") if pkill mpv; then notify-send -u low "Online Music stopped"; else pick; fi ;;
 *)
   echo "usage: $(basename "$0") [tasks|pick|play <station>|stop]" >&2
   exit 1

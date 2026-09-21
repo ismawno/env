@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-# Puts one picture of the public wallpaper repo on screen at once, then pins it into the flake in the background.
-# No argument opens a rofi picker, "<folder>/<file>.png" runs headless, --reset goes back to the
-# stock background, --list prints "<folder>/<file>.png TAB <pretty name>" per picture without opening rofi.
-# Paths, the repo slug and the quiet switch arrive in the environment, so nothing here knows about Nix.
-
+# Puts one picture of the public wallpaper repo on screen at once, then pins it into the flake in the background; nothing here knows about Nix.
 set -euo pipefail
 
 env_dir=${MAD_WP_ENV:?wallpaper-pick was built without an env checkout}
@@ -32,19 +28,8 @@ wrap_width=60
 wrap_lines=2
 
 declare -A pretty=()
-lines=()
-wrapped=""
-commit=""
-name=""
-url=""
-hash=""
-color=""
-saved=""
-store=""
-switching=""
-hm_pid=""
-failing=""
-thumb_dir=""
+lines=() wrapped="" commit="" name="" url="" hash="" color=""
+saved="" store="" switching="" hm_pid="" failing="" thumb_dir=""
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -69,13 +54,10 @@ hyprpaper_pids() {
   pgrep -u "$(id -u)" -f 'hyprpaper -c' || true
 }
 
-# hyprpaper 0.8.4 answers "invalid hyprpaper request" to its IPC verbs under this setup, so the
-# picture changes by restarting it exactly the way startup.lua starts it.
+# hyprpaper 0.8.4 refuses its IPC verbs here, so it restarts the way startup.lua starts it; hyprctl refuses an eval holding "/hyprpaper", hence the escaped slashes.
 restart_hyprpaper() {
   local config=${1:-$conf} escaped pids count
-  # hyprctl refuses any eval that contains "/hyprpaper", so the path's slashes travel as Lua escapes.
   escaped=$(printf '%s' "$config" | sed 's|/|\\047|g')
-  # Without a session to start it in, the running hyprpaper stays: better the old picture than none.
   hyprctl version >/dev/null 2>&1 || [ -n "${WAYLAND_DISPLAY:-}" ] || return 1
   pids=$(hyprpaper_pids)
   if [ -n "$pids" ]; then
@@ -148,11 +130,10 @@ sample_color() {
   printf 'rgb(%s)' "$(magick "$1[0]" -alpha off -depth 8 -resize '1x1!' -format '%[hex:p{0,0}]' info: | tr 'A-F' 'a-f')"
 }
 
-# The picture is already on screen when this runs, detached and holding the lock on fd 9 until the flake agrees.
+# Runs detached with the picture already on screen, holding the lock on fd 9 until the flake agrees; hyprpaper restarts only for a store name that drifted from the module's.
 pin() {
   mode=$1 name=$2 url=$3 hash=$4 store=$5 commit=$6
   flock -n 9 2>/dev/null || die "--pin only runs from a pick that holds $lock"
-  # The switch runs as a waited-for job, so a signal stops it at once instead of after it ends on its own.
   trap on_signal TERM INT HUP
 
   saved="$work/previous"
@@ -182,7 +163,6 @@ pin() {
     [ "$(nix hash file --sri --type sha256 "$target")" = "$hash" ] ||
       fail_back "$stable resolves to $target, which is not the picture that was fetched"
   fi
-  # Only a store name that drifted from the module's needs a restart; otherwise the screen already shows this file.
   if [ "$target" != "$store" ] && ! cmp -s "$target" "$store"; then
     restart_hyprpaper "$conf" || fail_back "hyprpaper did not come back as exactly one process"
   fi
@@ -206,12 +186,8 @@ render_selection() {
   if [ "$1" = reset ]; then
     printf '{ }\n'
   else
-    printf '{\n'
-    printf '  name = "%s";\n' "$(nix_string "$name")"
-    printf '  url = "%s";\n' "$(nix_string "$url")"
-    printf '  hash = "%s";\n' "$(nix_string "$hash")"
-    printf '  color = "%s";\n' "$(nix_string "$color")"
-    printf '}\n'
+    printf '{\n  name = "%s";\n  url = "%s";\n  hash = "%s";\n  color = "%s";\n}\n' \
+      "$(nix_string "$name")" "$(nix_string "$url")" "$(nix_string "$hash")" "$(nix_string "$color")"
   fi
 }
 
@@ -251,8 +227,7 @@ tree_names() {
     LC_ALL=C sort
 }
 
-# Without the collection on disk the rows still carry pictures: thumbnails/index.tsv and the small
-# jpegs beside it are plain git files on main, so listing and previewing costs no Git LFS bandwidth.
+# Without the collection the rows still carry pictures: thumbnails/index.tsv and its jpegs are plain git files, so no Git LFS bandwidth.
 remote_names() {
   local key index name thumb out
   [ -n "$commit" ] || resolve_commit
@@ -297,7 +272,7 @@ remote_names() {
   cut -f 1 <"$work/index" | LC_ALL=C sort
 }
 
-# names.tsv at the repo root maps "<folder>/<file>.png" TAB "<pretty name>", cached per main commit like index.tsv.
+# names.tsv maps "<folder>/<file>.png" TAB "<pretty name>", fetched by commit (.../main is served stale for minutes); curl's 22 or 37 means no map, so names fall back.
 load_pretty_names() {
   local head key dir path title code source
   dir=$cache/names
@@ -306,16 +281,15 @@ load_pretty_names() {
     head=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$slug" refs/heads/main 2>/dev/null | cut -f 1) || head=""
   fi
   key=$(printf '%s\n%s\n' "$thumb_base" "$head" | sha1sum | cut -c 1-12)
-  # raw.githubusercontent.com serves .../main from a cache for minutes after a push; a commit URL is never stale.
   source=$thumb_base/names.tsv
   [[ $thumb_base != */main ]] || source=${thumb_base%/main}/$head/names.tsv
+
   mkdir -p "$dir"
   if [ -n "$head" ] && [ "$(cat "$dir/key" 2>/dev/null)" != "$key" ]; then
     code=0
     curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$source" || code=$?
     case $code in
       0) mv -f "$dir/names.tsv.part" "$dir/names.tsv" ;;
-      # 22 is an HTTP error and 37 a missing file:// path: main has no map, so every name falls back.
       22 | 37) : >"$dir/names.tsv" ;;
     esac
     rm -f "$dir/names.tsv.part"
@@ -380,7 +354,7 @@ words_of() {
   done
 }
 
-# Rofi cannot wrap an element's text, so a name arrives already broken, preferably right after " - ".
+# Rofi cannot wrap an element's text, so a name arrives already broken, preferably right after " - "; one too long for every line ends ellipsized.
 wrap_name() {
   local LC_ALL=C.UTF-8
   local -a words plain first
@@ -398,7 +372,6 @@ wrap_name() {
       lines=("${plain[@]}")
     fi
   fi
-  # A name too long even for all the lines ends on one long line, which rofi then ellipsizes.
   if [ "${#lines[@]}" -gt "$wrap_lines" ]; then
     lines=("${lines[@]:0:wrap_lines-1}" "${lines[*]:wrap_lines-1}")
   fi

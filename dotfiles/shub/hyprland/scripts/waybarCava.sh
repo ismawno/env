@@ -4,10 +4,7 @@
 
 bar="▁▂▃▄▅▆▇█"
 dict="s/;//g"
-
-bar_length=${#bar}
-
-for ((i = 0; i < bar_length; i++)); do
+for ((i = 0; i < ${#bar}; i++)); do
     dict+=";s/$i/${bar:$i:1}/g"
 done
 

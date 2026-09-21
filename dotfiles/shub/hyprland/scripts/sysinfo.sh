@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
-# Waybar: compact "cpu% ram% temp°C" with a full breakdown in the tooltip
-# (per-core, memory, every sensor, GPU). Hwmon is discovered, never hardcoded.
-# A host with a battery also gets "bat%" after the temperature and a Battery section.
+# Waybar: "cpu% ram% temp°C [bat%]", with per-core, memory, every discovered hwmon sensor, GPU and battery in the tooltip.
 exec python3 - "$@" <<'PY'
 import os, glob, json, re, subprocess, sys
 
 STATE = "/tmp/.waybar-sysinfo-cpu"
-
-def notify(tooltip, title):
-    """Strip pango markup and show the tooltip as a notification. Never fatal."""
-    try:
-        subprocess.run(["notify-send", "-a", "waybar", title,
-                        re.sub(r"<[^>]*>", "", tooltip)], check=False)
-    except FileNotFoundError:
-        print("notify-send not found", file=sys.stderr)
 
 def cpu_percentages():
     """Per-core + total, from two /proc/stat samples cached between runs."""
@@ -25,13 +15,11 @@ def cpu_percentages():
             p = line.split()
             if p[0] == "cpu" or p[0][3:].isdigit():
                 v = list(map(int, p[1:8]))
-                cur[p[0]] = (sum(v), v[3] + v[4])   # total, idle
-    prev = {}
-    if os.path.exists(STATE):
-        try:
-            prev = json.load(open(STATE))
-        except Exception:
-            prev = {}
+                cur[p[0]] = (sum(v), v[3] + v[4])
+    try:
+        prev = json.load(open(STATE))
+    except Exception:
+        prev = {}
     json.dump({k: list(v) for k, v in cur.items()}, open(STATE, "w"))
     out = {}
     for k, (tot, idle) in cur.items():
@@ -52,7 +40,7 @@ def memory():
     return total, total - avail, swt, swt - swf
 
 def sensors():
-    """Every labelled hwmon input, grouped by chip. Numbering varies per host."""
+    """Every labelled hwmon input, grouped by chip; numbering varies per host, and unconnected superio headers read 0.0."""
     chips = {}
     for hw in sorted(glob.glob("/sys/class/hwmon/hwmon*")):
         try:
@@ -66,7 +54,7 @@ def sensors():
             except (OSError, ValueError):
                 continue
             if c <= 0.0:
-                continue   # unconnected superio headers read 0.0; pure noise
+                continue
             lf = ti.replace("_input", "_label")
             label = open(lf).read().strip() if os.path.exists(lf) else os.path.basename(ti).split("_")[0]
             rows.append((label, c))
@@ -129,17 +117,10 @@ mem_pct = 100.0 * mu / mt if mt else 0.0
 chips = sensors()
 
 # Headline temp: prefer a CPU package sensor, else the hottest reading.
-pkg = None
-for nm in ("coretemp", "k10temp", "zenpower", "acpitz"):
-    if nm in chips:
-        for label, c in chips[nm]:
-            if "Package" in label or "Tctl" in label or label == "temp1":
-                pkg = c; break
-    if pkg is not None:
-        break
+pkg = next((c for nm in ("coretemp", "k10temp", "zenpower", "acpitz") for label, c in chips.get(nm, [])
+            if "Package" in label or "Tctl" in label or label == "temp1"), None)
 if pkg is None:
-    allt = [c for rows in chips.values() for _, c in rows]
-    pkg = max(allt) if allt else 0.0
+    pkg = max((c for rows in chips.values() for _, c in rows), default=0.0)
 
 text = f"{total_cpu:.0f}% {mem_pct:.0f}% {pkg:.0f}°C"
 bat = battery()
@@ -151,37 +132,27 @@ cores = sorted(((k, v) for k, v in cpus.items() if k != "cpu"),
 lines = [f"<b>CPU</b>  {total_cpu:.1f}%  ({len(cores)} threads)"]
 for i in range(0, len(cores), 4):
     lines.append("  " + "  ".join(f"{k[3:]:>2}:{v:5.1f}%" for k, v in cores[i:i + 4]))
-lines.append("")
-lines.append(f"<b>Memory</b>  {mu:.1f} / {mt:.1f} GiB  ({mem_pct:.0f}%)")
+lines += ["", f"<b>Memory</b>  {mu:.1f} / {mt:.1f} GiB  ({mem_pct:.0f}%)"]
 if st > 0:
     lines.append(f"<b>Swap</b>    {su:.1f} / {st:.1f} GiB")
-lines.append("")
-lines.append("<b>Temperatures</b>")
+lines += ["", "<b>Temperatures</b>"]
 for name, rows in chips.items():
     lines.append(f"  {name}")
     for label, c in rows:
         lines.append(f"    {label:<20} {c:5.1f}°C")
 g = gpu()
 if g:
-    lines.append("")
-    lines.append("<b>GPU</b>")
-    lines.append("  " + g.replace("\n", "\n  "))
+    lines += ["", "<b>GPU</b>", "  " + g.replace("\n", "\n  ")]
 
 if bat:
-    lines.append("")
-    lines.append("<b>Battery</b>  {}%  {}".format(bat["cap"], bat["status"]))
+    lines += ["", "<b>Battery</b>  {}%  {}".format(bat["cap"], bat["status"])]
     row = "  {:.1f} W".format(bat["watts"])
     if bat["hours"] is not None:
         h = int(bat["hours"]); mnt = int((bat["hours"] - h) * 60)
         row += "   {}h {:02d}m {}".format(h, mnt, "left" if bat["status"] == "Discharging" else "to full")
     lines.append(row)
-    extra = []
-    if bat["health"] is not None:
-        extra.append("health {:.0f}%".format(bat["health"]))
-    if bat["cycles"] is not None:
-        extra.append("{} cycles".format(bat["cycles"]))
-    if bat["limit"] is not None:
-        extra.append("limit {}%".format(bat["limit"]))
+    extra = [f.format(bat[k]) for f, k in (("health {:.0f}%", "health"), ("{} cycles", "cycles"), ("limit {}%", "limit"))
+             if bat[k] is not None]
     if extra:
         lines.append("  " + "   ".join(extra))
 
@@ -194,7 +165,10 @@ if bat and bat["status"] == "Discharging":
 tooltip = "\n".join(lines)
 if "info" in sys.argv[1:]:
     # Middle click: same content as the hover tooltip, as a notification.
-    notify(tooltip, "System")
+    try:
+        subprocess.run(["notify-send", "-a", "waybar", "System", re.sub(r"<[^>]*>", "", tooltip)], check=False)
+    except FileNotFoundError:
+        print("notify-send not found", file=sys.stderr)
 else:
     print(json.dumps({"text": text, "tooltip": tooltip, "class": cls}))
 PY

@@ -1,7 +1,4 @@
 {
 "include": "~/.config/waybar/config",
-
-"modules-center": [
-	"custom/cava"
-	]
+"modules-center": ["custom/cava"]
 }

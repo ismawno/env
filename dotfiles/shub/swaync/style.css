@@ -1,5 +1,4 @@
-/* swaync 0.12.6 is GTK4 and loads its own sheet too, with selectors up to 7 classes
-   deep. Theme via these vars -- @define-color feeds none of them. */
+/* swaync's own GTK4 sheet uses selectors up to 7 classes deep: theme through its vars, not @define-color. */
 :root {
   --cc-bg: rgba(40, 40, 40, 0.86);
   --noti-bg: 40, 40, 40;
@@ -27,8 +26,7 @@
   font-weight: bold;
 }
 
-/* Full-screen scrim behind the panel; gruvbox gray, kept well above the
-   layerrule's ignore_alpha floor or Hyprland skips blurring it. */
+/* Scrim behind the panel; its alpha stays above the layerrule's ignore_alpha or Hyprland skips the blur. */
 .blank-window {
   background: rgba(168, 153, 132, 0.22);
 }
@@ -38,8 +36,7 @@
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
-/* Shipped sheet sets opacity 0.5 at this exact depth; GTK opacity bakes into the
-   layer buffer before the compositor sees it, so use colour instead. */
+/* Undoes the shipped opacity 0.5, which GTK bakes into the layer buffer; dim by colour instead. */
 .control-center .control-center-list-placeholder {
   opacity: 1;
   color: var(--text-color-disabled);
@@ -71,13 +68,4 @@
 .widget-title > button:hover {
   background: #ebdbb2;
   color: #282828;
-}
-
-.widget-label {
-  margin: 10px;
-}
-
-.widget-label > label {
-  font-size: 1rem;
-  color: #ebdbb2;
 }

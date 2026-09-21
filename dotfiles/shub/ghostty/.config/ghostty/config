@@ -1,12 +1,11 @@
 theme = catppuccin-mocha.conf
 cursor-color = #7a7d92
 font-family = FiraCode Nerd Font
-# 14.25, not 14: at scale 1 the em is pt * 96/72 device px, so an integral em needs
-# a multiple of 0.75 (14 -> 18.667px, fractional). bigsys value; smalltop overrides.
+# bigsys value (smalltop overrides): at scale 1 an integral em (pt * 96/72 px) needs a multiple of 0.75.
 font-size = 14.25
 background-opacity = 0.9
 confirm-close-surface = false
 resize-overlay = never
+
 # Ghostty injects its zsh integration via ZDOTDIR, which a `command =` re-exec would drop; without it the ssh wrapper below never loads and ssh under other identities breaks tmux.
 shell-integration-features = ssh-env,ssh-terminfo
-

@@ -7,7 +7,7 @@
 
 window {
   background-color: rgba(40, 40, 40, 0.1);
-  border-radius: 0px; /* Removed rounded corners */
+  border-radius: 0px;
 }
 
 button {
@@ -15,7 +15,7 @@ button {
   background-color: #076678;
   border-style: solid;
   border-width: 3px;
-  border-radius: 0px; /* Removed rounded corners */
+  border-radius: 0px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: 15%;
@@ -32,31 +32,25 @@ button:focus {
 }
 
 #lock {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/lock.png"),
-                         url("/home/maddev/.config/wlogout/icons/lock.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/lock.png");
 }
 
 #logout {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/logout.png"),
-                          url("/home/maddev/.config/wlogout/icons/logout.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/logout.png");
 }
 
 #suspend {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/suspend.png"),
-                          url("/home/maddev/.config/wlogout/icons/suspend.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/suspend.png");
 }
 
 #hibernate {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/hibernate.png"),
-                          url("/home/maddev/.config/wlogout/icons/hibernate.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/hibernate.png");
 }
 
 #shutdown {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/shutdown.png"),
-                          url("/home/maddev/.config/wlogout/icons/shutdown.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/shutdown.png");
 }
 
 #reboot {
-  background-image: image(url("/home/maddev/.config/wlogout/icons/reboot.png"),
-                         url("/home/maddev/.config/wlogout/icons/reboot.png"));
+  background-image: url("/home/maddev/.config/wlogout/icons/reboot.png");
 }

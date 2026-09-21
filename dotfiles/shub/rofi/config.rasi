@@ -1,5 +1,3 @@
-// default config
-
 configuration {
     show-icons: false;
     font: "JetBrainsMono 12";
@@ -19,6 +17,5 @@ configuration {
     sorting-method: "fzf";
     dpi: 110;
 }
-
 
 @theme "~/.config/rofi/gruvbox-material.rasi"

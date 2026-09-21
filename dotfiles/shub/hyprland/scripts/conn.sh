@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Waybar: "CONN/BLE" -- link type is classified from pure sysfs, bluetooth from a
-# sysfs-gated busctl call (bluetoothctl hangs forever when no adapter exists).
+# Waybar "CONN/BLE": link type from sysfs, bluetooth from a sysfs-gated busctl call (bluetoothctl hangs without an adapter).
 exec python3 - "$@" <<'PY'
 import fcntl, glob, html, json, os, re, socket, struct, subprocess, sys
 
 SKIP = ("lo", "tailscale", "docker", "veth", "virbr", "br-", "wg", "tun", "zt")
+SIOCGIFADDR, SIOCGIFNETMASK = 0x8915, 0x891B
 
 def rd(p):
     try:
@@ -30,8 +30,8 @@ def ipv4(n):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         req = struct.pack("256s", n.encode()[:15])
-        addr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, req)[20:24])   # SIOCGIFADDR
-        mask = socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x891B, req)[20:24])   # SIOCGIFNETMASK
+        addr = socket.inet_ntoa(fcntl.ioctl(s.fileno(), SIOCGIFADDR, req)[20:24])
+        mask = socket.inet_ntoa(fcntl.ioctl(s.fileno(), SIOCGIFNETMASK, req)[20:24])
         return "%s/%d" % (addr, sum(bin(int(o)).count("1") for o in mask.split(".")))
     except OSError:
         return None
@@ -104,7 +104,6 @@ def bluetooth():
     return ("B%d" % len(devices)) if powered else "Off", lines
 
 eth, wl = links()
-lines = []
 if eth:
     conn, cls, ifn = "[ETH]", "ethernet", eth
     speed = rd("/sys/class/net/%s/speed" % eth)
@@ -134,8 +133,7 @@ if ifn:
             lines.append("  %s    %s" % (label, val))
 
 ble, btlines = bluetooth()
-lines.append("")
-lines += btlines
+lines += [""] + btlines
 
 tooltip = "\n".join(lines)
 if "info" in sys.argv[1:]:

@@ -1,21 +1,12 @@
 {
   "hyprland/workspaces": {
-    "active-only": false,
     "all-outputs": true,
     "format": "{icon}",
-    "show-special": false,
     "on-click": "activate",
     "on-scroll-up": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"e+1\" }))'",
     "on-scroll-down": "hyprctl eval 'hl.dispatch(hl.dsp.focus({ workspace = \"e-1\" }))'",
-    "persistent-workspaces": {
-      "1": [],
-      "2": [],
-      "3": []
-    },
-    "format-icons": {
-      "active": "[*]",
-      "default": "( )"
-    }
+    "persistent-workspaces": { "1": [], "2": [], "3": [] },
+    "format-icons": { "active": "[*]", "default": "( )" }
   },
 
   "clock": {
@@ -66,11 +57,7 @@
     "on-click-right": "playerctl next",
     "scroll-step": 5.0,
     "smooth-scrolling-threshold": 1,
-    "status-icons": {
-      "paused": "||",
-      "playing": ">",
-      "stopped": ""
-    },
+    "status-icons": { "paused": "||", "playing": ">", "stopped": "" },
     "max-length": 30
   },
 
@@ -78,15 +65,7 @@
     "format": " {volume}% {icon} ",
     "format-bluetooth": " [BT] {volume}% {icon} ",
     "format-muted": "[MUTE]",
-    "format-icons": {
-      "headphone": "[S]",
-      "hands-free": "[S]",
-      "headset": "[S]",
-      "phone": "[S]",
-      "portable": "[S]",
-      "car": "[S]",
-      "default": ["[S]", "[S]", "[S]", "[S]"]
-    },
+    "format-icons": "[S]",
     "scroll-step": 5.0,
     // pavucontrol already picks the output, so no separate chooser is bound.
     "on-click": "~/.config/hypr/scripts/popup.sh -g 60 60 pavucontrol",
@@ -96,8 +75,7 @@
     "smooth-scrolling-threshold": 1
   },
 
-  // Power profile + night light in one. Safe without PPD: the mode shows "--".
-  // Refresh with `pkill -RTMIN+10 waybar` (replaces the old RTMIN+8 / RTMIN+9).
+  // Power profile + night light in one, "--" without PPD; refresh with `pkill -RTMIN+10 waybar`.
   "custom/modelight": {
     "exec": "~/.config/hypr/scripts/modelight.sh status",
     "return-type": "json",
@@ -106,12 +84,10 @@
     "format": " {} ",
     "on-click": "~/.config/hypr/scripts/modelight.sh cycle-mode",
     "on-click-right": "~/.config/hypr/scripts/modelight.sh toggle-light",
-    "on-click-middle": "~/.config/hypr/scripts/modelight.sh info",
-    "tooltip": true
+    "on-click-middle": "~/.config/hypr/scripts/modelight.sh info"
   },
 
   "custom/swaync": {
-    "tooltip": true,
     "format": " {} {icon} ",
     "format-icons": {
       "notification": "[N]<span foreground='red'><sup>+</sup></span>",
@@ -120,8 +96,7 @@
       "dnd-none": "[DND]",
       "inhibited-notification": "[I]<span foreground='red'><sup>+</sup></span>",
       "inhibited-none": "[I]",
-      "dnd-inhibited-notification":
-        "[DND-I]<span foreground='red'><sup>+</sup></span>",
+      "dnd-inhibited-notification": "[DND-I]<span foreground='red'><sup>+</sup></span>",
       "dnd-inhibited-none": "[DND-I]"
     },
     "return-type": "json",
@@ -132,34 +107,27 @@
     "escape": true
   },
 
-
   "custom/cava": {
-    "exec": "~/.config/hypr/scripts/waybarCava.sh",
-    "format": "{}"
+    "exec": "~/.config/hypr/scripts/waybarCava.sh"
   },
 
-  // One module replacing cpu+memory+temperature: "cpu% ram% temp°C" with the
-  // full per-core/sensor/GPU breakdown in the tooltip. Hwmon paths are discovered.
+  // cpu% ram% temp°C, with the per-core/sensor/GPU breakdown in the tooltip.
   "custom/sysinfo": {
     "exec": "~/.config/hypr/scripts/sysinfo.sh",
     "return-type": "json",
     "interval": 3,
     "format": " {} ",
-    "tooltip": true,
     "on-click": "~/.config/hypr/scripts/popup.sh 85 85 btop",
     "on-click-middle": "~/.config/hypr/scripts/sysinfo.sh info"
   },
 
-
-  // Combined network + bluetooth: "[ETH]/B1". Sysfs-first, so bigsys never shells
-  // out at all; bluetoothctl is never used (it hangs when no adapter exists).
+  // Network + bluetooth ("[ETH]/B1") from sysfs; never bluetoothctl, which hangs without an adapter.
   "custom/conn": {
     "exec": "~/.config/hypr/scripts/conn.sh",
     "return-type": "json",
     "interval": 5,
     "signal": 10,
     "format": " {} ",
-    "tooltip": true,
     "on-click": "~/.config/hypr/scripts/popup.sh 60 60 nmtui",
     "on-click-right": "~/.config/hypr/scripts/popup.sh 60 60 bluetuith",
     "on-click-middle": "~/.config/hypr/scripts/conn.sh info"

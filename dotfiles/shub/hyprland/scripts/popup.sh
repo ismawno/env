@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Float a command centred at a share of the focused monitor (waybar clicks, rofi entries).
-# popup.sh btop | popup.sh 60 60 nmtui | popup.sh -g 60 60 pavucontrol
+# Float a command centred at a share of the focused monitor (waybar clicks, rofi entries); -g runs it without a terminal.
 set -uo pipefail
 
 GUI=0

@@ -1,4 +1,4 @@
--- Laptop profile: inactive windows stay readable, no blur on the integrated GPU, and the lid drives the panel.
+-- Laptop profile: inactive windows stay opaque, so blur only costs the bar and the menus; the lid drives the panel.
 local host = require("host")
 local lid = host.lid
 
@@ -48,7 +48,7 @@ hl.on("config.reloaded", sync)
 
 return {
   inactive_opacity = 1.0,
-  blur = false,
+  blur = true,
   autostart = {},
   binds = function(locked)
     hl.bind("switch:on:" .. lid.switch, close, locked)

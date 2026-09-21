@@ -13,7 +13,7 @@
 }
 
 window#waybar {
-  background-color: #282828;
+  background-color: rgba(40, 40, 40, 0.6);
   /* inherited by every child, so a NEW module is light-on-dark with no edits here */
   color: #ebdbb2;
   padding: 0px;

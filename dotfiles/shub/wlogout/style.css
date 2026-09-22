@@ -32,25 +32,25 @@ button:focus {
 }
 
 #lock {
-  background-image: url("/home/maddev/.config/wlogout/icons/lock.png");
+  background-image: url("icons/lock.png");
 }
 
 #logout {
-  background-image: url("/home/maddev/.config/wlogout/icons/logout.png");
+  background-image: url("icons/logout.png");
 }
 
 #suspend {
-  background-image: url("/home/maddev/.config/wlogout/icons/suspend.png");
+  background-image: url("icons/suspend.png");
 }
 
 #hibernate {
-  background-image: url("/home/maddev/.config/wlogout/icons/hibernate.png");
+  background-image: url("icons/hibernate.png");
 }
 
 #shutdown {
-  background-image: url("/home/maddev/.config/wlogout/icons/shutdown.png");
+  background-image: url("icons/shutdown.png");
 }
 
 #reboot {
-  background-image: url("/home/maddev/.config/wlogout/icons/reboot.png");
+  background-image: url("icons/reboot.png");
 }

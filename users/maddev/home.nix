@@ -53,9 +53,12 @@ in
     imagemagick
     tree-sitter
 
-    thunar
-    thunar-archive-plugin
-    thunar-volman
+    (thunar.override {
+      thunarPlugins = [
+        thunar-archive-plugin
+        thunar-volman
+      ];
+    })
     tumbler
     file-roller
 
@@ -287,7 +290,6 @@ in
 
   home.sessionVariables = {
     GTK_THEME = "Gruvbox-Light";
-    THUNARX_DIRS = "$HOME/.nix-profile/lib/thunarx-3";
     XDG_SESSION_TYPE = "wayland";
     WNO_NVIM_PATH = nvimCheckout.path;
   };

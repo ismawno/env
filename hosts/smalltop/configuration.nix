@@ -253,4 +253,7 @@ in
     powertop
     tpm2-tools
   ];
+
+  # Home Manager runs standalone via home-rebuild.sh; the embedded copy re-applied a stale generation at every boot.
+  home-manager.users = lib.mkForce { };
 }

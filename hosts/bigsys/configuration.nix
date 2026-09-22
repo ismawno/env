@@ -102,4 +102,7 @@
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # Home Manager runs standalone via home-rebuild.sh; the embedded copy re-applied a stale generation at every boot.
+  home-manager.users = lib.mkForce { };
 }

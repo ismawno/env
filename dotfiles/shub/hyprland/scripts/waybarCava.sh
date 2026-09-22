@@ -22,6 +22,6 @@ data_format = ascii
 ascii_max_range = 7
 EOF
 
-pkill -f "cava -p $config_file"
+pkill -u "$UID" -f "cava -p $config_file"
 
 cava -p "$config_file" | sed -u "$dict"

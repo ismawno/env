@@ -6,26 +6,26 @@ flock 9
 # NixOS runs the bar as .waybar-wrapped, so match the command line; the variant in use is read off the running bar.
 bar='waybar -c [^ ]*/waybar/config(-cava)?( |$)'
 variant=config
-pgrep -f 'waybar -c [^ ]*/waybar/config-cava( |$)' >/dev/null && variant=config-cava
+pgrep -u "$UID" -f 'waybar -c [^ ]*/waybar/config-cava( |$)' >/dev/null && variant=config-cava
 if [ "${1:-}" = toggle ]; then
   [ "$variant" = config ] && variant=config-cava || variant=config
 fi
 
-pkill -f "$bar"
+pkill -u "$UID" -f "$bar"
 for _ in {1..30}; do
-  pgrep -f "$bar" >/dev/null || break
+  pgrep -u "$UID" -f "$bar" >/dev/null || break
   sleep 0.1
 done
 # cava outlives the bar that spawned it and is reparented to init.
-pkill -f 'scripts/waybarCava.sh'
-pkill -f 'cava -p [^ ]*bar_cava_config'
+pkill -u "$UID" -f 'scripts/waybarCava.sh'
+pkill -u "$UID" -f 'cava -p [^ ]*bar_cava_config'
 
 # Closing fd 9 in the child: an inherited lock would block the next press forever.
 waybar -c ~/.config/waybar/"$variant" -s ~/.config/waybar/style.css >/dev/null 2>&1 9>&- &
 
 # The lock is only worth holding until the new bar is matchable by the next press.
 for _ in {1..30}; do
-  pgrep -f "$bar" >/dev/null && break
+  pgrep -u "$UID" -f "$bar" >/dev/null && break
   sleep 0.1
 done
 

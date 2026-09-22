@@ -28,7 +28,7 @@ mode_label() {
   esac
 }
 
-night_on() { pgrep -x hyprsunset >/dev/null 2>&1; }
+night_on() { pgrep -u "$UID" -x hyprsunset >/dev/null 2>&1; }
 
 # Emits literal \n two-char sequences; printf %s passes them into the JSON as-is.
 build_tooltip() {
@@ -62,12 +62,12 @@ case "$cmd" in
     elif command -v notify-send >/dev/null 2>&1; then
       notify-send -a waybar "Power profile" "power-profiles-daemon is not available on this host"
     fi
-    pkill -RTMIN+$sig waybar 2>/dev/null
+    pkill -RTMIN+$sig -u "$UID" waybar 2>/dev/null
     ;;
   toggle-light|toggle)
     "$here/hyprsunset.sh"
     sleep 0.3   # let hyprsunset appear/vanish in the process table before re-reading
-    pkill -RTMIN+$sig waybar 2>/dev/null
+    pkill -RTMIN+$sig -u "$UID" waybar 2>/dev/null
     ;;
   info)
     command -v notify-send >/dev/null 2>&1 &&

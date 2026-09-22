@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-pkill -x hyprsunset || { hyprsunset -t 4500 & }
+pkill -u "$UID" -x hyprsunset || { hyprsunset -t 4500 & }

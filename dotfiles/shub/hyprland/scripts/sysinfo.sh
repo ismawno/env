@@ -3,7 +3,7 @@
 exec python3 - "$@" <<'PY'
 import os, glob, json, re, subprocess, sys
 
-STATE = "/tmp/.waybar-sysinfo-cpu"
+STATE = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "waybar-sysinfo-cpu")
 
 def cpu_percentages():
     """Per-core + total, from two /proc/stat samples cached between runs."""

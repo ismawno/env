@@ -12,7 +12,7 @@ play() {
     notify-send -u critical "Online Music" "no station named $name"
     exit 1
   fi
-  pkill mpv
+  pkill -u "$UID" mpv
   notify-send -u normal "Playing now: $name"
   case "$link" in
   *playlist* | *watch*) exec mpv --shuffle --vid=no --volume=50 "$link" ;;
@@ -29,9 +29,9 @@ pick() {
 case "${1-}" in
 tasks) printf '> Radio\t%s pick\n> Radio: Stop\t%s stop\n' "$0" "$0" ;;
 play) play "$2" ;;
-stop) pkill mpv && notify-send -u low "Online Music stopped" ;;
+stop) pkill -u "$UID" mpv && notify-send -u low "Online Music stopped" ;;
 pick) pick ;;
-"") if pkill mpv; then notify-send -u low "Online Music stopped"; else pick; fi ;;
+"") if pkill -u "$UID" mpv; then notify-send -u low "Online Music stopped"; else pick; fi ;;
 *)
   echo "usage: $(basename "$0") [tasks|pick|play <station>|stop]" >&2
   exit 1

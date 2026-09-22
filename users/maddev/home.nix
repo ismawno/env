@@ -293,7 +293,8 @@ in
 
   home.activation.nvimCheckout = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     if [ ! -e ${lib.escapeShellArg nvimCheckout.path} ]; then
-      run env GIT_TERMINAL_PROMPT=0 ${lib.getExe config.programs.git.package} clone --quiet \
+      run env GIT_TERMINAL_PROMPT=0 ${lib.getExe config.programs.git.package} \
+        -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=20 clone --quiet \
         ${nvimCheckout.url} ${lib.escapeShellArg nvimCheckout.path} \
         || warnEcho "Could not clone ${nvimCheckout.url} into ${nvimCheckout.path}; the next activation retries."
     fi

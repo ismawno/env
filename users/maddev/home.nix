@@ -10,6 +10,7 @@
 let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
+  gruvboxPlusIcons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
   # Writable checkout for lazy.nvim's lock file; switch the url to move to a fork.
   nvimCheckout = {
     path = "${config.home.homeDirectory}/nvim";
@@ -116,7 +117,8 @@ in
     nmap
 
     gruvbox-gtk-theme
-    gruvbox-dark-icons-gtk
+    # Gruvbox Plus names breeze-dark as its parent; the old icon pack carried its own copy of its parent.
+    kdePackages.breeze-icons
     bibata-cursors
     nerd-fonts.jetbrains-mono
     noto-fonts
@@ -321,8 +323,8 @@ in
       package = pkgs.gruvbox-gtk-theme;
     };
     iconTheme = {
-      name = "oomox-gruvbox-dark";
-      package = pkgs.gruvbox-dark-icons-gtk;
+      name = "Gruvbox-Plus-Dark";
+      package = gruvboxPlusIcons;
     };
     cursorTheme = {
       name = "Bibata-Modern-Ice";

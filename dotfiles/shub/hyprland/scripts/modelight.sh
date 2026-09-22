@@ -5,7 +5,7 @@ here=$(dirname "$(readlink -f "$0")")
 sig=10   # waybar "signal": 10  ->  pkill -RTMIN+10 waybar
 cmd=${1:-status}
 
-# PPD is absent on bigsys; the firmware profile is shown instead, read-only because only root can set it.
+# PPD is absent on bigsys; the firmware profile or else the CPU governor is shown instead, read-only because only root can set them.
 have_ppd=0
 current=""
 profiles=()
@@ -15,7 +15,9 @@ if command -v powerprofilesctl >/dev/null 2>&1 && current=$(powerprofilesctl get
     | grep -oE '^[* ] [a-z-]+:' | tr -d '*: ' | sed '/^$/d')
   [ ${#profiles[@]} -eq 0 ] && profiles=(power-saver balanced performance)
 elif [ -r /sys/firmware/acpi/platform_profile ]; then
-  current=$(cat /sys/firmware/acpi/platform_profile 2>/dev/null)
+  current=$(cat /sys/firmware/acpi/platform_profile 2>/dev/null) origin=firmware
+elif [ -r /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]; then
+  current=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null) origin="CPU governor"
 fi
 
 mode_label() {
@@ -38,7 +40,7 @@ build_tooltip() {
       if [ "$p" = "$current" ]; then tt+=" * ${p}\n"; else tt+="   ${p}\n"; fi
     done
   elif [ -n "$current" ]; then
-    tt+="   ${current}  (firmware, read-only)\n   power-profiles-daemon not running\n"
+    tt+="   ${current}  (${origin}, read-only)\n   power-profiles-daemon not running\n"
   else
     tt+="   unavailable  (no power-profiles-daemon)\n"
   fi

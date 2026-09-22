@@ -3,9 +3,10 @@
 {
   imports = [ ../../users/modules/hypr-desktop.nix ];
 
-  # Pascal has no AV1 decoder; off pushes YouTube to VP9. Never share: Iris Xe would regress.
+  # NVIDIA only: Pascal has no AV1 decoder (off pushes YouTube to VP9) and Gecko 153 blocklists VA-API on the proprietary driver.
   mad.zen.extraPrefs = ''
     user_pref("media.av1.enabled", false);
+    user_pref("media.hardware-video-decoding.force-enabled", true);
   '';
 
   mad.hypr.monitors = [

@@ -290,7 +290,6 @@ in
 
   home.sessionVariables = {
     GTK_THEME = "Gruvbox-Light";
-    XDG_SESSION_TYPE = "wayland";
     WNO_NVIM_PATH = nvimCheckout.path;
   };
   mad.hypr.facts.env = { inherit (config.home.sessionVariables) WNO_NVIM_PATH; };

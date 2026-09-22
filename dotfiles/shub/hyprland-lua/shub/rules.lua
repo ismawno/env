@@ -1,5 +1,5 @@
 for _, rule in ipairs({
-  { match = { class = "(jetbrains-studio|jetbrains-rustrover|scrcpy)" }, opaque = true },
+  { match = { class = "(jetbrains-(studio|rustrover)|scrcpy|zen-.*|mpv|com\\.obsproject\\.Studio)" }, opaque = true },
   { match = { class = "(firefox)" }, opacity = 1, rounding = 3 },
   { match = { class = "^(com.github.neithern.g4music|org.qbittorrent.qBittorrent)$" }, float = true },
   { match = { class = "^(it.mijorus.smile)" }, float = true },
@@ -19,6 +19,7 @@ for _, rule in ipairs({
     pin = true,
     no_dim = true,
     opacity = "1 0.8",
+    opaque = false, -- Zen's PiP carries the browser's class, which the first rule makes opaque.
     no_initial_focus = true,
   },
   { match = { title = "(Picture-in-Picture)", float = false }, opacity = 1 },

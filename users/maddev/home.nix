@@ -139,10 +139,7 @@ in
     python3
   ];
 
-  services.syncthing = {
-    enable = true;
-    tray.enable = true;
-  };
+  services.syncthing.enable = true;
 
   # TUI tools rofi would otherwise miss, each floated in its own ghostty by popup.sh.
   xdg.desktopEntries =

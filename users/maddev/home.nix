@@ -300,6 +300,16 @@ in
     fi
   '';
 
+  # A .config directory an older generation linked whole would get its new links written into the read-only store; unlink it first.
+  home.activation.unlinkDirs = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+    for dir in "$newGenPath"/home-files/.config/*/; do
+      dir=''${dir%/}
+      if [[ ! -L $dir && $(readlink "$HOME/.config/''${dir##*/}") == ${builtins.storeDir}/*-home-manager-files/* ]]; then
+        run rm "$HOME/.config/''${dir##*/}"
+      fi
+    done
+  '';
+
   gtk = {
     enable = true;
     font = {

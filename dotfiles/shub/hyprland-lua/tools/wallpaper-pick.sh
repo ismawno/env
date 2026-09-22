@@ -25,11 +25,11 @@ log=$runtime/wallpaper-pick.log
 
 # Must match the name width wallpapers.rasi leaves beside each thumbnail, in characters of its font.
 wrap_width=60
-wrap_lines=2
+wrap_lines=3
 
 declare -A pretty=()
 lines=() wrapped="" commit="" name="" url="" hash="" color=""
-saved="" store="" switching="" hm_pid="" failing="" thumb_dir=""
+saved="" store="" switching="" hm_pid="" failing="" thumb_dir="" names_file="" source_base=""
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -220,74 +220,29 @@ build_local_thumbs() {
 tree_names() {
   local tree
   tree=$(curl -fsSL --max-time 60 "https://api.github.com/repos/$slug/git/trees/$commit?recursive=1") ||
-    die "$slug main carries no thumbnails and the GitHub API did not answer either"
+    die "$slug main carries no names.tsv and the GitHub API did not answer either"
   printf '%s' "$tree" |
     jq -r --arg p "$prefix/" '.tree[] | select(.type == "blob") | .path
       | select(startswith($p)) | select(endswith(".png")) | ltrimstr($p)' |
     LC_ALL=C sort
 }
 
-# Without the collection the rows still carry pictures: thumbnails/index.tsv and its jpegs are plain git files, so no Git LFS bandwidth.
-remote_names() {
-  local key index name thumb out
-  [ -n "$commit" ] || resolve_commit
-  key=$(printf '%s\n%s\n' "$thumb_base" "$commit" | sha1sum | cut -c 1-12)
-  thumb_dir=$cache/remote/$key
-  index=$thumb_dir/index.tsv
-  mkdir -p "$thumb_dir"
-  find "$cache/remote" -mindepth 1 -maxdepth 1 -type d ! -name "$key" -exec rm -rf {} + 2>/dev/null || true
-
-  if [ ! -s "$index" ]; then
-    if curl -fsL --max-time 60 -o "$index.part" "$thumb_base/thumbnails/index.tsv"; then
-      mv -f "$index.part" "$index"
-    else
-      rm -f "$index.part"
-    fi
-  fi
-
-  if [ ! -s "$index" ]; then
-    notify low "$slug main carries no thumbnails yet; the list comes without pictures"
-    tree_names
-    return 0
-  fi
-
-  jq -Rr --arg p "$prefix/" --arg base "$thumb_base" \
-    'split("\t") | select(length == 2) | select(.[0] | startswith($p))
-     | [ (.[0] | ltrimstr($p)), ($base + "/" + (.[1] | split("/") | map(@uri) | join("/"))) ] | @tsv' \
-    <"$index" >"$work/index"
-  [ -s "$work/index" ] || die "thumbnails/index.tsv on $slug main lists nothing under $prefix/"
-
-  : >"$work/fetch"
-  while IFS=$'\t' read -r name thumb; do
-    out=$thumb_dir/${name%.png}.jpg
-    [ -s "$out" ] && continue
-    mkdir -p "$(dirname -- "$out")"
-    printf '%s\0%s\0' "$thumb" "$out" >>"$work/fetch"
-  done <"$work/index"
-
-  if [ -s "$work/fetch" ]; then
-    xargs -0 -r -P 8 -n 2 bash "$0" --download <"$work/fetch" >/dev/null 2>&1 || true
-  fi
-
-  cut -f 1 <"$work/index" | LC_ALL=C sort
-}
-
-# names.tsv maps "<folder>/<file>.png" TAB "<pretty name>", fetched by commit (.../main is served stale for minutes); curl's 22 or 37 means no map, so names fall back.
+# names.tsv, the list of the collection, maps "<folder>/<file>.png" TAB "<pretty name>"; it is read by commit because .../main is served stale for minutes, and curl's 22 or 37 means the commit carries none.
 load_pretty_names() {
-  local head key dir path title code source
+  local key dir path title code
   dir=$cache/names
-  head=$commit
-  if [ -z "$head" ]; then
-    head=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$slug" refs/heads/main 2>/dev/null | cut -f 1) || head=""
+  if [ -z "$commit" ]; then
+    commit=$(GIT_TERMINAL_PROMPT=0 git ls-remote "https://github.com/$slug" refs/heads/main 2>/dev/null | cut -f 1) || commit=""
+    [[ $commit =~ ^[0-9a-f]{40}$ ]] || commit=""
   fi
-  key=$(printf '%s\n%s\n' "$thumb_base" "$head" | sha1sum | cut -c 1-12)
-  source=$thumb_base/names.tsv
-  [[ $thumb_base != */main ]] || source=${thumb_base%/main}/$head/names.tsv
+  source_base=$thumb_base
+  [ -z "$commit" ] || [[ $thumb_base != */main ]] || source_base=${thumb_base%/main}/$commit
+  key=$(printf '%s\n%s\n' "$thumb_base" "$commit" | sha1sum | cut -c 1-12)
 
   mkdir -p "$dir"
-  if [ -n "$head" ] && [ "$(cat "$dir/key" 2>/dev/null)" != "$key" ]; then
+  if [ -n "$commit" ] && [ "$(cat "$dir/key" 2>/dev/null)" != "$key" ]; then
     code=0
-    curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$source" || code=$?
+    curl -fsL --max-time 30 -o "$dir/names.tsv.part" "$source_base/names.tsv" || code=$?
     case $code in
       0) mv -f "$dir/names.tsv.part" "$dir/names.tsv" ;;
       22 | 37) : >"$dir/names.tsv" ;;
@@ -298,13 +253,50 @@ load_pretty_names() {
     esac
   fi
   [ -s "$dir/names.tsv" ] || return 0
+  names_file=$dir/names.tsv
   while IFS=$'\t' read -r path title || [ -n "$path" ]; do
     title=${title%$'\r'}
     case $path in
       '' | '#'*) continue ;;
     esac
     [ -z "$title" ] || pretty[$path]=$title
-  done <"$dir/names.tsv"
+  done <"$names_file"
+}
+
+# Without the collection the rows still carry pictures: every path in names.tsv has a thumbnail of the same name beside it, and those jpegs are plain git files, so no Git LFS bandwidth.
+remote_names() {
+  local key name thumb out
+  [ -n "$commit" ] || resolve_commit
+  key=$(printf '%s\n%s\n' "$thumb_base" "$commit" | sha1sum | cut -c 1-12)
+  thumb_dir=$cache/remote/$key
+  mkdir -p "$thumb_dir"
+  find "$cache/remote" -mindepth 1 -maxdepth 1 -type d ! -name "$key" -exec rm -rf {} + 2>/dev/null || true
+
+  if [ -z "$names_file" ]; then
+    notify low "$slug carries no names.tsv at ${commit:0:12}; the list comes without pictures"
+    tree_names
+    return 0
+  fi
+
+  jq -Rr --arg base "$source_base" \
+    'split("\t")[0] | select(startswith("#") | not) | select(endswith(".png"))
+     | [ ., ($base + "/thumbnails/" + (rtrimstr(".png") | split("/") | map(@uri) | join("/")) + ".jpg") ]
+     | @tsv' <"$names_file" >"$work/thumbs"
+  [ -s "$work/thumbs" ] || die "names.tsv on $slug at ${commit:0:12} lists no picture"
+
+  : >"$work/fetch"
+  while IFS=$'\t' read -r name thumb; do
+    out=$thumb_dir/${name%.png}.jpg
+    [ -s "$out" ] && continue
+    mkdir -p "$(dirname -- "$out")"
+    printf '%s\0%s\0' "$thumb" "$out" >>"$work/fetch"
+  done <"$work/thumbs"
+
+  if [ -s "$work/fetch" ]; then
+    xargs -0 -r -P 8 -n 2 bash "$0" --download <"$work/fetch" >/dev/null 2>&1 || true
+  fi
+
+  cut -f 1 <"$work/thumbs" | LC_ALL=C sort
 }
 
 greedy_lines() {
@@ -383,6 +375,7 @@ load_pictures() {
   if [ -d "$collection" ]; then
     collection_names >"$work/names" || true
   fi
+  load_pretty_names
   if [ -s "$work/names" ]; then
     build_local_thumbs
     thumb_dir=$cache/local
@@ -390,7 +383,6 @@ load_pictures() {
     remote_names >"$work/names"
     [ -s "$work/names" ] || die "neither $collection nor $slug main lists a picture"
   fi
-  load_pretty_names
 }
 
 # Rows follow $work/names line for line, so the index rofi prints (-format i) names the file.

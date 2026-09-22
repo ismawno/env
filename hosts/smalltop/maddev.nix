@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   ...
@@ -64,17 +63,6 @@ in
       #workspaces button {
         padding: 0px 5px;
       }
-    '';
-
-    # qt6ct paints its own light palette unless it is given one.
-    "qt6ct/colors/gruvbox.conf".source = ../../dotfiles/shub/qt6ct/colors/gruvbox.conf;
-    "qt6ct/qt6ct.conf".text = ''
-      [Appearance]
-      color_scheme_path=${config.xdg.configHome}/qt6ct/colors/gruvbox.conf
-      custom_palette=true
-      icon_theme=Gruvbox-Plus-Dark
-      standard_dialogs=default
-      style=Fusion
     '';
   };
 }

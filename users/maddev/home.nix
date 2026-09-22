@@ -368,6 +368,17 @@ in
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
     "nvim".source = inputs.nvim;
 
+    # qt6ct paints its own light palette unless it is given one.
+    "qt6ct/colors/gruvbox.conf".source = "${shub}/qt6ct/colors/gruvbox.conf";
+    "qt6ct/qt6ct.conf".text = ''
+      [Appearance]
+      color_scheme_path=${config.xdg.configHome}/qt6ct/colors/gruvbox.conf
+      custom_palette=true
+      icon_theme=${config.gtk.iconTheme.name}
+      standard_dialogs=default
+      style=Fusion
+    '';
+
     # gvfsd-http fetches swaync's https album art and needs glib-networking for TLS.
     "systemd/user/gvfs-daemon.service.d/tls.conf".text = ''
       [Service]

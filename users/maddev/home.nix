@@ -11,6 +11,12 @@ let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
   gruvboxPlusIcons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
+  thunarWithPlugins = pkgs.thunar.override {
+    thunarPlugins = with pkgs; [
+      thunar-archive-plugin
+      thunar-volman
+    ];
+  };
   # Writable checkout for lazy.nvim's lock file; switch the url to move to a fork.
   nvimCheckout = {
     path = "${config.home.homeDirectory}/nvim";
@@ -54,12 +60,7 @@ in
     imagemagick
     tree-sitter
 
-    (thunar.override {
-      thunarPlugins = [
-        thunar-archive-plugin
-        thunar-volman
-      ];
-    })
+    thunarWithPlugins
     tumbler
     file-roller
 
@@ -388,6 +389,13 @@ in
       icon_theme=${config.gtk.iconTheme.name}
       standard_dialogs=default
       style=Fusion
+    '';
+
+    # D-Bus hands Thunar to systemd, and the unit nixpkgs ships starts the unwrapped one, with no plugins.
+    "systemd/user/thunar.service.d/plugins.conf".text = ''
+      [Service]
+      ExecStart=
+      ExecStart=${thunarWithPlugins}/bin/Thunar --daemon
     '';
 
     # gvfsd-http fetches swaync's https album art and needs glib-networking for TLS.

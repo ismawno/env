@@ -27,6 +27,16 @@ in
     description = "Host-specific user_pref lines, appended after the shared set.";
   };
 
+  # Zen announces DesktopEntry "zen" over MPRIS but ships zen-beta.desktop, so media widgets found no icon.
+  config.xdg.dataFile."applications/zen.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Zen Browser
+    Icon=zen-browser
+    Exec=zen-beta %U
+    NoDisplay=true
+  '';
+
   # Zen's profile directory name is generated at first launch, so match on the marker files.
   config.home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do

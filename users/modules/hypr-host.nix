@@ -29,6 +29,12 @@ in
       description = "A tracked, pure-data Lua file of hl.monitor specs, installed beside host.lua and read instead of mad.hypr.monitors.";
     };
 
+    keyring = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Set this on a host whose system config has services.gnome.gnome-keyring.enable. PAM starts the daemon with --login, which only stashes the password and waits: the daemon exits 120 seconds later unless something runs gnome-keyring-daemon --start to finish its initialisation and unlock the login keyring. GNOME does that from an XDG autostart entry; under Hyprland nothing does, so the session has to.";
+    };
+
     facts = lib.mkOption {
       type = lib.types.attrsOf lib.types.anything;
       description = "Everything rendered into host.lua; hypr-laptop.nix or hypr-desktop.nix adds the profile.";
@@ -53,5 +59,8 @@ in
     inherit (cfg) monitors;
     monitors_file = cfg.monitorsFile != null;
     polkit_agent = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+  }
+  // lib.optionalAttrs cfg.keyring {
+    keyring_start = "/run/wrappers/bin/gnome-keyring-daemon --start --components=secrets";
   };
 }

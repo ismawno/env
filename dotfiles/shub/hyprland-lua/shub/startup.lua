@@ -26,6 +26,8 @@ end
 
 -- swaync is missing on purpose: its D-Bus unit starts it, and a second copy makes that unit fail.
 hl.on("hyprland.start", function()
+  -- PAM only half-starts the keyring daemon, which then quits two minutes in: this second call completes it.
+  if host.keyring_start then hl.exec_cmd(host.keyring_start) end
   for _, command in ipairs({
     "copyq --start-server",
     programs.wallpaper,

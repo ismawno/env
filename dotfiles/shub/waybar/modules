@@ -68,7 +68,7 @@
     "format-icons": "[S]",
     "scroll-step": 5.0,
     // pavucontrol already picks the output, so no separate chooser is bound.
-    "on-click": "~/.config/hypr/scripts/popup.sh -g 60 60 pavucontrol",
+    "on-click": "~/.config/hypr/scripts/popup.sh -g -c org.pulseaudio.pavucontrol 60 60 pavucontrol",
     "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
     "on-click-middle": "~/.config/hypr/scripts/audio.sh",
     "tooltip-format": "{icon} {desc} | {volume}%",

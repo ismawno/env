@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Float a command centred at a share of the focused monitor (waybar clicks, rofi entries); -g runs it without a terminal.
+# Float a command centred at a share of the focused monitor, or travel to the one it already opened and focus it; -g runs it without a terminal.
 set -uo pipefail
 
 GUI=0

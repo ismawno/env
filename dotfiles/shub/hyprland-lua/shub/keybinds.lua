@@ -14,7 +14,6 @@ local mouse = { mouse = true }
 
 local centred = { float = true, center = true }
 local half = { silent = true, float = true, size = "(monitor_w*0.5) (monitor_h*0.5)", center = true }
-local mid = { float = true, size = "(monitor_w*0.6) (monitor_h*0.6)", center = true }
 
 hl.bind(mod .. " + ALT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh"))
 hl.bind(mod .. " + SHIFT + W", dsp.exec_cmd(programs.scripts .. "/waybarRestart.sh toggle"))
@@ -39,7 +38,7 @@ hl.bind(mod .. " + P", dsp.exec_cmd("mpv"))
 hl.bind(mod .. " + A", dsp.exec_cmd("spotify"))
 hl.bind(mod .. " + SHIFT + A", dsp.exec_cmd(programs.scripts .. "/lofi.sh"))
 hl.bind(mod .. " + CTRL + A", dsp.exec_cmd(terminal .. " -e cava", half))
-hl.bind(mod .. " + M", dsp.exec_cmd(terminal .. " -e nmtui", mid))
+hl.bind(mod .. " + M", dsp.exec_cmd(programs.scripts .. "/popup.sh 60 60 nmtui"))
 hl.bind(mod .. " + O", dsp.exec_cmd(programs.scripts .. "/scrcpy.sh", centred))
 hl.bind(mod .. " + B", dsp.exec_cmd(programs.scripts .. "/hyprsunset.sh"))
 hl.bind(mod .. " + H", dsp.exec_cmd("hyprpicker -a"))

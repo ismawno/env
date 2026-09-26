@@ -55,11 +55,11 @@ in
         size = 11;
       };
       theme = {
-        name = "Gruvbox-Light";
+        name = "Gruvbox-Dark";
         package = theme;
       };
       gtk4.theme = config.gtk.theme;
-      colorScheme = "light";
+      colorScheme = "dark";
       iconTheme = {
         name = "Gruvbox-Plus-Dark";
         package = pkgs.callPackage ./gruvbox-plus-icons.nix { };

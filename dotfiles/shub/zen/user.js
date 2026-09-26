@@ -31,9 +31,9 @@ user_pref("extensions.formautofill.creditCards.enabled", true);
 // Restore the previous session on startup.
 user_pref("browser.startup.page", 3);
 
-// Gruvbox dark: scheme 0 = dark; the accent shows in a space with no picked colour dot, or only a custom one.
-user_pref("zen.view.window.scheme", 0);
-user_pref("zen.theme.accent-color", "#83a598");
+// Gruvbox light, scheme 1; blue #458588, as Zen picks a custom-colour space's text from the accent and faded #076678 turns it white past 0.85 opacity.
+user_pref("zen.view.window.scheme", 1);
+user_pref("zen.theme.accent-color", "#458588");
 
-// Shows Custom Color in a space's Edit Theme panel, the one way to give a space the exact Gruvbox #282828.
+// Shows Custom Color in a space's Edit Theme panel, the one way to give a space the exact Gruvbox #fbf1c7.
 user_pref("zen.theme.gradient.show-custom-colors", true);

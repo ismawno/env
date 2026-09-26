@@ -340,7 +340,6 @@ in
     "wlogout".source = "${shub}/wlogout";
     "fastfetch".source = "${shub}/fastfetch";
     "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
-    "ghostty/themes".source = "${shub}/ghostty/.config/ghostty/themes";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
     "nvim".source = inputs.nvim;
 

@@ -1,5 +1,5 @@
-theme = catppuccin-mocha.conf
-cursor-color = #7a7d92
+theme = Gruvbox Dark
+window-theme = dark
 font-family = FiraCode Nerd Font
 # bigsys value (smalltop overrides): at scale 1 an integral em (pt * 96/72 px) needs a multiple of 0.75.
 font-size = 14.25

@@ -8,6 +8,19 @@
 
 let
   cfg = config.mad.gtk;
+  # The theme's GTK 3 sheet carries GTK 4's border-spacing, which every GTK 3 process reported as a parse error.
+  theme = pkgs.gruvbox-gtk-theme.overrideAttrs (old: {
+    postPatch = old.postPatch + ''
+      substituteInPlace themes/src/sass/gtk/_common-3.0.scss \
+        --replace-fail $'\t\tborder-spacing: $space-size;\n' ""
+    '';
+    postInstall = (old.postInstall or "") + ''
+      if grep -rn border-spacing $out/share/themes/*/gtk-3.0; then
+        echo "a GTK 3 sheet still declares border-spacing" >&2
+        exit 1
+      fi
+    '';
+  });
   modules = pkgs.runCommand "gtk3-modules" { } ''
     mkdir -p $out/lib/gtk-3.0/modules
     ${lib.concatStrings (
@@ -43,7 +56,7 @@ in
       };
       theme = {
         name = "Gruvbox-Light";
-        package = pkgs.gruvbox-gtk-theme;
+        package = theme;
       };
       gtk4.theme = config.gtk.theme;
       colorScheme = "light";

@@ -93,6 +93,9 @@
 
   services.tailscale.enable = true;
 
+  # xdg-open ran zen-beta in the foreground and blocked callers like `gh auth login`; the portal launches it detached.
+  xdg.portal.xdgOpenUsePortal = true;
+
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
   boot.plymouth.theme = lib.mkForce "pixels";
   boot.plymouth.themePackages = lib.mkForce [

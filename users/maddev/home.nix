@@ -10,7 +10,6 @@
 let
   shub = ../../dotfiles/shub;
   vanilla = ../../dotfiles/vanilla;
-  gruvboxPlusIcons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
   thunarWithPlugins = pkgs.thunar.override {
     thunarPlugins = with pkgs; [
       thunar-archive-plugin
@@ -25,6 +24,7 @@ let
 in
 {
   imports = [
+    ./gtk.nix
     ./opencode.nix
     ../modules/zen.nix
     ../modules/hypr-host.nix
@@ -117,10 +117,6 @@ in
     wget
     nmap
 
-    gruvbox-gtk-theme
-    # Gruvbox Plus names breeze-dark as its parent; the old icon pack carried its own copy of its parent.
-    kdePackages.breeze-icons
-    bibata-cursors
     nerd-fonts.jetbrains-mono
     noto-fonts
     noto-fonts-color-emoji
@@ -289,7 +285,6 @@ in
   };
 
   home.sessionVariables = {
-    GTK_THEME = "Gruvbox-Light";
     WNO_NVIM_PATH = nvimCheckout.path;
   };
   mad.hypr.facts.env = { inherit (config.home.sessionVariables) WNO_NVIM_PATH; };
@@ -312,37 +307,6 @@ in
       fi
     done
   '';
-
-  gtk = {
-    enable = true;
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 11;
-    };
-    theme = {
-      name = "Gruvbox-Light";
-      package = pkgs.gruvbox-gtk-theme;
-    };
-    iconTheme = {
-      name = "Gruvbox-Plus-Dark";
-      package = gruvboxPlusIcons;
-    };
-    cursorTheme = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-    };
-    gtk4.theme = config.gtk.theme;
-  };
-
-  # Also sets XCURSOR_* and HYPRCURSOR_*.
-  home.pointerCursor = {
-    gtk.enable = true;
-    x11.enable = true;
-    hyprcursor.enable = true;
-    name = "Bibata-Modern-Ice";
-    package = pkgs.bibata-cursors;
-    size = 24;
-  };
 
   home.username = lib.mkForce "maddev";
   home.homeDirectory = lib.mkForce "/home/maddev";

@@ -1,3 +1,6 @@
+/* look.css, beside this file, defines the @look_* colours of the current theme */
+@import url("look.css");
+
 * {
   font-family: JetBrainsMonoNerdFontMono;
   font-size: 24px;
@@ -6,13 +9,13 @@
 }
 
 window {
-  background-color: rgba(40, 40, 40, 0.1);
+  background-color: alpha(@look_bg, 0.1);
   border-radius: 0px;
 }
 
 button {
-  color: #ebdbb2;
-  background-color: #076678;
+  color: @look_fg;
+  background-color: @look_blue_dark;
   border-style: solid;
   border-width: 3px;
   border-radius: 0px;
@@ -23,12 +26,9 @@ button {
 }
 
 button:active,
-button:hover {
-  background-color: #458388;
-}
-
+button:hover,
 button:focus {
-  background-color: #458488;
+  background-color: @look_blue;
 }
 
 #lock {

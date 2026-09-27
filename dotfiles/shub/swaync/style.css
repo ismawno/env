@@ -1,18 +1,9 @@
+/* look.css, beside this file, sets the colour variables of the current theme */
+@import url("look.css");
+
 /* swaync's own GTK4 sheet uses selectors up to 7 classes deep: theme through its vars, not @define-color. */
 :root {
-  --cc-bg: rgba(40, 40, 40, 0.86);
-  --noti-bg: 40, 40, 40;
   --noti-bg-alpha: 0.94;
-  --noti-bg-darker: rgb(29, 32, 33);
-  --noti-bg-hover: rgb(60, 56, 54);
-  --noti-bg-focus: rgba(80, 73, 69, 0.9);
-  --noti-border-color: rgba(235, 219, 178, 0.55);
-  --noti-close-bg: rgba(235, 219, 178, 0.12);
-  --noti-close-bg-hover: rgb(235, 219, 178);
-  --text-color: rgb(235, 219, 178);
-  --text-color-disabled: rgb(168, 153, 132);
-  --bg-selected: rgb(215, 153, 33);
-  --border: 2px solid rgb(235, 219, 178);
   --border-radius: 0px;
   --notification-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
   --font-size-body: 12px;
@@ -28,11 +19,11 @@
 
 /* Scrim behind the panel; its alpha stays above the layerrule's ignore_alpha or Hyprland skips the blur. */
 .blank-window {
-  background: rgba(168, 153, 132, 0.22);
+  background: var(--look-scrim);
 }
 
 .control-center {
-  border: 2px solid #ebdbb2;
+  border: var(--border);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
@@ -48,24 +39,24 @@
 }
 
 .close-button:hover {
-  color: #282828;
+  color: var(--look-bg);
 }
 
 .widget-title {
-  color: #ebdbb2;
+  color: var(--look-fg);
   padding: 10px;
   margin: 10px 10px 5px 10px;
 }
 
 .widget-title > button {
-  color: #ebdbb2;
-  background: rgba(235, 219, 178, 0.12);
+  color: var(--look-fg);
+  background: var(--noti-close-bg);
   padding: 10px;
   text-shadow: none;
   box-shadow: none;
 }
 
 .widget-title > button:hover {
-  background: #ebdbb2;
-  color: #282828;
+  background: var(--look-fg);
+  color: var(--look-bg);
 }

@@ -337,8 +337,11 @@ in
     "rofi/tasks.sh".source = "${shub}/rofi/tasks.sh";
     "rofi/tasks.d/10-radio.sh".source = "${shub}/rofi/tasks.d/10-radio.sh";
 
-    "swaync".source = "${shub}/swaync";
-    "wlogout".source = "${shub}/wlogout";
+    "swaync/config.json".source = "${shub}/swaync/config.json";
+    "swaync/style.css".source = "${shub}/swaync/style.css";
+    "wlogout/layout".source = "${shub}/wlogout/layout";
+    "wlogout/style.css".source = "${shub}/wlogout/style.css";
+    "wlogout/icons".source = "${shub}/wlogout/icons";
     "fastfetch".source = "${shub}/fastfetch";
     "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";

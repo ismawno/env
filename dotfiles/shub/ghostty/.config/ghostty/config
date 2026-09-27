@@ -1,5 +1,5 @@
 theme = Gruvbox Dark
-window-theme = dark
+window-theme = ghostty
 font-family = FiraCode Nerd Font
 # bigsys value (smalltop overrides): at scale 1 an integral em (pt * 96/72 px) needs a multiple of 0.75.
 font-size = 14.25
@@ -9,3 +9,6 @@ resize-overlay = never
 
 # Ghostty injects its zsh integration via ZDOTDIR, which a `command =` re-exec would drop; without it the ssh wrapper below never loads and ssh under other identities breaks tmux.
 shell-integration-features = ssh-env,ssh-terminfo
+
+# look-pick's current theme; Ghostty reads includes after this whole file, so it wins over the theme line above.
+config-file = ?look-theme

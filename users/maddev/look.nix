@@ -143,6 +143,7 @@ in
     ) kinds;
 
     xdg.configFile = {
+      "ghostty/look-theme".source = state "theme/ghostty";
       "waybar/look.css".source = state "theme/gtk3.css";
       "waybar/look.json".source = state "theme/waybar.json";
       "wlogout/look.css".source = state "theme/gtk3.css";

@@ -34,13 +34,20 @@ printf "[org/gnome/desktop/interface]\nmonospace-font-name='%s 11'\n" "$mono" >s
 printf '[Fonts]\nfixed="%s,11"\n' "$mono" >settings/qt6ct.ini
 printf '%s\n' ghostty >pokes
 
-# At 20 pt first, then at the size that makes the sample 296 px wide, so every font fills the thumb alike.
+# Fitted to 296 px from a 20 pt measure, then shrunk while whole-pixel advances still overshoot, so every font fills the thumb alike.
 markup() {
   printf '<span font_family="%s" size="%s" foreground="#ebdbb2">%s</span>' "$family" "$1" \
     "$(sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' <<<"$sample")"
 }
-width=$(magick -background none "pango:$(markup 20480)" -format '%w' info:)
+measure() {
+  magick -background none "pango:$(markup "$1")" -format '%w' info:
+}
+width=$(measure 20480)
 [ "$width" -gt 0 ] || die "pango drew nothing"
-magick -background none "pango:$(markup $((20480 * 296 / width)))" "$TMPDIR/text.png"
+size=$((20480 * 296 / width)) width=$(measure "$size")
+while [ "$width" -gt 296 ]; do
+  size=$((size * 296 / width)) width=$(measure "$size")
+done
+magick -background none "pango:$(markup "$size")" "$TMPDIR/text.png"
 magick -size 320x200 xc:'#282828' "$TMPDIR/text.png" -gravity center -composite \
   -depth 8 -strip -define png:exclude-chunks=date,time thumb.png

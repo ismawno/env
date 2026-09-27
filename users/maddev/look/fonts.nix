@@ -1,66 +1,110 @@
-# Every mono font look-pick offers: family is the one Ghostty asks for, mono the strictly monospaced one behind the desktop's "monospace".
+# Every mono font look-pick offers, fetched from its free upstream at a pinned version: family is the one Ghostty asks for, mono the one behind the desktop's "monospace".
 { lib, pkgs }:
 
 let
-  # Iosevka and Monaspace ship dozens of styles each, 1 GiB and 477 MiB; four styles are all a terminal and the alias ever ask for.
-  styles =
-    package: prefixes:
-    pkgs.runCommand "${package.pname}-four-styles" { } ''
-      mkdir -p $out/share/fonts
-      ${lib.concatMapStrings (prefix: ''
-        for style in Regular Bold Italic BoldItalic; do
-          found=$(find ${package}/share/fonts -name "${prefix}-$style.*")
-          [ -n "$found" ] || { echo "${package.name} has no ${prefix}-$style" >&2; exit 1; }
-          cp $found $out/share/fonts/
-        done
-      '') prefixes}
-    '';
+  # google/fonts at one commit, so every file keeps its hash.
+  google =
+    name: files:
+    pkgs.linkFarm "${name}-font" (
+      lib.mapAttrsToList (file: hash: {
+        name = "share/fonts/${file}";
+        path = pkgs.fetchurl {
+          name = lib.strings.sanitizeDerivationName file;
+          url = "https://raw.githubusercontent.com/google/fonts/23e54b51ddffbc7713c583748e3bd86f62b1fa4a/ofl/${name}/${lib.escapeURL file}";
+          inherit hash;
+        };
+      }) files
+    );
+
+  # A release archive trimmed inside its fixed-output fetch, so the whole archive never reaches the store.
+  release =
+    name: url: hash: path:
+    pkgs.fetchzip {
+      inherit url hash;
+      name = "${name}-font";
+      stripRoot = false;
+      postFetch = ''
+        mkdir "$TMPDIR/fonts"
+        ${lib.concatMapStrings
+          (style: "mv \"$out\"/${lib.escapeShellArg (path style)} \"$TMPDIR/fonts/\"\n")
+          [
+            "Regular"
+            "Bold"
+            "Italic"
+            "BoldItalic"
+          ]
+        }
+        rm -r "$out"
+        mkdir -p "$out/share"
+        mv "$TMPDIR/fonts" "$out/share/fonts"
+      '';
+    };
 in
 [
   {
     name = "Cascadia Code";
-    package = pkgs.nerd-fonts.caskaydia-cove;
-    family = "CaskaydiaCove Nerd Font";
-    mono = "CaskaydiaCove Nerd Font Mono";
+    package =
+      release "cascadia-code"
+        "https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip"
+        "sha256-OMr5N/KDOqXhhsDmdrZKZiEmKaEPQ/CvLT+3FJP0xaU="
+        (style: "ttf/static/CascadiaCode-${style}.ttf");
+    family = "Cascadia Code";
+    mono = "Cascadia Code";
   }
   {
     name = "Cousine";
-    package = pkgs.nerd-fonts.cousine;
-    family = "Cousine Nerd Font";
-    mono = "Cousine Nerd Font Mono";
+    package = google "cousine" {
+      "Cousine-Regular.ttf" = "sha256-HaIiUGdfxMQvzzqXNsRLwFcFFhBTMUQ7Zj/Vz70UEv4=";
+      "Cousine-Bold.ttf" = "sha256-F8inJFFW0iU1McnlKUdJN7Cdn2QcWudpXF4z8igi7vQ=";
+      "Cousine-Italic.ttf" = "sha256-6ip2rj0OzpzVnw0w/cCN1w6PX0V77uWwhSp7UMIobHw=";
+      "Cousine-BoldItalic.ttf" = "sha256-hI6Fhyb+4K4nt1TkzWonVSCb8UKKjJH3R2ltWMM5BsM=";
+    };
+    family = "Cousine";
+    mono = "Cousine";
   }
   {
     name = "Fira Code";
-    package = pkgs.nerd-fonts.fira-code;
-    family = "FiraCode Nerd Font";
-    mono = "FiraCode Nerd Font Mono";
+    package = google "firacode" {
+      "FiraCode[wght].ttf" = "sha256-kzWwgrPHhQ2YpktYTzQX9lNV80cSeLte64xsDoZXrus=";
+    };
+    family = "Fira Code";
+    mono = "Fira Code";
   }
+  # Unhinted: under his hintslight and Ghostty's light hinting FreeType auto-hints anyway, and the hinted set is 13 MB more.
   {
     name = "Iosevka";
-    package = styles pkgs.nerd-fonts.iosevka [
-      "IosevkaNerdFont"
-      "IosevkaNerdFontMono"
-    ];
-    family = "Iosevka Nerd Font";
-    mono = "Iosevka Nerd Font Mono";
+    package =
+      release "iosevka"
+        "https://github.com/be5invis/Iosevka/releases/download/v34.9.0/PkgTTF-Unhinted-Iosevka-34.9.0.zip"
+        "sha256-anX5Ivmz9iFgIMaSzezoDgYrltA/sbtRjHSJGwCJpRs="
+        (style: "Iosevka-${style}.ttf");
+    family = "Iosevka";
+    mono = "Iosevka";
   }
+  # The Nerd build home.nix installs for waybar, swaync, wlogout, hyprlock and GTK; a plain "JetBrains Mono" would also turn rofi's "JetBrainsMono", Noto Sans today, into it.
   {
     name = "JetBrains Mono";
     package = pkgs.nerd-fonts.jetbrains-mono;
     family = "JetBrainsMono Nerd Font";
     mono = "JetBrainsMono Nerd Font Mono";
   }
-  # Upstream's own Nerd Font build of 1.400; nerd-fonts.monaspace patches the older 1.200.
   {
     name = "Monaspace Neon";
-    package = styles pkgs.monaspace.nerdfonts [ "MonaspaceNeonNF" ];
-    family = "Monaspace Neon NF";
-    mono = "Monaspace Neon NF";
+    package =
+      release "monaspace-neon"
+        "https://github.com/githubnext/monaspace/releases/download/v1.400/monaspace-static-v1.400.zip"
+        "sha256-okzYBugZjTSb9iFcHeQtp7AfhYWznUFv36dPvidgqsg="
+        (style: "Static Fonts/Monaspace Neon/MonaspaceNeon-${style}.otf");
+    family = "Monaspace Neon";
+    mono = "Monaspace Neon";
   }
   {
     name = "Source Code Pro";
-    package = pkgs.nerd-fonts.sauce-code-pro;
-    family = "SauceCodePro Nerd Font";
-    mono = "SauceCodePro Nerd Font Mono";
+    package = google "sourcecodepro" {
+      "SourceCodePro[wght].ttf" = "sha256-tAD8WE4Qr/JdDndc4YG0/BxeobXcN7ga6yCEN1uUV5A=";
+      "SourceCodePro-Italic[wght].ttf" = "sha256-bbd9Jap7MO/0STBbXJmOR1aUx005hCESfqWmD1NkE80=";
+    };
+    family = "Source Code Pro";
+    mono = "Source Code Pro";
   }
 ]

@@ -1,19 +1,11 @@
+// look.rasi, beside this file, holds the @look-* colours of the current theme.
+@import "~/.config/rofi/look.rasi"
+
 * {
-  gruv0: #282828;
-  gruv6: #eee0b7;
-  gruv7: #a89984;
-  gruv8: #928374;
-  gruv9: #7c6f64;
-
-  red: #ea6962;
-  yellow: #d8a657;
-  reddark: #c14a4a;
-  yellowdark: #b47109;
-
-  foreground: @gruv9;
+  foreground: @look-dim;
   background-color: transparent;
 
-  highlight: underline bold #eee0b7;
+  highlight: @look-highlight;
 
   transparent: rgba(0, 0, 0, 0.1);
 }
@@ -25,7 +17,7 @@ window {
   height: 560px;
   width: 600px;
 
-  background-color: rgba(40, 40, 40, 0.93);
+  background-color: @look-window;
   spacing: 0;
   children: [mainbox];
   orientation: horizontal;
@@ -39,16 +31,16 @@ mainbox {
 message {
   padding: 10px;
   border: 0px 2px 2px 2px;
-  border-color: @gruv0;
+  border-color: @look-bg;
   background-color: @transparent;
 }
 
 inputbar {
   children: [entry];
-  color: @gruv6;
+  color: @look-fg;
   padding: 14px;
   background-color: @transparent;
-  border-color: @gruv6;
+  border-color: @look-fg;
 
   border: 4px;
   border-radius: 0px;
@@ -64,7 +56,7 @@ listview {
   padding: 8px;
   border-radius: 0px;
   border: 0px 4px 4px 4px;
-  border-color: @gruv6;
+  border-color: @look-fg;
   background-color: @transparent;
   dynamic: false;
 }
@@ -74,29 +66,29 @@ element {
   vertical-align: 0.5;
   border-radius: 0px;
   color: @foreground;
-  text-color: @gruv6;
+  text-color: @look-fg;
   background-color: @transparent;
 }
 
 element.normal.active {
-  background-color: @yellow;
+  background-color: @look-accent;
 }
 
 element.normal.urgent {
-  background-color: @reddark;
+  background-color: @look-crit;
 }
 
 element.selected.normal {
-  background-color: @gruv7;
-  text-color: @gruv0;
+  background-color: @look-subtle;
+  text-color: @look-bg;
 }
 
 element.selected.active {
-  background-color: @yellowdark;
+  background-color: @look-accent-dark;
 }
 
 element.selected.urgent {
-  background-color: @red;
+  background-color: @look-crit-bright;
 }
 
 element.alternate.normal {
@@ -108,5 +100,5 @@ element-icon {
   size: 3ch;
   margin: 0 10 0 0;
   vertical-align: 0.5;
-  text-color: @gruv6;
+  text-color: @look-fg;
 }

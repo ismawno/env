@@ -332,7 +332,7 @@ in
     "waybar/style.css".source = "${shub}/waybar/style.css";
     "rofi/config.rasi".source = "${shub}/rofi/config.rasi";
     "rofi/apps.rasi".source = "${shub}/rofi/apps.rasi";
-    "rofi/gruvbox-material.rasi".source = "${shub}/rofi/gruvbox-material.rasi";
+    "rofi/theme.rasi".source = "${shub}/rofi/theme.rasi";
     "rofi/wallpapers.rasi".source = "${shub}/rofi/wallpapers.rasi";
     "rofi/tasks.sh".source = "${shub}/rofi/tasks.sh";
     "rofi/tasks.d/10-radio.sh".source = "${shub}/rofi/tasks.d/10-radio.sh";

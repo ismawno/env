@@ -147,6 +147,7 @@ in
       "waybar/look.json".source = state "theme/waybar.json";
       "wlogout/look.css".source = state "theme/gtk3.css";
       "swaync/look.css".source = state "theme/swaync.css";
+      "rofi/look.rasi".source = state "theme/rofi.rasi";
       "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
       "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");
       "gtk-4.0/settings.ini".source = lib.mkForce (state "gtk4.ini");

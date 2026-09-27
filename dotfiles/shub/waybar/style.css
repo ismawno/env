@@ -1,3 +1,6 @@
+/* look.css, beside this file, defines the @look_* colours of the current theme */
+@import url("look.css");
+
 * {
   font-family: "JetBrainsMonoNerdFontMono";
   font-weight: bold;
@@ -13,9 +16,9 @@
 }
 
 window#waybar {
-  background-color: rgba(40, 40, 40, 0.6);
+  background-color: alpha(@look_bg, 0.6);
   /* inherited by every child, so a NEW module is light-on-dark with no edits here */
-  color: #ebdbb2;
+  color: @look_fg;
   padding: 0px;
   transition-property: background-color;
   transition-duration: 0.5s;
@@ -30,15 +33,15 @@ window#waybar.empty {
 }
 
 tooltip {
-  background-color: #282828;
-  border: 1px solid #ebdbb2;
+  background-color: @look_bg;
+  border: 1px solid @look_fg;
   border-radius: 0px;
   opacity: 1;
 }
 
 tooltip label {
   padding: 6px;
-  color: #ebdbb2;
+  color: @look_fg;
 }
 
 /* the container has no padding of its own, its buttons already carry it */
@@ -50,24 +53,24 @@ tooltip label {
   margin: 1px;
   padding: 0px 4px;
   border-radius: 0px;
-  background-color: #ebdbb2;
-  color: #282828;
+  background-color: @look_fg;
+  color: @look_bg;
 }
 
 #workspaces button:hover {
-  background-color: #d5c4a1;
-  color: #282828;
+  background-color: @look_fg2;
+  color: @look_bg;
 }
 
 /* per-module tweaks are state colours only; fg and geometry come from above */
 #custom-sysinfo.warning,
 #custom-swaync.notification {
-  color: #fabd2f;
+  color: @look_warn;
 }
 
 #custom-sysinfo.critical {
-  background-color: #cc241d;
-  color: #fbf1c7;
+  background-color: @look_crit;
+  color: @look_on_crit;
 }
 
 #custom-sysinfo.normal,
@@ -75,10 +78,10 @@ tooltip label {
 #custom-modelight,
 #custom-swaync,
 #pulseaudio {
-  color: #ebdbb2;
+  color: @look_fg;
 }
 
 #custom-conn.disconnected,
 #pulseaudio.muted {
-  color: #928374;
+  color: @look_muted;
 }

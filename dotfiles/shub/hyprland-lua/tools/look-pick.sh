@@ -202,7 +202,10 @@ choose() {
   name=$(name_of "$kind" "$slug")
   printf '%s\n' "$slug" | replace "$state/$kind.name"
   apply "$live" "$kind"
-  notify low "$name is on; libadwaita apps take its colours when they next start"
+  case $kind in
+    theme) notify low "$name is on; libadwaita apps take its colours when they next start" ;;
+    *) notify low "$name is on in Ghostty; other apps take it when they next start" ;;
+  esac
 }
 
 list() {
@@ -219,7 +222,7 @@ list() {
 
 usage() {
   cat <<'USAGE'
-look-pick KIND                 pick a KIND (theme) in rofi
+look-pick KIND                 pick a KIND (font or theme) in rofi
 look-pick KIND NAME            switch to NAME, a display name or a slug, without asking
 look-pick --list [KIND]        print kind, slug and name of every entry, the shown one marked current
 look-pick --reset [KIND]       go back to the defaults this build was made with

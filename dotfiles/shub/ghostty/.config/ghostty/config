@@ -10,5 +10,6 @@ resize-overlay = never
 # Ghostty injects its zsh integration via ZDOTDIR, which a `command =` re-exec would drop; without it the ssh wrapper below never loads and ssh under other identities breaks tmux.
 shell-integration-features = ssh-env,ssh-terminfo
 
-# look-pick's current theme; Ghostty reads includes after this whole file, so it wins over the theme line above.
+# look-pick's current theme and font; Ghostty reads includes after this whole file, so they win over the lines above.
 config-file = ?look-theme
+config-file = ?look-font

@@ -14,6 +14,7 @@ let
   slug = name: lib.toLower (lib.replaceStrings [ " " ] [ "-" ] name);
 
   themes = import ./look/themes.nix { inherit lib pkgs; };
+  fonts = import ./look/fonts.nix { inherit lib pkgs; };
   icons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
 
   # GTK 3 has no border-spacing, yet several sheets carry GTK 4's, and every GTK 3 process printed a parse error for it.
@@ -57,12 +58,29 @@ let
       roles = toString (lib.mapAttrsToList (role: color: "${role}=${color}") (theme.roles or { }));
     } "bash ${./look/theme-bundle.sh}";
 
+  fontBundle =
+    font:
+    pkgs.runCommand "look-font-${slug font.name}" {
+      nativeBuildInputs = [
+        pkgs.fontconfig
+        pkgs.imagemagick
+      ];
+      lookName = font.name;
+      inherit (font) family mono;
+      FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ font.package ]; };
+    } "bash ${./look/font-bundle.sh}";
+
   # A kind is one picker: its bundles under their slugs, plus index.tsv, slug and display name in menu order.
   kinds = {
     theme = {
       entries = themes;
       bundle = themeBundle;
       default = cfg.theme;
+    };
+    font = {
+      entries = fonts;
+      bundle = fontBundle;
+      default = cfg.font;
     };
   };
 
@@ -129,6 +147,12 @@ in
       default = "gruvbox-dark";
       description = "The theme a fresh state starts from, and the one look-pick --reset goes back to. The pick itself lives in ~/.local/state/look, so no rebuild ever undoes it.";
     };
+
+    font = lib.mkOption {
+      type = lib.types.enum (map (font: slug font.name) fonts);
+      default = "fira-code";
+      description = "The mono font of Ghostty and of the desktop's monospace alias a fresh state starts from, and the one look-pick --reset goes back to; the UI font stays gtk.font.";
+    };
   };
 
   config = {
@@ -136,7 +160,8 @@ in
       picker
       gtkThemes
       icons
-    ];
+    ]
+    ++ map (font: font.package) fonts;
 
     xdg.dataFile = lib.mapAttrs' (
       kind: _: lib.nameValuePair "look/${kind}s" { source = folder kind; }
@@ -144,6 +169,8 @@ in
 
     xdg.configFile = {
       "ghostty/look-theme".source = state "theme/ghostty";
+      "ghostty/look-font".source = state "font/ghostty";
+      "fontconfig/conf.d/60-look-monospace.conf".source = state "font/fontconfig.conf";
       "waybar/look.css".source = state "theme/gtk3.css";
       "waybar/look.json".source = state "theme/waybar.json";
       "wlogout/look.css".source = state "theme/gtk3.css";
@@ -153,7 +180,8 @@ in
       "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
       "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");
       "gtk-4.0/settings.ini".source = lib.mkForce (state "gtk4.ini");
-      "rofi/tasks.d/40-look.tsv".text = "> Change Theme\tlook-pick theme\n";
+      "rofi/tasks.d/40-look.tsv".text =
+        "> Change Font\tlook-pick font\n> Change Theme\tlook-pick theme\n";
     };
 
     # After dconfSettings, which resets the interface keys it no longer sets; a boot-time activation has no session bus of its own.

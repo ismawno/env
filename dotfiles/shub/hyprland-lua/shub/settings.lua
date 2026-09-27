@@ -2,6 +2,16 @@ local host = require("host")
 local profile = require("shub." .. host.kind)
 local background = host.background_color or "rgb(282828)"
 
+-- look.lua is look-pick's current theme; without it the borders stay Gruvbox Dark.
+local look = {}
+local file = io.open(os.getenv("HOME") .. "/.config/hypr/look.lua")
+if file then
+  local chunk = load(file:read("*a"))
+  file:close()
+  local ok, loaded = pcall(chunk or error)
+  if ok and type(loaded) == "table" then look = loaded end
+end
+
 for _, monitor in ipairs(require("shub.monitors").list) do
   hl.monitor(monitor)
 end
@@ -15,8 +25,8 @@ hl.config({
     border_size = 2,
     -- The explicit angle stops a lone colour from being read as one end of a gradient.
     col = {
-      active_border = { colors = { "rgb(EBDBB2)" }, angle = 0 },
-      inactive_border = "rgb(A4997F)",
+      active_border = { colors = { look.active_border or "rgb(EBDBB2)" }, angle = 0 },
+      inactive_border = look.inactive_border or "rgb(A4997F)",
     },
   },
 

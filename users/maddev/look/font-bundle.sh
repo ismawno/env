@@ -10,7 +10,7 @@ die() {
 
 export HOME=$TMPDIR XDG_CACHE_HOME=$TMPDIR/cache
 for name in "$family" "$mono"; do
-  [ -n "$(fc-list "$name:charset=20-7e" family)" ] || die "no face of $name covers ASCII in $fontDir"
+  [ -n "$(fc-list "$name:charset=20-7e" family)" ] || die "no face of $name covers ASCII"
 done
 
 mkdir -p "$out/settings"
@@ -18,13 +18,14 @@ cd "$out"
 
 printf 'font-family = ""\nfont-family = "%s"\n' "$family" >ghostty
 
+# Icons come from the symbols-only Nerd Font look.nix installs, behind a font that has none of its own.
 cat >fontconfig.conf <<EOF
 <?xml version="1.0"?>
 <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
 <fontconfig>
   <alias binding="strong">
     <family>monospace</family>
-    <prefer><family>$mono</family></prefer>
+    <prefer><family>$mono</family><family>Symbols Nerd Font Mono</family></prefer>
   </alias>
 </fontconfig>
 EOF

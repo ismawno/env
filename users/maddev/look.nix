@@ -160,6 +160,7 @@ in
       picker
       gtkThemes
       icons
+      pkgs.nerd-fonts.symbols-only
     ]
     ++ map (font: font.package) fonts;
 

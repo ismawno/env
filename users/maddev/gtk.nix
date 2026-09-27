@@ -1,4 +1,4 @@
-# GTK look and modules, exported to shells, the Hyprland session and systemd user services alike.
+# GTK font, cursor and modules, exported to shells, the Hyprland session and systemd user services alike; the theme, icons and colour scheme are look.nix's.
 {
   config,
   lib,
@@ -8,19 +8,6 @@
 
 let
   cfg = config.mad.gtk;
-  # The theme's GTK 3 sheet carries GTK 4's border-spacing, which every GTK 3 process reported as a parse error.
-  theme = pkgs.gruvbox-gtk-theme.overrideAttrs (old: {
-    postPatch = old.postPatch + ''
-      substituteInPlace themes/src/sass/gtk/_common-3.0.scss \
-        --replace-fail $'\t\tborder-spacing: $space-size;\n' ""
-    '';
-    postInstall = (old.postInstall or "") + ''
-      if grep -rn border-spacing $out/share/themes/*/gtk-3.0; then
-        echo "a GTK 3 sheet still declares border-spacing" >&2
-        exit 1
-      fi
-    '';
-  });
   modules = pkgs.runCommand "gtk3-modules" { } ''
     mkdir -p $out/lib/gtk-3.0/modules
     ${lib.concatStrings (
@@ -31,10 +18,7 @@ let
       '') cfg.modules
     )}
   '';
-  env = {
-    GTK_THEME = config.gtk.theme.name;
-  }
-  // lib.optionalAttrs (cfg.modules != { }) {
+  env = lib.optionalAttrs (cfg.modules != { }) {
     GTK_MODULES = lib.concatStringsSep ":" (lib.attrNames cfg.modules);
   };
 in
@@ -53,16 +37,6 @@ in
       font = {
         name = "JetBrainsMono Nerd Font";
         size = 11;
-      };
-      theme = {
-        name = "Gruvbox-Dark";
-        package = theme;
-      };
-      gtk4.theme = config.gtk.theme;
-      colorScheme = "dark";
-      iconTheme = {
-        name = "Gruvbox-Plus-Dark";
-        package = pkgs.callPackage ./gruvbox-plus-icons.nix { };
       };
     };
 

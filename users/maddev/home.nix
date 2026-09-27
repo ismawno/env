@@ -25,6 +25,7 @@ in
 {
   imports = [
     ./gtk.nix
+    ./look.nix
     ./opencode.nix
     ../modules/zen.nix
     ../modules/hypr-host.nix
@@ -342,17 +343,6 @@ in
     "ghostty/config".source = "${shub}/ghostty/.config/ghostty/config";
     "starship.toml".source = "${vanilla}/starship/.config/starship.toml";
     "nvim".source = inputs.nvim;
-
-    # qt6ct paints its own light palette unless it is given one.
-    "qt6ct/colors/gruvbox.conf".source = "${shub}/qt6ct/colors/gruvbox.conf";
-    "qt6ct/qt6ct.conf".text = ''
-      [Appearance]
-      color_scheme_path=${config.xdg.configHome}/qt6ct/colors/gruvbox.conf
-      custom_palette=true
-      icon_theme=${config.gtk.iconTheme.name}
-      standard_dialogs=default
-      style=Fusion
-    '';
 
     # D-Bus hands Thunar to systemd, and the unit nixpkgs ships starts the unwrapped one, with no plugins.
     "systemd/user/thunar.service.d/plugins.conf".text = ''

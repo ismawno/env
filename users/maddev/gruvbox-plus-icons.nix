@@ -15,16 +15,16 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     hash = "sha256-Xv/9HUdTloQNuUcgTeprcomZFzZEoYaWt9DdYNg++LI=";
   };
 
-  # Only the dark set; the light one and the spare folder colours are another 170M nothing reads.
+  # The dark set for dark themes and the light one for light themes; the spare folder colours stay out, nothing reads them.
   installPhase = ''
     runHook preInstall
     mkdir -p $out/share/icons
-    cp -r Gruvbox-Plus-Dark $out/share/icons/
+    cp -r Gruvbox-Plus-Dark Gruvbox-Plus-Light $out/share/icons/
     runHook postInstall
   '';
 
   meta = {
-    description = "Gruvbox-coloured icon pack for dark themes";
+    description = "Gruvbox-coloured icon pack for dark and light themes";
     homepage = "https://github.com/SylEleuth/gruvbox-plus-icon-pack";
     license = lib.licenses.gpl3Only;
     platforms = lib.platforms.all;

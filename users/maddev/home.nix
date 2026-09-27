@@ -299,13 +299,20 @@ in
     fi
   '';
 
-  # A .config directory an older generation linked whole would get its new links written into the read-only store; unlink it first.
-  home.activation.unlinkDirs = lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ] ''
+  # checkLinkTargets refuses the files of a .config directory an older generation linked whole, so it is split first into per-file links to that same generation.
+  home.activation.splitDirLinks = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
     for dir in "$newGenPath"/home-files/.config/*/; do
       dir=''${dir%/}
-      if [[ ! -L $dir && $(readlink "$HOME/.config/''${dir##*/}") == ${builtins.storeDir}/*-home-manager-files/* ]]; then
-        run rm "$HOME/.config/''${dir##*/}"
-      fi
+      link=$HOME/.config/''${dir##*/}
+      old=$(readlink "$link") || continue
+      [[ ! -L $dir && $old == ${builtins.storeDir}/*-home-manager-files/* ]] || continue
+      run rm "$link"
+      while IFS= read -r -d "" file; do
+        if [[ -e $old/$file ]]; then
+          run mkdir -p "$(dirname "$link/$file")"
+          run ln -s "$old/$file" "$link/$file"
+        fi
+      done < <(find "$dir" \( -type f -o -type l \) -printf '%P\0')
     done
   '';
 

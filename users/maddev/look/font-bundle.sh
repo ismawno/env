@@ -31,9 +31,10 @@ cat >fontconfig.conf <<XML
 XML
 
 list="\"$mono\", \"Symbols Nerd Font Mono\""
+# GTK 3 (waybar, wlogout) only parses the feature list as one quoted string.
 {
   printf '* {\n  font-family: %s;\n' "$list"
-  [ -z "$features" ] || printf '  font-feature-settings: %s;\n' "$features"
+  [ -z "$features" ] || printf "  font-feature-settings: '%s';\n" "$features"
   printf '}\n'
 } >gtk.css
 printf ':root {\n  --look-font: %s;\n}\n' "$list" >swaync.css

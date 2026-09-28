@@ -1,4 +1,4 @@
-# The desktop look, switched at runtime by look-pick: every valid entry is a prebuilt bundle, and ~/.local/state/look points each kind at one of them.
+# The desktop look: every valid theme and font is a prebuilt bundle, look-choice.nix names the pair each activation shows, and look-pick switches it at runtime before pinning its pick there.
 {
   config,
   lib,
@@ -7,11 +7,25 @@
 }:
 
 let
-  cfg = config.mad.look;
   stateDir = "${config.xdg.stateHome}/look";
   dataDir = "${config.xdg.dataHome}/look";
+  envDir = "${config.home.homeDirectory}/env";
+  repoPath = "users/maddev/look-choice.nix";
   state = path: config.lib.file.mkOutOfStoreSymlink "${stateDir}/${path}";
   slug = name: lib.toLower (lib.replaceStrings [ " " ] [ "-" ] name);
+
+  # What a kind look-choice.nix leaves out shows, and what look-pick --reset pins.
+  stock = {
+    theme = "gruvbox-dark";
+    font = "jetbrains-mono";
+  };
+  choice = import ./look-choice.nix;
+  strays = lib.attrNames (removeAttrs choice (lib.attrNames stock));
+  declared =
+    assert lib.assertMsg (
+      strays == [ ]
+    ) "${repoPath} names ${toString strays}, neither a theme nor a font";
+    stock // choice;
 
   themes = import ./look/themes.nix { inherit lib pkgs; };
   fonts = import ./look/fonts.nix { inherit lib pkgs; };
@@ -98,13 +112,13 @@ let
       } >$out/index.tsv
     '';
 
-  # The folder look-pick reads a kind from; a default this build lacks fails here, before any switch.
+  # The folder look-pick reads a kind from; a look-choice.nix naming what this build lacks fails here, before any switch.
   data =
     kind: bundles:
     pkgs.runCommand "look-${kind}s"
       {
-        slug = cfg.${kind};
-        message = "mad.look.${kind} is \"${cfg.${kind}}\", which this build has not";
+        slug = declared.${kind};
+        message = "${repoPath} names the ${kind} \"${declared.${kind}}\", which this build has not";
       }
       ''
         awk -F '\t' -v slug="$slug" '$1 == slug { found = 1 } END { exit !found }' ${bundles}/index.tsv ||
@@ -116,6 +130,7 @@ let
     font = fontBundles;
     theme = themeBundles;
   };
+  pairs = set: toString (lib.mapAttrsToList (kind: _: "${kind}=${set.${kind}}") kinds);
 
   picker = pkgs.writeShellApplication {
     name = "look-pick";
@@ -124,8 +139,10 @@ let
       dconf
       findutils
       gawk
+      git
       gnugrep
       gnused
+      jq
       libnotify
       procps
       rofi
@@ -134,9 +151,12 @@ let
     ];
     text = ''
       export MAD_LOOK_KINDS=${lib.escapeShellArg (toString (lib.attrNames kinds))}
-      export MAD_LOOK_DEFAULTS=${
-        lib.escapeShellArg (toString (lib.mapAttrsToList (kind: _: "${kind}=${cfg.${kind}}") kinds))
-      }
+      export MAD_LOOK_DECLARED=${lib.escapeShellArg (pairs declared)}
+      export MAD_LOOK_STOCK=${lib.escapeShellArg (pairs stock)}
+      export MAD_LOOK_ENV=${lib.escapeShellArg envDir}
+      export MAD_LOOK_CHOICE=${lib.escapeShellArg "${envDir}/${repoPath}"}
+      export MAD_LOOK_REPO_PATH=${lib.escapeShellArg repoPath}
+      export MAD_PIN_LIB=${../../dotfiles/shub/hyprland-lua/tools/flake-pin.sh}
       export MAD_LOOK_GTK3_BASE=${
         pkgs.writeText "look-gtk3.ini" config.xdg.configFile."gtk-3.0/settings.ini".text
       }
@@ -149,71 +169,56 @@ let
         standard_dialogs=default
         style=Fusion
       ''}
-      # The test seams: a run may aim the picker at a scratch home.
+      # The test seams: a run may aim the picker at a scratch home and another home-manager.
       export MAD_LOOK_DATA=''${MAD_LOOK_DATA:-${lib.escapeShellArg dataDir}}
       export MAD_LOOK_STATE=''${MAD_LOOK_STATE:-${lib.escapeShellArg stateDir}}
       export MAD_LOOK_QT6CT=''${MAD_LOOK_QT6CT:-${lib.escapeShellArg "${config.xdg.configHome}/qt6ct/qt6ct.conf"}}
+      export MAD_LOOK_HM=''${MAD_LOOK_HM:-home-manager}
       exec ${pkgs.bash}/bin/bash ${../../dotfiles/shub/hyprland-lua/tools/look-pick.sh} "$@"
     '';
   };
 in
 {
-  options.mad.look = {
-    theme = lib.mkOption {
-      type = lib.types.str;
-      default = "gruvbox-dark";
-      description = "The theme, by slug, a fresh state starts from, and the one look-pick --reset goes back to; the build fails on one that no bundle has. The pick itself lives in ~/.local/state/look, so no rebuild ever undoes it.";
-    };
+  home.packages = [
+    picker
+    nativeGtk
+    themeBundles.gtk
+    icons
+    pkgs.nerd-fonts.symbols-only
+  ]
+  ++ map (font: font.package) fonts;
 
-    font = lib.mkOption {
-      type = lib.types.enum (map (font: slug font.name) fonts);
-      default = "fira-code";
-      description = "The font of Ghostty, GTK, Qt, the bar, the panels, the menus and the lock screen a fresh state starts from, and the one look-pick --reset goes back to.";
-    };
+  xdg.dataFile = lib.mapAttrs' (
+    kind: bundles: lib.nameValuePair "look/${kind}s" { source = data kind bundles; }
+  ) kinds;
+
+  xdg.configFile = {
+    "ghostty/look-theme".source = state "theme/ghostty";
+    "ghostty/look-font".source = state "font/ghostty";
+    "fontconfig/conf.d/60-look-monospace.conf".source = state "font/fontconfig.conf";
+    "waybar/look.css".source = state "theme/gtk3.css";
+    "waybar/look-font.css".source = state "font/gtk.css";
+    "waybar/look.json".source = state "theme/waybar.json";
+    "wlogout/look.css".source = state "theme/gtk3.css";
+    "wlogout/look-font.css".source = state "font/gtk.css";
+    "swaync/look.css".source = state "theme/swaync.css";
+    "swaync/look-font.css".source = state "font/swaync.css";
+    "rofi/look.rasi".source = state "theme/rofi.rasi";
+    "rofi/look-font.rasi".source = state "font/rofi.rasi";
+    "hypr/look.lua".source = state "theme/hypr.lua";
+    "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
+    "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");
+    "gtk-4.0/settings.ini".source = lib.mkForce (state "gtk4.ini");
+    "rofi/tasks.d/40-look.tsv".text =
+      "> Change Font\tlook-pick font\n> Change Theme\tlook-pick theme\n";
   };
 
-  config = {
-    home.packages = [
-      picker
-      nativeGtk
-      themeBundles.gtk
-      icons
-      pkgs.nerd-fonts.symbols-only
-    ]
-    ++ map (font: font.package) fonts;
-
-    xdg.dataFile = lib.mapAttrs' (
-      kind: bundles: lib.nameValuePair "look/${kind}s" { source = data kind bundles; }
-    ) kinds;
-
-    xdg.configFile = {
-      "ghostty/look-theme".source = state "theme/ghostty";
-      "ghostty/look-font".source = state "font/ghostty";
-      "fontconfig/conf.d/60-look-monospace.conf".source = state "font/fontconfig.conf";
-      "waybar/look.css".source = state "theme/gtk3.css";
-      "waybar/look-font.css".source = state "font/gtk.css";
-      "waybar/look.json".source = state "theme/waybar.json";
-      "wlogout/look.css".source = state "theme/gtk3.css";
-      "wlogout/look-font.css".source = state "font/gtk.css";
-      "swaync/look.css".source = state "theme/swaync.css";
-      "swaync/look-font.css".source = state "font/swaync.css";
-      "rofi/look.rasi".source = state "theme/rofi.rasi";
-      "rofi/look-font.rasi".source = state "font/rofi.rasi";
-      "hypr/look.lua".source = state "theme/hypr.lua";
-      "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
-      "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");
-      "gtk-4.0/settings.ini".source = lib.mkForce (state "gtk4.ini");
-      "rofi/tasks.d/40-look.tsv".text =
-        "> Change Font\tlook-pick font\n> Change Theme\tlook-pick theme\n";
-    };
-
-    # After dconfSettings, which resets the interface keys it no longer sets; a boot-time activation has no session bus of its own.
-    home.activation.look = lib.hm.dag.entryAfter [ "linkGeneration" "dconfSettings" ] ''
-      lookBus=""
-      [[ -v DBUS_SESSION_BUS_ADDRESS ]] ||
-        lookBus="${pkgs.dbus}/bin/dbus-run-session --dbus-daemon=${pkgs.dbus}/bin/dbus-daemon"
-      run env MAD_LOOK_DCONF_WRAP="$lookBus" ${lib.getExe picker} --no-live --apply ||
-        warnEcho "look-pick could not apply the saved look; look-pick --apply retries"
-    '';
-  };
+  # After dconfSettings, which resets the interface keys it no longer sets; a boot-time activation has no session bus of its own.
+  home.activation.look = lib.hm.dag.entryAfter [ "linkGeneration" "dconfSettings" ] ''
+    lookBus=""
+    [[ -v DBUS_SESSION_BUS_ADDRESS ]] ||
+      lookBus="${pkgs.dbus}/bin/dbus-run-session --dbus-daemon=${pkgs.dbus}/bin/dbus-daemon"
+    run env MAD_LOOK_DCONF_WRAP="$lookBus" ${lib.getExe picker} --no-live --apply ||
+      warnEcho "look-pick could not show the look look-choice.nix declares; look-pick --apply retries"
+  '';
 }

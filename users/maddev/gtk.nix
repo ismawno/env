@@ -1,4 +1,4 @@
-# GTK font, cursor and modules, exported to shells, the Hyprland session and systemd user services alike; the theme, icons and colour scheme are look.nix's.
+# GTK cursor and modules, exported to shells, the Hyprland session and systemd user services alike; the theme, icons, colour scheme and font are look.nix's.
 {
   config,
   lib,
@@ -32,13 +32,7 @@ in
   };
 
   config = {
-    gtk = {
-      enable = true;
-      font = {
-        name = "JetBrainsMono Nerd Font";
-        size = 11;
-      };
-    };
+    gtk.enable = true;
 
     # Also sets XCURSOR_*, HYPRCURSOR_* and the GTK cursor theme.
     home.pointerCursor = {

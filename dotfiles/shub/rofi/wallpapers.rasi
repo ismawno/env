@@ -34,7 +34,7 @@ element.selected.normal {
 
 // wallpaper-pick breaks names to fit this width: its wrap_width counts characters of this font.
 element-text {
-  font: "JetBrainsMono 11";
+  font: @look-font-small;
   horizontal-align: 0.5;
   vertical-align: 0.5;
   margin: 0;

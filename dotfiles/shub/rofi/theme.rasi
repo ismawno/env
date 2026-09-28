@@ -1,7 +1,9 @@
-// look.rasi, beside this file, holds the @look-* colours of the current theme.
+// look.rasi and look-font.rasi, beside this file, hold the @look-* colours and fonts of the current look.
 @import "~/.config/rofi/look.rasi"
+@import "~/.config/rofi/look-font.rasi"
 
 * {
+  font: @look-font;
   foreground: @look-dim;
   background-color: transparent;
 

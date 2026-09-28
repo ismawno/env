@@ -1,4 +1,4 @@
-# Every mono font look-pick offers, fetched from its free upstream at a pinned version: family is the one Ghostty asks for, mono the one behind the desktop's "monospace".
+# Every mono font look-pick offers, fetched from its free upstream at a pinned version: family is the one Ghostty and the GTK and Qt UI ask for, mono the one behind "monospace", the bars, the menus and the lock screen.
 { lib, pkgs }:
 
 let
@@ -81,12 +81,13 @@ in
     family = "Iosevka";
     mono = "Iosevka";
   }
-  # The Nerd build home.nix installs for waybar, swaync, wlogout, hyprlock and GTK; a plain "JetBrains Mono" would also turn rofi's "JetBrainsMono", Noto Sans today, into it.
+  # The Nerd build home.nix installs, so this pick keeps the bar, the panels and GTK as they were before look-pick, the bar's own character variants included.
   {
     name = "JetBrains Mono";
     package = pkgs.nerd-fonts.jetbrains-mono;
     family = "JetBrainsMono Nerd Font";
     mono = "JetBrainsMono Nerd Font Mono";
+    features = ''"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"'';
   }
   {
     name = "Monaspace Neon";

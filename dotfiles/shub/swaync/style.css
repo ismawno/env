@@ -1,5 +1,6 @@
-/* look.css, beside this file, sets the colour variables of the current theme */
+/* look.css and look-font.css, beside this file, set the colour and font variables of the current look */
 @import url("look.css");
+@import url("look-font.css");
 
 /* swaync's own GTK4 sheet uses selectors up to 7 classes deep: theme through its vars, not @define-color. */
 :root {
@@ -13,7 +14,7 @@
 /* Scoped to the two toplevels: a bare `*` also hits every internal GTK box. */
 .blank-window,
 .floating-notifications {
-  font-family: JetBrainsMonoNerdFontMono;
+  font-family: var(--look-font);
   font-weight: bold;
 }
 

@@ -67,6 +67,9 @@ let
       ];
       lookName = font.name;
       inherit (font) family mono;
+      features = font.features or "";
+      # The UI size of every pick, in points: GTK, dconf and Qt alike.
+      size = "11";
       FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ font.package ]; };
     } "bash ${./look/font-bundle.sh}";
 
@@ -151,7 +154,7 @@ in
     font = lib.mkOption {
       type = lib.types.enum (map (font: slug font.name) fonts);
       default = "fira-code";
-      description = "The mono font of Ghostty and of the desktop's monospace alias a fresh state starts from, and the one look-pick --reset goes back to; the UI font stays gtk.font.";
+      description = "The font of Ghostty, GTK, Qt, the bar, the panels, the menus and the lock screen a fresh state starts from, and the one look-pick --reset goes back to.";
     };
   };
 
@@ -173,10 +176,14 @@ in
       "ghostty/look-font".source = state "font/ghostty";
       "fontconfig/conf.d/60-look-monospace.conf".source = state "font/fontconfig.conf";
       "waybar/look.css".source = state "theme/gtk3.css";
+      "waybar/look-font.css".source = state "font/gtk.css";
       "waybar/look.json".source = state "theme/waybar.json";
       "wlogout/look.css".source = state "theme/gtk3.css";
+      "wlogout/look-font.css".source = state "font/gtk.css";
       "swaync/look.css".source = state "theme/swaync.css";
+      "swaync/look-font.css".source = state "font/swaync.css";
       "rofi/look.rasi".source = state "theme/rofi.rasi";
+      "rofi/look-font.rasi".source = state "font/rofi.rasi";
       "hypr/look.lua".source = state "theme/hypr.lua";
       "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
       "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");

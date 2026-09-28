@@ -204,7 +204,7 @@ choose() {
   apply "$live" "$kind"
   case $kind in
     theme) notify low "$name is on; libadwaita apps take its colours when they next start" ;;
-    *) notify low "$name is on in Ghostty; other apps take it when they next start" ;;
+    *) notify low "$name is on; wlogout, rofi, the lock screen and Zen's web pages take it when they next open" ;;
   esac
 }
 

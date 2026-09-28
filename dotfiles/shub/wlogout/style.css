@@ -1,8 +1,8 @@
-/* look.css, beside this file, defines the @look_* colours of the current theme */
+/* look.css and look-font.css, beside this file, hold the colours and the font of the current look */
 @import url("look.css");
+@import url("look-font.css");
 
 * {
-  font-family: JetBrainsMonoNerdFontMono;
   font-size: 24px;
   transition-property: background-color;
   transition-duration: 0.7s;

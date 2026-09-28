@@ -81,12 +81,16 @@ in
     family = "Iosevka";
     mono = "Iosevka";
   }
-  # The Nerd build home.nix installs, so this pick keeps the bar, the panels and GTK as they were before look-pick, the bar's own character variants included.
+  # The bar's own character variants from before look-pick ride along.
   {
     name = "JetBrains Mono";
-    package = pkgs.nerd-fonts.jetbrains-mono;
-    family = "JetBrainsMono Nerd Font";
-    mono = "JetBrainsMono Nerd Font Mono";
+    package =
+      release "jetbrains-mono"
+        "https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip"
+        "sha256-Iia/mYqdXz8MLZ4XUznyzeJiqYi53Z8xH4YTp7mM38M="
+        (style: "fonts/ttf/JetBrainsMono-${style}.ttf");
+    family = "JetBrains Mono";
+    mono = "JetBrains Mono";
     features = ''"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"'';
   }
   {

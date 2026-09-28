@@ -17,8 +17,6 @@ cache=${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper-pick
 theme=${MAD_WP_THEME:-${XDG_CONFIG_HOME:-$HOME/.config}/rofi/wallpapers.rasi}
 hm=${MAD_WP_HM:-home-manager}
 runtime=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
-# Held from the moment a pick touches anything until its switch is over; tmpfs, so it never outlives the login.
-lock=$runtime/wallpaper-pick.lock
 gcroot=$runtime/wallpaper-pick.gcroot
 tmpconf=$runtime/wallpaper-pick.conf
 log=$runtime/wallpaper-pick.log
@@ -29,7 +27,7 @@ wrap_lines=3
 
 declare -A pretty=()
 lines=() wrapped="" commit="" name="" url="" hash="" color=""
-saved="" store="" switching="" hm_pid="" failing="" thumb_dir="" names_file="" source_base=""
+store="" thumb_dir="" names_file="" source_base=""
 
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
@@ -40,9 +38,13 @@ notify() {
   fi
 }
 
+warn() {
+  printf 'wallpaper-pick: %s\n' "$1" >&2
+}
+
 die() {
   notify critical "$1"
-  printf 'wallpaper-pick: %s\n' "$1" >&2
+  warn "$1"
   exit 1
 }
 
@@ -79,45 +81,21 @@ restart_hyprpaper() {
   [ "$count" = 1 ]
 }
 
-busy() {
-  notify normal "still pinning the previous pick into the flake; try again in a moment"
-  printf 'wallpaper-pick: %s\n' "still pinning the previous pick into the flake; try again in a moment" >&2
-  if [ "$mode" = menu ]; then exit 0; fi
-  exit 75
-}
+# shellcheck source=flake-pin.sh
+source "${MAD_PIN_LIB:?wallpaper-pick was built without the flake-pin library}"
+pin_env=$env_dir pin_file=$selection pin_repo_path=$repo_path pin_hm=$hm
+pin_undone="the previous wallpaper is back"
 
-# Every failure of the background pin puts the old selection and the old picture back, so the flake never keeps a wallpaper that did not verify.
-fail_back() {
-  local back="; the previous wallpaper is back"
-  failing=1
-  if [ -n "$saved" ]; then
-    cp -f "$saved" "$selection.new"
-    mv -f "$selection.new" "$selection"
-    if [ -n "$switching" ]; then
-      "$hm" switch --flake "$env_dir" -b backup >/dev/null 2>&1 ||
-        back="; $repo_path is back, but the switch that would show it failed too"
-    fi
-  fi
+# A failed pin puts the old picture back on screen too.
+pin_restore() {
   if ! restart_hyprpaper "$conf"; then
     if [ -n "$(hyprpaper_pids)" ]; then
-      back="$back, and hyprpaper was left as it was: Super+N starts it again"
+      pin_back+=", and hyprpaper was left as it was: Super+N starts it again"
     else
-      back="$back, and hyprpaper is not running: start it with Super+N"
+      pin_back+=", and hyprpaper is not running: start it with Super+N"
     fi
   fi
   rm -f "$gcroot" "$tmpconf"
-  die "$1$back"
-}
-
-# shellcheck disable=SC2329 # invoked by the trap in pin
-on_signal() {
-  [ -z "$failing" ] || return 0
-  if [ -n "$hm_pid" ]; then
-    pkill -TERM -P "$hm_pid" 2>/dev/null || true
-    kill "$hm_pid" 2>/dev/null || true
-    wait "$hm_pid" 2>/dev/null || true
-  fi
-  fail_back "interrupted"
 }
 
 # Same name as the module's fetchurl, so the prefetched file is the very store path the switch pins.
@@ -133,46 +111,34 @@ sample_color() {
 # Runs detached with the picture already on screen, holding the lock on fd 9 until the flake agrees; hyprpaper restarts only for a store name that drifted from the module's.
 pin() {
   mode=$1 name=$2 url=$3 hash=$4 store=$5 commit=$6
-  flock -n 9 2>/dev/null || die "--pin only runs from a pick that holds $lock"
-  trap on_signal TERM INT HUP
+  pin_held || die "--pin only runs from a pick that holds $pin_lock"
+  trap pin_on_signal TERM INT HUP
 
-  saved="$work/previous"
-  cp -f "$selection" "$saved"
+  pin_save
   if [ "$mode" != reset ]; then
-    color=$(sample_color "$store") || fail_back "cannot sample the colour of $name"
+    color=$(sample_color "$store") || pin_fail "cannot sample the colour of $name"
   fi
-  render_selection "$mode" >"$selection.new"
-  mv -f "$selection.new" "$selection"
-
-  git -C "$env_dir" ls-files --error-unmatch -- "$repo_path" >/dev/null 2>&1 ||
-    fail_back "$repo_path is not tracked by git, so the flake would not see it"
-  nix-instantiate --eval --strict -- "$selection" >/dev/null 2>&1 ||
-    fail_back "the selection just written does not evaluate as Nix"
-
-  switching=1
-  "$hm" switch --flake "$env_dir" -b backup >"$work/switch" 2>&1 &
-  hm_pid=$!
-  wait "$hm_pid" || fail_back "home-manager switch failed: $(tail -1 "$work/switch")"
-  hm_pid=""
+  render_selection "$mode" >"$work/new"
+  pin_write "$work/new" selection
+  pin_switch
 
   target=$(readlink -f "$stable" || true)
-  [ -n "$target" ] && [ -f "$target" ] || fail_back "$stable does not resolve to a file"
+  [ -n "$target" ] && [ -f "$target" ] || pin_fail "$stable does not resolve to a file"
   if [ "$mode" = reset ]; then
-    [ "$(basename "$target")" = "1.png" ] || fail_back "$stable resolves to $target, not the stock background"
+    [ "$(basename "$target")" = "1.png" ] || pin_fail "$stable resolves to $target, not the stock background"
   else
     [ "$(nix hash file --sri --type sha256 "$target")" = "$hash" ] ||
-      fail_back "$stable resolves to $target, which is not the picture that was fetched"
+      pin_fail "$stable resolves to $target, which is not the picture that was fetched"
   fi
   if [ "$target" != "$store" ] && ! cmp -s "$target" "$store"; then
-    restart_hyprpaper "$conf" || fail_back "hyprpaper did not come back as exactly one process"
+    restart_hyprpaper "$conf" || pin_fail "hyprpaper did not come back as exactly one process"
   fi
 
-  saved=""
   rm -f "$gcroot" "$tmpconf"
   if [ "$mode" = reset ]; then
-    notify normal "back to the stock background; $repo_path changed, review the diff and commit it"
+    pin_done "back to the stock background"
   else
-    notify normal "$name is up, pinned at ${commit:0:12}; $repo_path changed, review the diff and commit it"
+    pin_done "$name is up, pinned at ${commit:0:12}"
   fi
   exit 0
 }
@@ -453,14 +419,9 @@ if [ "$mode" = list ]; then
   exit 0
 fi
 
-git -C "$env_dir" ls-files --error-unmatch -- "$repo_path" >/dev/null 2>&1 ||
-  die "$repo_path is not tracked by git, so the flake would not see it"
+pin_tracked || die "$repo_path is not tracked by git, so the flake would not see it"
 [ -r "$selection" ] || die "cannot read $selection"
-
-# Refused before rofi opens rather than after browsing; the lock is not kept while the picker is open.
-exec 9>>"$lock"
-flock -n 9 || busy
-exec 9>&-
+pin_probe "$mode"
 
 if [ "$mode" != reset ]; then
   resolve_commit
@@ -502,8 +463,7 @@ else
 fi
 
 # Taken again now: two pickers may both have passed the probe, and only one may touch the screen.
-exec 9>>"$lock"
-flock -n 9 || busy
+pin_take "$mode"
 
 # The colour is only sampled later, so it cannot tell two selections apart here.
 render_selection "$mode" | grep -v '^  color = ' >"$work/new"

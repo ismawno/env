@@ -20,14 +20,22 @@ done
 pkill -u "$UID" -f 'scripts/waybarCava.sh'
 pkill -u "$UID" -f 'cava -p [^ ]*bar_cava_config'
 
+log="${XDG_RUNTIME_DIR:-/tmp}/waybar.log"
 # Closing fd 9 in the child: an inherited lock would block the next press forever.
-waybar -c ~/.config/waybar/"$variant" -s ~/.config/waybar/style.css >/dev/null 2>&1 9>&- &
+waybar -c ~/.config/waybar/"$variant" -s ~/.config/waybar/style.css >"$log" 2>&1 9>&- &
 
 # The lock is only worth holding until the new bar is matchable by the next press.
 for _ in {1..30}; do
   pgrep -u "$UID" -f "$bar" >/dev/null && break
   sleep 0.1
 done
+
+# A bad stylesheet makes the bar exit within a second of starting.
+sleep 1
+if ! pgrep -u "$UID" -f "$bar" >/dev/null; then
+  notify-send -u critical "Waybar failed to start" "$(grep -m1 -i error "$log")"
+  exit 1
+fi
 
 [ "${1:-}" = toggle ] && exit 0
 # swaync belongs to its systemd user unit; a hand-started copy makes that unit fail.

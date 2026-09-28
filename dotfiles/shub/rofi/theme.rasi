@@ -81,8 +81,8 @@ element.normal.urgent {
 }
 
 element.selected.normal {
-  background-color: @look-subtle;
-  text-color: @look-bg;
+  background-color: @look-select;
+  text-color: @look-on-select;
 }
 
 element.selected.active {
@@ -102,5 +102,5 @@ element-icon {
   size: 3ch;
   margin: 0 10 0 0;
   vertical-align: 0.5;
-  text-color: @look-fg;
+  text-color: inherit;
 }

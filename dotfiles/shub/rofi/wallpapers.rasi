@@ -29,7 +29,6 @@ element {
 }
 
 element.selected.normal {
-  background-color: @look-select;
   border-color: @look-fg;
 }
 

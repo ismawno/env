@@ -30,7 +30,7 @@ declare -A color=()
 while IFS= read -r line || [ -n "$line" ]; do
   if [[ $line =~ ^palette\ *=\ *([0-9]+)\ *=\ *#?([0-9A-Fa-f]{6})\ *$ ]]; then
     color[p${BASH_REMATCH[1]}]=#${BASH_REMATCH[2],,}
-  elif [[ $line =~ ^(background|foreground)\ *=\ *#?([0-9A-Fa-f]{6})\ *$ ]]; then
+  elif [[ $line =~ ^(background|foreground|selection-background|selection-foreground)\ *=\ *#?([0-9A-Fa-f]{6})\ *$ ]]; then
     color[${BASH_REMATCH[1]}]=#${BASH_REMATCH[2],,}
   fi
 done <"$ghosttyTheme"
@@ -216,12 +216,11 @@ cat >swaync.css <<EOF
 }
 EOF
 
-# The pickers draw their selected row in bg on subtle, pushed toward fg until that reads at 4.5:1, and their current row in whichever of bg and fg reads better on its accent.
-selection=${role[subtle]}
-for step in 65 70 75 80 85 90 95 100; do
-  [ "$(colours contrast "${role[bg]}" "$selection")" -lt 450 ] || break
-  selection=$(mix "${role[bg]}" "${role[fg]}" "$step")
-done
+# Rofi's selected row takes the theme's own selection colours (Ghostty inverts fg and bg without them) while they read at 4.5:1, else bg on the accent moved as far as that needs; its current row whichever of bg and fg reads better on the accent.
+select_bg=${color[selection-background]:-$fg} select_fg=${color[selection-foreground]:-$bg}
+if [ "$(colours contrast "$select_fg" "$select_bg")" -lt 450 ]; then
+  select_fg=${role[bg]} select_bg=$(colours apart "${role[accent]}" 0 "${role[bg]}")
+fi
 
 on() {
   if [ "$(colours contrast "${role[bg]}" "$1")" -ge "$(colours contrast "${role[fg]}" "$1")" ]; then
@@ -236,8 +235,8 @@ cat >rofi.rasi <<EOF
   look-bg: ${role[bg]};
   look-window: ${role[bg]}ed;
   look-fg: ${role[fg]};
-  look-subtle: ${role[subtle]};
-  look-select: $selection;
+  look-select: $select_bg;
+  look-on-select: $select_fg;
   look-muted: ${role[muted]};
   look-dim: ${role[dim]};
   look-accent: ${role[accent]};

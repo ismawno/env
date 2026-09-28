@@ -1,5 +1,4 @@
-# Zen prefs: the shared user.js, plus optional host-specific lines appended after
-# it. Gecko takes the last user_pref for a key, so a host override always wins.
+# Zen's profiles: the shared user.js with host lines after it (Gecko takes a key's last user_pref, so a host override wins), and chrome/userChrome.css linked to mad.zen.userChrome.
 {
   config,
   lib,
@@ -27,6 +26,13 @@ in
     description = "Host-specific user_pref lines, appended after the shared set.";
   };
 
+  options.mad.zen.userChrome = lib.mkOption {
+    type = lib.types.nullOr lib.types.str;
+    default = null;
+    example = "/home/me/.local/state/look/theme/zen.css";
+    description = "A path each profile's chrome/userChrome.css links to; Zen reads it at its start.";
+  };
+
   # Zen announces DesktopEntry "zen" over MPRIS but ships zen-beta.desktop, so media widgets found no icon.
   config.xdg.dataFile."applications/zen.desktop".text = ''
     [Desktop Entry]
@@ -38,12 +44,19 @@ in
   '';
 
   # Zen's profile directory name is generated at first launch, so match on the marker files.
-  config.home.activation.zenUserJs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+  config.home.activation.zenProfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
       for profile in "$root"/*/; do
         if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
           # install -m, not cp: cp preserves the store's 0444 and the next activation dies on it.
           install -m 0644 "${userJs}" "$profile/user.js"
+          ${lib.optionalString (cfg.userChrome != null) ''
+            # A userChrome.css of his own is kept aside as .hm-bak, as Home Manager does with what it would clobber.
+            chrome=$profile/chrome/userChrome.css
+            [ ! -e "$chrome" ] || [ -L "$chrome" ] || mv "$chrome" "$chrome.hm-bak"
+            mkdir -p "$profile/chrome"
+            ln -sfn ${lib.escapeShellArg cfg.userChrome} "$chrome"
+          ''}
         fi
       done
     done

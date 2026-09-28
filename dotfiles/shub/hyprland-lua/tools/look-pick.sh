@@ -383,7 +383,7 @@ fi
 
 show "$live" "$wanted"
 case $picked in
-  theme) notify low "$label is on; libadwaita apps take its colours when they next start" ;;
+  theme) notify low "$label is on; libadwaita apps and Zen take its colours when they next start" ;;
   font) notify low "$label is on; wlogout, rofi, the lock screen and Zen's web pages take it when they next open" ;;
   *) notify low "$label is on" ;;
 esac

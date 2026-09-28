@@ -428,6 +428,37 @@ EOF
 fi
 [ ! -d gtk-theme ] || cat gtk4.css >>gtk-theme/gtk-4.0/gtk.css
 
+# Zen's userChrome.css, read at its start: the GTK window colours, accent and scheme over the ones Zen derives from a space's Edit Theme dots; private and unsynced windows keep Zen's own tint.
+win=':root:not([zen-private-window], [zen-unsynced-window])'
+cat >zen.css <<EOF
+$win {
+  --zen-primary-color: $accent_bg !important;
+  --zen-branding-bg: $win_bg !important;
+  --zen-branding-bg-reverse: $win_fg !important;
+  --toolbox-textcolor: $win_fg !important;
+  --toolbar-color-scheme: $scheme !important;
+  --arrowpanel-background: $dialog !important;
+  --zen-dialog-background: $dialog !important;
+}
+$win zen-workspace {
+  --zen-primary-color: $accent_bg !important;
+  --toolbox-textcolor: $win_fg !important;
+}
+$win .zen-browser-generic-background {
+  --zen-main-browser-background: $win_bg !important;
+  --zen-main-browser-background-toolbar: $win_bg !important;
+  --zen-main-browser-background-old: $win_bg !important;
+  --zen-main-browser-background-toolbar-old: $win_bg !important;
+}
+$win :is(panel, menupopup) {
+  --panel-text-color: $win_fg !important;
+}
+$win#main-window,
+$win#main-window :is(panel, menupopup, zen-workspace, #browser, .zen-browser-generic-background, #urlbar[breakout-extend], #zen-toast-container, #tabbrowser-tabpanels browser[type="content"]) {
+  color-scheme: $scheme !important;
+}
+EOF
+
 prefer_dark=false
 [ "$scheme" = light ] || prefer_dark=true
 for version in 3 4; do

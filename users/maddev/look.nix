@@ -213,6 +213,9 @@ in
       "> Change Font\tlook-pick font\n> Change Theme\tlook-pick theme\n";
   };
 
+  # Through the state, so Zen starts in the theme a pick shows even before its switch lands.
+  mad.zen.userChrome = "${stateDir}/theme/zen.css";
+
   # After dconfSettings, which resets the interface keys it no longer sets; a boot-time activation has no session bus of its own.
   home.activation.look = lib.hm.dag.entryAfter [ "linkGeneration" "dconfSettings" ] ''
     lookBus=""

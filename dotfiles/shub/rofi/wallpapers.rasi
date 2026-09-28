@@ -29,7 +29,16 @@ element {
 }
 
 element.selected.normal {
+  background-color: @look-select;
   border-color: @look-fg;
+}
+
+element.normal.active {
+  text-color: @look-on-accent;
+}
+
+element.selected.active {
+  text-color: @look-on-accent-dark;
 }
 
 // wallpaper-pick breaks names to fit this width: its wrap_width counts characters of this font.

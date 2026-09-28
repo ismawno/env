@@ -151,16 +151,34 @@ cat >swaync.css <<EOF
 }
 EOF
 
+# The pickers draw their selected row in bg on subtle, pushed toward fg until that reads at 4.5:1, and their current row in whichever of bg and fg reads better on its accent.
+selection=${role[subtle]}
+for step in 65 70 75 80 85 90 95 100; do
+  [ "$(contrast "${role[bg]}" "$selection")" -lt 450 ] || break
+  selection=$(mix "${role[bg]}" "${role[fg]}" "$step")
+done
+
+on() {
+  if [ "$(contrast "${role[bg]}" "$1")" -ge "$(contrast "${role[fg]}" "$1")" ]; then
+    printf '%s' "${role[bg]}"
+  else
+    printf '%s' "${role[fg]}"
+  fi
+}
+
 cat >rofi.rasi <<EOF
 * {
   look-bg: ${role[bg]};
   look-window: ${role[bg]}ed;
   look-fg: ${role[fg]};
   look-subtle: ${role[subtle]};
+  look-select: $selection;
   look-muted: ${role[muted]};
   look-dim: ${role[dim]};
   look-accent: ${role[accent]};
+  look-on-accent: $(on "${role[accent]}");
   look-accent-dark: ${role[accent_dark]};
+  look-on-accent-dark: $(on "${role[accent_dark]}");
   look-crit: ${role[crit]};
   look-crit-bright: ${role[crit_bright]};
   look-highlight: underline bold ${role[fg]};

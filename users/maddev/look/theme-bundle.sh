@@ -64,18 +64,83 @@ rgba() {
   printf 'rgba(%s, %s)' "$(triple "$1")" "$2"
 }
 
-# WCAG 2 contrast ratio of two colours, times 100.
-contrast() {
-  awk -v a="$1" -v b="$2" '
-    function lin(hex, v) { v = strtonum("0x" hex) / 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ^ 2.4 }
-    function lum(c) { return 0.2126 * lin(substr(c, 2, 2)) + 0.7152 * lin(substr(c, 4, 2)) + 0.0722 * lin(substr(c, 6, 2)) }
-    BEGIN { x = lum(a); y = lum(b); if (x < y) { t = x; x = y; y = t } printf "%d\n", 100 * (x + 0.05) / (y + 0.05) }'
+# Colour maths on #rrggbb, as colours MODE ARG...: WCAG 2 contrast, mixes, and HSL lightness moved only as far as 4.5:1 needs, either way.
+colours() {
+  awk -v mode="$1" -v args="${*:2}" '
+    function ch(c, i) { return strtonum("0x" substr(c, 2 * i + 2, 2)) / 255 }
+    function lin(v) { return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ^ 2.4 }
+    function lum(c) { return 0.2126 * lin(ch(c, 0)) + 0.7152 * lin(ch(c, 1)) + 0.0722 * lin(ch(c, 2)) }
+    function cr(a, b, x, y) { x = lum(a); y = lum(b); return x > y ? (x + 0.05) / (y + 0.05) : (y + 0.05) / (x + 0.05) }
+    function hex(r, g, b) { return sprintf("#%02x%02x%02x", r * 255 + 0.5, g * 255 + 0.5, b * 255 + 0.5) }
+    function mix(a, b, f) { return hex(ch(a, 0) + (ch(b, 0) - ch(a, 0)) * f, ch(a, 1) + (ch(b, 1) - ch(a, 1)) * f, ch(a, 2) + (ch(b, 2) - ch(a, 2)) * f) }
+    function hue(p, q, t) { t = t < 0 ? t + 1 : t > 1 ? t - 1 : t; return t < 1 / 6 ? p + (q - p) * 6 * t : t < 1 / 2 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p }
+    function shade(c, d, r, g, b, hi, lo, h, s, l, q) {
+      r = ch(c, 0); g = ch(c, 1); b = ch(c, 2)
+      hi = r > g ? (r > b ? r : b) : (g > b ? g : b); lo = r < g ? (r < b ? r : b) : (g < b ? g : b)
+      l = (hi + lo) / 2; h = s = 0
+      if (hi > lo) {
+        s = l > 0.5 ? (hi - lo) / (2 - hi - lo) : (hi - lo) / (hi + lo)
+        h = (hi == r ? (g - b) / (hi - lo) + (g < b ? 6 : 0) : hi == g ? (b - r) / (hi - lo) + 2 : (r - g) / (hi - lo) + 4) / 6
+      }
+      l = l + d < 0 ? 0 : l + d > 1 ? 1 : l + d
+      q = l < 0.5 ? l * (1 + s) : l + s - l * s
+      return hex(hue(2 * l - q, q, h + 1 / 3), hue(2 * l - q, q, h), hue(2 * l - q, q, h - 1 / 3))
+    }
+    # The worse of text on fill as drawn and on fill lifted toward white, which GTK 3 draws suggested buttons on.
+    function onfill(f, t, lift, x, y) { x = cr(t, f); y = cr(t, mix(f, "#ffffff", lift)); return x < y ? x : y }
+    # fill F DARK LIFT: F and the better of white and DARK on it, F darkened for white or lightened for DARK when neither reads.
+    function fill(f, dark, lift, i, c) {
+      if (onfill(f, "#ffffff", lift) >= onfill(f, dark, lift) && onfill(f, "#ffffff", lift) >= 4.5) return f " #ffffff"
+      if (onfill(f, dark, lift) >= 4.5) return f " " dark
+      for (i = 1; i <= 200; i++) {
+        c = shade(f, -i / 200); if (onfill(c, "#ffffff", lift) >= 4.5) return c " #ffffff"
+        c = shade(f, i / 200); if (onfill(c, dark, lift) >= 4.5) return c " " dark
+      }
+    }
+    # infobar X BG FG DARK: the tint GTK draws an infobar in and its text, FG while that reads, else white or DARK.
+    function infobar(x, bg, fg, dark, tint, i, c) {
+      tint = mix(bg, x, 0.3)
+      for (i = 0; i <= 200; i++) {
+        c = i ? shade(tint, -i / 200) : tint
+        if (cr(fg, c) >= 4.5) return c " " fg
+        if (cr("#ffffff", c) >= 4.5) return c " #ffffff"
+        c = shade(tint, i / 200)
+        if (cr(dark, c) >= 4.5) return c " " dark
+      }
+    }
+    # apart C ALPHA BASE...: C as text on each BASE under an ALPHA tint of C itself.
+    function apart(c, i, x, v) { x = 99; for (i = 3; i <= n; i++) { v = cr(c, mix(a[i], c, a[2])); x = v < x ? v : x } return x }
+    function flat(c, over, m) {
+      if (c ~ /^#[0-9a-fA-F]{3}$/) c = "#" substr(c, 2, 1) substr(c, 2, 1) substr(c, 3, 1) substr(c, 3, 1) substr(c, 4, 1) substr(c, 4, 1)
+      if (c ~ /^#[0-9a-fA-F]{6}/) return tolower(substr(c, 1, 7))
+      if (match(c, /^rgba?\(([0-9.]+),([0-9.]+),([0-9.]+)(,([0-9.]+))?\)$/, m)) return mix(over, hex(m[1] / 255, m[2] / 255, m[3] / 255), m[5] == "" ? 1 : m[5])
+      print "colours: cannot read " c > "/dev/stderr"
+      exit 1
+    }
+    BEGIN {
+      n = split(args, a, " ")
+      if (mode == "contrast") printf "%d\n", 100 * cr(a[1], a[2])
+      else if (mode == "mix") print mix(a[1], a[2], a[3])
+      else if (mode == "darker") print (lum(a[1]) <= lum(a[2]) ? a[1] : a[2])
+      else if (mode == "flat") print flat(a[1], a[2])
+      else if (mode == "fill") print fill(a[1], a[2], a[3])
+      else if (mode == "infobar") print infobar(a[1], a[2], a[3], a[4])
+      else if (mode == "apart") {
+        # A mid-tone base under the tint caps every colour below 4.5:1; there the least change to 3:1 keeps the hue.
+        for (goal = 4.5; goal >= 3; goal -= 1.5) {
+          for (i = 0; i <= 200; i++) {
+            if (apart(c = i ? shade(a[1], i / 200) : a[1]) >= goal || apart(c = shade(a[1], -i / 200)) >= goal) { print c; exit }
+          }
+        }
+        print a[1]
+      }
+    }'
 }
 
 bg=${color[background]} fg=${color[foreground]}
 
 # Text under 3:1, WCAG's floor even for large bold text, is unreadable in the bar, the menus and every GTK app alike.
-ratio=$(contrast "$fg" "$bg")
+ratio=$(colours contrast "$fg" "$bg")
 [ "$ratio" -ge 300 ] || reject "its text contrast is $((ratio / 100)).$(printf '%02d' $((ratio % 100))):1, under 3:1"
 for key in background foreground p{0..15}; do
   printf '%s ' "${color[$key]}"
@@ -154,12 +219,12 @@ EOF
 # The pickers draw their selected row in bg on subtle, pushed toward fg until that reads at 4.5:1, and their current row in whichever of bg and fg reads better on its accent.
 selection=${role[subtle]}
 for step in 65 70 75 80 85 90 95 100; do
-  [ "$(contrast "${role[bg]}" "$selection")" -lt 450 ] || break
+  [ "$(colours contrast "${role[bg]}" "$selection")" -lt 450 ] || break
   selection=$(mix "${role[bg]}" "${role[fg]}" "$step")
 done
 
 on() {
-  if [ "$(contrast "${role[bg]}" "$1")" -ge "$(contrast "${role[fg]}" "$1")" ]; then
+  if [ "$(colours contrast "${role[bg]}" "$1")" -ge "$(colours contrast "${role[fg]}" "$1")" ]; then
     printf '%s' "${role[bg]}"
   else
     printf '%s' "${role[fg]}"
@@ -222,55 +287,6 @@ disabled_colors=$(qt "${disabled[@]}")
 inactive_colors=$(qt "${normal[@]}")
 EOF
 
-# No native GTK theme: adw-gtk3 recoloured through its own named colours, the way it is meant to be themed; its GTK 4 sheet also gets gtk4.css below.
-if [ -z "$gtkName" ]; then
-  gtkName=look-$slug gtkDir=$PWD/gtk-theme
-  base=$adwaita/adw-gtk3
-  [ "$scheme" = light ] || base=$base-dark
-  card="@headerbar_bg_color" popover="mix(@window_bg_color, @window_fg_color, 0.1)"
-  [ "$scheme" = dark ] || card="@view_bg_color" popover="@view_bg_color"
-  on_blue=$bg
-  [ "$(contrast "$bg" "${role[blue]}")" -ge "$(contrast "$fg" "${role[blue]}")" ] || on_blue=$fg
-  mkdir -p gtk-theme/gtk-3.0 gtk-theme/gtk-4.0
-  cat >gtk-theme/named.css <<CSS
-@define-color window_bg_color ${role[bg]};
-@define-color window_fg_color ${role[fg]};
-@define-color view_bg_color ${role[bg]};
-@define-color view_fg_color ${role[fg]};
-@define-color accent_bg_color ${role[blue]};
-@define-color accent_fg_color $on_blue;
-@define-color destructive_bg_color ${role[crit]};
-@define-color success_bg_color ${role[green]};
-@define-color warning_bg_color ${role[accent]};
-@define-color error_bg_color ${role[crit]};
-CSS
-  {
-    printf '@import url("file://%s/gtk-3.0/gtk.css");\n' "$base"
-    cat gtk-theme/named.css
-    cat <<CSS
-@define-color headerbar_bg_color mix(@window_bg_color, @window_fg_color, 0.06);
-@define-color headerbar_fg_color @window_fg_color;
-@define-color headerbar_border_color @window_fg_color;
-@define-color sidebar_bg_color @headerbar_bg_color;
-@define-color sidebar_fg_color @window_fg_color;
-@define-color sidebar_backdrop_color @window_bg_color;
-@define-color card_bg_color $card;
-@define-color card_fg_color @window_fg_color;
-@define-color dialog_bg_color $popover;
-@define-color dialog_fg_color @window_fg_color;
-@define-color popover_bg_color @dialog_bg_color;
-@define-color popover_fg_color @window_fg_color;
-@define-color thumbnail_bg_color @dialog_bg_color;
-@define-color thumbnail_fg_color @window_fg_color;
-CSS
-  } >gtk-theme/gtk-3.0/gtk.css
-  {
-    printf '@import url("file://%s/gtk-4.0/gtk.css");\n' "$base"
-    cat gtk-theme/named.css
-  } >gtk-theme/gtk-4.0/gtk.css
-  rm gtk-theme/named.css
-fi
-
 # The GTK theme's own literal colour for the first name it defines, so libadwaita apps match the GTK apps beside them.
 sheet() {
   local fallback=$1 name value
@@ -287,6 +303,88 @@ sheet() {
   fi
   printf '%s' "$fallback"
 }
+flat() {
+  colours flat "${1// /}" "$2"
+}
+
+# What GTK writes on or in colour: accent and status fills under white or the theme's dark end (GTK 3 lifts suggested buttons 10% toward white), status text (adw-gtk3's shade of the fill) on its own tint, 23.5% under a destructive button and 10% in an entry, infobars.
+win_bg=$(flat "$(sheet "${role[bg]}" window_bg_color theme_bg_color)" "#000000")
+win_fg=$(flat "$(sheet "${role[fg]}" window_fg_color theme_fg_color)" "$win_bg")
+dark=$(colours darker "$win_bg" "$win_fg")
+dialog=$win_bg
+[ "$scheme" = light ] || dialog=$(colours mix "$win_bg" "$win_fg" 0.1)
+read -r accent_bg accent_fg <<<"$(colours fill "$(flat "$(sheet "${role[blue]}" accent_bg_color theme_selected_bg_color)" "$win_bg")" "$dark" 0.1)"
+kinds=(destructive success warning error)
+declare -A status=([destructive]=crit [success]=green [warning]=accent [error]=crit) alpha=([destructive]=0.235 [success]=0.1 [warning]=0.1 [error]=0.1) fill=() on_fill=() text=()
+for kind in "${kinds[@]}"; do
+  read -r "fill[$kind]" "on_fill[$kind]" <<<"$(colours fill "${role[${status[$kind]}]}" "$dark" 0)"
+  shade=$(colours mix "${role[${status[$kind]}]}" "#ffffff" 0.4)
+  [ "$scheme" = dark ] || shade=$(colours mix "${role[${status[$kind]}]}" "#000000" 0.17)
+  text[$kind]=$(colours apart "$shade" "${alpha[$kind]}" "$win_bg" "$dialog")
+done
+
+# No native GTK theme: adw-gtk3 recoloured through its own named colours, the way it is meant to be themed; its GTK 4 sheet also gets gtk4.css below.
+if [ -z "$gtkName" ]; then
+  gtkName=look-$slug gtkDir=$PWD/gtk-theme
+  base=$adwaita/adw-gtk3
+  [ "$scheme" = light ] || base=$base-dark
+  card="@headerbar_bg_color" popover="mix(@window_bg_color, @window_fg_color, 0.1)"
+  [ "$scheme" = dark ] || card="@view_bg_color" popover="@view_bg_color"
+  mkdir -p gtk-theme/gtk-3.0 gtk-theme/gtk-4.0
+  {
+    cat <<CSS
+@define-color window_bg_color ${role[bg]};
+@define-color window_fg_color ${role[fg]};
+@define-color view_bg_color ${role[bg]};
+@define-color view_fg_color ${role[fg]};
+@define-color accent_bg_color $accent_bg;
+@define-color accent_fg_color $accent_fg;
+CSS
+    for kind in "${kinds[@]}"; do
+      printf '@define-color %s_bg_color %s;\n@define-color %s_fg_color %s;\n@define-color %s_color %s;\n' \
+        "$kind" "${fill[$kind]}" "$kind" "${on_fill[$kind]}" "$kind" "${text[$kind]}"
+    done
+    for kind in warning error; do
+      read -r tint ink <<<"$(colours infobar "${fill[$kind]}" "$win_bg" "$win_fg" "$dark")"
+      printf 'infobar.%s > revealer > box {\n  background-color: %s;\n  color: %s;\n}\n' "$kind" "$tint" "$ink"
+    done
+  } >gtk-theme/common.css
+  {
+    printf '@import url("file://%s/gtk-3.0/gtk.css");\n' "$base"
+    cat gtk-theme/common.css
+    cat <<CSS
+@define-color headerbar_bg_color mix(@window_bg_color, @window_fg_color, 0.06);
+@define-color headerbar_fg_color @window_fg_color;
+@define-color headerbar_border_color @window_fg_color;
+@define-color sidebar_bg_color @headerbar_bg_color;
+@define-color sidebar_fg_color @window_fg_color;
+@define-color sidebar_backdrop_color @window_bg_color;
+@define-color card_bg_color $card;
+@define-color card_fg_color @window_fg_color;
+@define-color dialog_bg_color $popover;
+@define-color dialog_fg_color @window_fg_color;
+@define-color popover_bg_color @dialog_bg_color;
+@define-color popover_fg_color @window_fg_color;
+@define-color thumbnail_bg_color @dialog_bg_color;
+@define-color thumbnail_fg_color @window_fg_color;
+button.suggested-action, button.suggested-action:hover, button.suggested-action:active, button.suggested-action:checked {
+  color: @accent_fg_color;
+}
+label.error, entry.error, spinbutton.error:not(.vertical), headerbar entry.error, .titlebar entry.error {
+  color: @error_color;
+}
+entry.warning, spinbutton.warning:not(.vertical), headerbar entry.warning, .titlebar entry.warning {
+  color: @warning_color;
+}
+CSS
+  } >gtk-theme/gtk-3.0/gtk.css
+  {
+    printf '@import url("file://%s/gtk-4.0/gtk.css");\n' "$base"
+    cat gtk-theme/common.css
+  } >gtk-theme/gtk-4.0/gtk.css
+  rm gtk-theme/common.css
+fi
+
 if [ -z "$gtkDir" ]; then
   : >gtk4.css
 else
@@ -302,12 +400,12 @@ else
   --window-fg-color: $(sheet "${role[fg]}" window_fg_color theme_fg_color);
   --view-bg-color: $(sheet "${role[bg]}" view_bg_color theme_base_color);
   --view-fg-color: $(sheet "${role[fg]}" view_fg_color theme_text_color);
-  --accent-bg-color: $(sheet "${role[blue]}" accent_bg_color theme_selected_bg_color);
-  --accent-fg-color: $(sheet "${role[bg]}" accent_fg_color theme_selected_fg_color);
-  --destructive-bg-color: ${role[crit]};
-  --success-bg-color: ${role[green]};
-  --warning-bg-color: ${role[accent]};
-  --error-bg-color: ${role[crit]};
+  --accent-bg-color: $accent_bg;
+  --accent-fg-color: $accent_fg;
+$(for kind in "${kinds[@]}"; do
+    printf '  --%s-bg-color: %s;\n  --%s-fg-color: %s;\n  --%s-color: %s;\n' \
+      "$kind" "${fill[$kind]}" "$kind" "${on_fill[$kind]}" "$kind" "${text[$kind]}"
+  done)
   --headerbar-bg-color: $(sheet "$bar" headerbar_bg_color);
   --headerbar-fg-color: var(--window-fg-color);
   --headerbar-border-color: var(--window-fg-color);

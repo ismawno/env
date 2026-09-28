@@ -96,7 +96,16 @@ in
     mpv
     playerctl
     scrcpy
-    wdisplays
+    # Drop this override once nixpkgs has wdisplays 1.3.0 (NixOS/nixpkgs#567876).
+    (wdisplays.overrideAttrs (old: {
+      version = "1.3.0";
+      src = fetchFromGitHub {
+        owner = "artizirk";
+        repo = "wdisplays";
+        rev = "1.3.0";
+        hash = "sha256-y8tE3R0kGWVSqPFcT8EX2PBIwpdnyAaxICyXJ4J9NCA=";
+      };
+    }))
     android-tools
     qt6Packages.qt6ct
     spotify

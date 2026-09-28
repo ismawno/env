@@ -1,5 +1,4 @@
-# shellcheck shell=bash disable=SC2154
-# Sourced by the pickers that pin into the flake: one lock for all of them, the tracked file rewritten whole, a home-manager switch behind it and every failure undone; the caller sets pin_env, pin_file, pin_repo_path, pin_hm, pin_undone and work, and defines notify, die, warn and pin_restore, which puts the previous pick back on screen and may add to pin_back.
+# shellcheck shell=bash disable=SC2154 # Sourced by the pickers that pin into the flake: one lock for all of them, the tracked file rewritten whole, a home-manager switch behind it and every failure undone; the caller sets pin_env, pin_file, pin_repo_path, pin_hm, pin_undone and work, and defines notify, die, warn and pin_restore, which puts the previous pick back on screen and may add to pin_back.
 
 pin_lock=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/flake-pin.lock
 pin_saved="" pin_switching="" pin_hm_pid="" pin_failing="" pin_back=""

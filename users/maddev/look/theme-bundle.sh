@@ -1,12 +1,25 @@
-# Build-time only: turns one Ghostty theme and its GTK theme into the files every app reads through look-pick's state; a missing piece fails the build.
+# Build-time only: turns one Ghostty theme and its GTK theme, native or generated here from adw-gtk3, into the files every app reads through look-pick's state; themes.sh calls it once per theme.
 set -euo pipefail
+
+lookName=$1 slug=$2 gtkName=$3 gtkDir=$4 roles=$5
+ghosttyTheme=$ghosttyThemes/$lookName
 
 die() {
   printf 'theme-bundle: %s: %s\n' "$lookName" "$1" >&2
   exit 1
 }
 
-[ -f "$ghosttyTheme" ] || die "Ghostty ships no theme called ${ghosttyTheme##*/}"
+mkdir -p "$bundles/$slug/settings"
+cd "$bundles/$slug"
+
+# A theme themes.nix does not name is only left out, with the reason themes.sh logs; a named one that falls short fails the build.
+reject() {
+  [ -z "$gtkName" ] || die "$1"
+  printf '%s\n' "$1" >rejected
+  exit 0
+}
+
+[ -f "$ghosttyTheme" ] || die "Ghostty ships no theme called $lookName"
 if [ -n "$gtkDir" ]; then
   for sheet in gtk-3.0/gtk.css gtk-4.0/gtk.css; do
     [ -f "$gtkDir/$sheet" ] || die "the GTK theme $gtkName has no $sheet"
@@ -22,7 +35,7 @@ while IFS= read -r line || [ -n "$line" ]; do
   fi
 done <"$ghosttyTheme"
 for key in background foreground p{0..15}; do
-  [ -n "${color[$key]:-}" ] || die "the Ghostty theme sets no $key"
+  [ -n "${color[$key]:-}" ] || reject "the Ghostty theme sets no $key"
 done
 
 channels() {
@@ -51,7 +64,23 @@ rgba() {
   printf 'rgba(%s, %s)' "$(triple "$1")" "$2"
 }
 
+# WCAG 2 contrast ratio of two colours, times 100.
+contrast() {
+  awk -v a="$1" -v b="$2" '
+    function lin(hex, v) { v = strtonum("0x" hex) / 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ^ 2.4 }
+    function lum(c) { return 0.2126 * lin(substr(c, 2, 2)) + 0.7152 * lin(substr(c, 4, 2)) + 0.0722 * lin(substr(c, 6, 2)) }
+    BEGIN { x = lum(a); y = lum(b); if (x < y) { t = x; x = y; y = t } printf "%d\n", 100 * (x + 0.05) / (y + 0.05) }'
+}
+
 bg=${color[background]} fg=${color[foreground]}
+
+# Text under 3:1, WCAG's floor even for large bold text, is unreadable in the bar, the menus and every GTK app alike.
+ratio=$(contrast "$fg" "$bg")
+[ "$ratio" -ge 300 ] || reject "its text contrast is $((ratio / 100)).$(printf '%02d' $((ratio % 100))):1, under 3:1"
+for key in background foreground p{0..15}; do
+  printf '%s ' "${color[$key]}"
+done >palette
+
 read -ra lum <<<"$(channels "$bg")"
 if ((2126 * lum[0] + 7152 * lum[1] + 722 * lum[2] < 1280000)); then
   scheme=dark icons=$iconsDark
@@ -95,9 +124,6 @@ for pair in $roles; do
   [[ $value =~ ^#[0-9a-f]{6}$ ]] || die "role $key wants #rrggbb, not $value"
   role[$key]=$value
 done
-
-mkdir -p "$out/settings"
-cd "$out"
 
 printf 'theme = %s\n' "$lookName" >ghostty
 
@@ -178,6 +204,55 @@ disabled_colors=$(qt "${disabled[@]}")
 inactive_colors=$(qt "${normal[@]}")
 EOF
 
+# No native GTK theme: adw-gtk3 recoloured through its own named colours, the way it is meant to be themed; its GTK 4 sheet also gets gtk4.css below.
+if [ -z "$gtkName" ]; then
+  gtkName=look-$slug gtkDir=$PWD/gtk-theme
+  base=$adwaita/adw-gtk3
+  [ "$scheme" = light ] || base=$base-dark
+  card="@headerbar_bg_color" popover="mix(@window_bg_color, @window_fg_color, 0.1)"
+  [ "$scheme" = dark ] || card="@view_bg_color" popover="@view_bg_color"
+  on_blue=$bg
+  [ "$(contrast "$bg" "${role[blue]}")" -ge "$(contrast "$fg" "${role[blue]}")" ] || on_blue=$fg
+  mkdir -p gtk-theme/gtk-3.0 gtk-theme/gtk-4.0
+  cat >gtk-theme/named.css <<CSS
+@define-color window_bg_color ${role[bg]};
+@define-color window_fg_color ${role[fg]};
+@define-color view_bg_color ${role[bg]};
+@define-color view_fg_color ${role[fg]};
+@define-color accent_bg_color ${role[blue]};
+@define-color accent_fg_color $on_blue;
+@define-color destructive_bg_color ${role[crit]};
+@define-color success_bg_color ${role[green]};
+@define-color warning_bg_color ${role[accent]};
+@define-color error_bg_color ${role[crit]};
+CSS
+  {
+    printf '@import url("file://%s/gtk-3.0/gtk.css");\n' "$base"
+    cat gtk-theme/named.css
+    cat <<CSS
+@define-color headerbar_bg_color mix(@window_bg_color, @window_fg_color, 0.06);
+@define-color headerbar_fg_color @window_fg_color;
+@define-color headerbar_border_color @window_fg_color;
+@define-color sidebar_bg_color @headerbar_bg_color;
+@define-color sidebar_fg_color @window_fg_color;
+@define-color sidebar_backdrop_color @window_bg_color;
+@define-color card_bg_color $card;
+@define-color card_fg_color @window_fg_color;
+@define-color dialog_bg_color $popover;
+@define-color dialog_fg_color @window_fg_color;
+@define-color popover_bg_color @dialog_bg_color;
+@define-color popover_fg_color @window_fg_color;
+@define-color thumbnail_bg_color @dialog_bg_color;
+@define-color thumbnail_fg_color @window_fg_color;
+CSS
+  } >gtk-theme/gtk-3.0/gtk.css
+  {
+    printf '@import url("file://%s/gtk-4.0/gtk.css");\n' "$base"
+    cat gtk-theme/named.css
+  } >gtk-theme/gtk-4.0/gtk.css
+  rm gtk-theme/named.css
+fi
+
 # The GTK theme's own literal colour for the first name it defines, so libadwaita apps match the GTK apps beside them.
 sheet() {
   local fallback=$1 name value
@@ -236,14 +311,15 @@ else
 }
 EOF
 fi
+[ ! -d gtk-theme ] || cat gtk4.css >>gtk-theme/gtk-4.0/gtk.css
 
-prefer_dark=false interface=3
-[ "$scheme" = light ] || prefer_dark=true interface=2
+prefer_dark=false
+[ "$scheme" = light ] || prefer_dark=true
 for version in 3 4; do
   {
     printf '[Settings]\ngtk-theme-name=%s\ngtk-icon-theme-name=%s\ngtk-application-prefer-dark-theme=%s\n' \
       "$gtkName" "${icons##*/}" "$prefer_dark"
-    [ "$version" = 3 ] || printf 'gtk-interface-color-scheme=%s\n' "$interface"
+    [ "$version" = 3 ] || printf 'gtk-interface-color-scheme=%s\n' "$scheme"
   } >"settings/gtk$version.ini"
 done
 printf "[org/gnome/desktop/interface]\ngtk-theme='%s'\nicon-theme='%s'\ncolor-scheme='prefer-%s'\n" \

@@ -18,7 +18,7 @@ let
   icons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
 
   # GTK 3 has no border-spacing, yet several sheets carry GTK 4's, and every GTK 3 process printed a parse error for it.
-  gtkThemes = pkgs.runCommand "look-gtk-themes" { } ''
+  nativeGtk = pkgs.runCommand "look-gtk-themes" { } ''
     ${lib.concatMapStrings (
       theme:
       lib.optionalString (theme.gtk.package != null) ''
@@ -43,20 +43,31 @@ let
     fi
   '';
 
-  themeBundle =
-    theme:
-    pkgs.runCommand "look-theme-${slug theme.name}" {
-      nativeBuildInputs = [ pkgs.imagemagick ];
-      lookName = theme.name;
-      ghosttyTheme = "${pkgs.ghostty}/share/ghostty/themes/${theme.name}";
-      gtkName = theme.gtk.name;
-      gtkDir = lib.optionalString (
-        theme.gtk.package != null
-      ) "${gtkThemes}/share/themes/${theme.gtk.name}";
-      iconsDark = "${icons}/share/icons/Gruvbox-Plus-Dark";
-      iconsLight = "${icons}/share/icons/Gruvbox-Plus-Light";
-      roles = toString (lib.mapAttrsToList (role: color: "${role}=${color}") (theme.roles or { }));
-    } "bash ${./look/theme-bundle.sh}";
+  # Every Ghostty theme at once, since which of them pass is only known once their palettes are read; out holds the bundles, gtk the generated GTK themes.
+  themeBundles = pkgs.runCommand "look-theme-bundles" {
+    outputs = [
+      "out"
+      "gtk"
+    ];
+    nativeBuildInputs = [ pkgs.imagemagick ];
+    ghosttyThemes = "${pkgs.ghostty}/share/ghostty/themes";
+    adwaita = "${pkgs.adw-gtk3}/share/themes";
+    iconsDark = "${icons}/share/icons/Gruvbox-Plus-Dark";
+    iconsLight = "${icons}/share/icons/Gruvbox-Plus-Light";
+    nativeThemes = pkgs.writeText "look-native-themes.tsv" (
+      lib.concatMapStrings (
+        theme:
+        lib.concatStringsSep "\t" [
+          theme.name
+          theme.gtk.name
+          (lib.optionalString (theme.gtk.package != null) "${nativeGtk}/share/themes/${theme.gtk.name}")
+          (toString (lib.mapAttrsToList (role: color: "${role}=${color}") (theme.roles or { })))
+        ]
+        + "\n"
+      ) themes
+    );
+    bundleScript = ./look/theme-bundle.sh;
+  } "bash ${./look/themes.sh}";
 
   fontBundle =
     font:
@@ -73,35 +84,38 @@ let
       FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [ font.package ]; };
     } "bash ${./look/font-bundle.sh}";
 
-  # A kind is one picker: its bundles under their slugs, plus index.tsv, slug and display name in menu order.
-  kinds = {
-    theme = {
-      entries = themes;
-      bundle = themeBundle;
-      default = cfg.theme;
-    };
-    font = {
-      entries = fonts;
-      bundle = fontBundle;
-      default = cfg.font;
-    };
-  };
-
-  folder =
-    kind:
+  fontBundles =
     let
-      inherit (kinds.${kind}) entries bundle;
-      sorted = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) entries;
-      slugs = map (entry: slug entry.name) entries;
+      sorted = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) fonts;
+      slugs = map (font: slug font.name) fonts;
     in
-    assert lib.assertMsg (lib.allUnique slugs) "look: two ${kind} entries share a slug";
-    pkgs.runCommand "look-${kind}s" { } ''
+    assert lib.assertMsg (lib.allUnique slugs) "look: two fonts share a slug";
+    pkgs.runCommand "look-font-bundles" { } ''
       mkdir $out
-      ${lib.concatMapStrings (entry: "ln -s ${bundle entry} $out/${slug entry.name}\n") entries}
+      ${lib.concatMapStrings (font: "ln -s ${fontBundle font} $out/${slug font.name}\n") fonts}
       printf '%s' ${
-        lib.escapeShellArg (lib.concatMapStrings (entry: "${slug entry.name}\t${entry.name}\n") sorted)
+        lib.escapeShellArg (lib.concatMapStrings (font: "${slug font.name}\t${font.name}\n") sorted)
       } >$out/index.tsv
     '';
+
+  # The folder look-pick reads a kind from; a default this build lacks fails here, before any switch.
+  data =
+    kind: bundles:
+    pkgs.runCommand "look-${kind}s"
+      {
+        slug = cfg.${kind};
+        message = "mad.look.${kind} is \"${cfg.${kind}}\", which this build has not";
+      }
+      ''
+        awk -F '\t' -v slug="$slug" '$1 == slug { found = 1 } END { exit !found }' ${bundles}/index.tsv ||
+          { echo "$message" >&2; exit 1; }
+        ln -s ${bundles} $out
+      '';
+
+  kinds = {
+    font = fontBundles;
+    theme = themeBundles;
+  };
 
   picker = pkgs.writeShellApplication {
     name = "look-pick";
@@ -121,7 +135,7 @@ let
     text = ''
       export MAD_LOOK_KINDS=${lib.escapeShellArg (toString (lib.attrNames kinds))}
       export MAD_LOOK_DEFAULTS=${
-        lib.escapeShellArg (toString (lib.mapAttrsToList (kind: k: "${kind}=${k.default}") kinds))
+        lib.escapeShellArg (toString (lib.mapAttrsToList (kind: _: "${kind}=${cfg.${kind}}") kinds))
       }
       export MAD_LOOK_GTK3_BASE=${
         pkgs.writeText "look-gtk3.ini" config.xdg.configFile."gtk-3.0/settings.ini".text
@@ -146,9 +160,9 @@ in
 {
   options.mad.look = {
     theme = lib.mkOption {
-      type = lib.types.enum (map (theme: slug theme.name) themes);
+      type = lib.types.str;
       default = "gruvbox-dark";
-      description = "The theme a fresh state starts from, and the one look-pick --reset goes back to. The pick itself lives in ~/.local/state/look, so no rebuild ever undoes it.";
+      description = "The theme, by slug, a fresh state starts from, and the one look-pick --reset goes back to; the build fails on one that no bundle has. The pick itself lives in ~/.local/state/look, so no rebuild ever undoes it.";
     };
 
     font = lib.mkOption {
@@ -161,14 +175,15 @@ in
   config = {
     home.packages = [
       picker
-      gtkThemes
+      nativeGtk
+      themeBundles.gtk
       icons
       pkgs.nerd-fonts.symbols-only
     ]
     ++ map (font: font.package) fonts;
 
     xdg.dataFile = lib.mapAttrs' (
-      kind: _: lib.nameValuePair "look/${kind}s" { source = folder kind; }
+      kind: bundles: lib.nameValuePair "look/${kind}s" { source = data kind bundles; }
     ) kinds;
 
     xdg.configFile = {

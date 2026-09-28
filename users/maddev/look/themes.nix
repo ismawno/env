@@ -1,4 +1,4 @@
-# Every theme look-pick offers: a Ghostty theme of the same name plus a GTK 3 and GTK 4 theme of that palette, which the bundle build checks.
+# The Ghostty themes with a native GTK 3 and GTK 4 theme of their palette, kept over the one look.nix would generate from adw-gtk3; every other Ghostty theme that passes theme-bundle.sh's checks gets that.
 { lib, pkgs }:
 
 let

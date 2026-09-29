@@ -31,7 +31,8 @@ user_pref("extensions.formautofill.creditCards.enabled", true);
 // Restore the previous session on startup.
 user_pref("browser.startup.page", 3);
 
-// The look paints Zen through chrome/userChrome.css (users/maddev/look.nix); the scheme follows the system, which the look sets, and a space's colours never flip it.
+// The look paints Zen through chrome/userChrome.css (users/maddev/look.nix) and the system accent and scheme it sets, which a space's colours never override.
 user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 user_pref("zen.view.window.scheme", 2);
 user_pref("zen.theme.use-system-colors", true);
+user_pref("zen.theme.accent-color", "AccentColor");

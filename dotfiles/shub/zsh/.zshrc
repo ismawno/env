@@ -68,6 +68,7 @@ alias git-rename-branch="$HOME/develop/scripts/git-rename-branch.sh"
 alias reload="source ${ZDOTDIR:-$HOME}/.zshrc"
 
 eval "$(fzf --zsh)"
+[[ -z $IN_NIX_SHELL ]] && command -v direnv >/dev/null && eval "$(direnv hook zsh)"
 # Greet before the tool inits; zoxide wants its init to stay last. (Off the launcher: `-e zsh -c` broke the terminfo-over-ssh integration.)
 [[ -z $TMUX && $SHLVL -eq 1 ]] && fastfetch
 

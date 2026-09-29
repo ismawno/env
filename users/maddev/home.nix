@@ -288,6 +288,12 @@ in
 
   programs.starship.enable = true;
 
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+    config.global.hide_env_diff = true;
+  };
+
   programs.gh = {
     enable = true;
     settings.git_protocol = "https";

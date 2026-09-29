@@ -211,9 +211,9 @@ cat >swaync.css <<EOF
 }
 EOF
 
-# Rofi's selected row takes the theme's own selection colours (Ghostty inverts fg and bg without them) while they read at 4.5:1, else bg on the accent moved as far as that needs; its current row whichever of bg and fg reads better on the accent.
+# Rofi's selected row takes the theme's own selection colours (Ghostty inverts fg and bg without them) while they read at 4.5:1 and the fill stands 1.5:1 off the window, else bg on the accent moved as far as that needs; its current row whichever of bg and fg reads better on the accent.
 select_bg=${color[selection-background]:-$fg} select_fg=${color[selection-foreground]:-$bg}
-if [ "$(colours contrast "$select_fg" "$select_bg")" -lt 450 ]; then
+if [ "$(colours contrast "$select_bg" "${role[bg]}")" -lt 150 ] || [ "$(colours contrast "$select_fg" "$select_bg")" -lt 450 ]; then
   select_fg=${role[bg]} select_bg=$(colours apart "${role[accent]}" 0 "${role[bg]}")
 fi
 

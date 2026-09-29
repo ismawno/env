@@ -18,13 +18,6 @@ let
     "/home/maddev/Videos" = "/nomad/maddev/Videos";
     "/home/maddev/Music" = "/nomad/maddev/Music";
   };
-
-  # "Forested hills in Lysekil in fog" by W.carter, CC BY-SA 4.0: fetched from Wikimedia Commons, not kept in the repo.
-  forestPhoto = pkgs.fetchurl {
-    name = "lysekil-fog.jpg";
-    url = "https://upload.wikimedia.org/wikipedia/commons/e/e6/Forested_hills_in_Lysekil_in_fog_-_B%26W.jpg";
-    hash = "sha256-mmAxXPTGmneQa87riECVUopaxchny5B5LkTNuza5OSs=";
-  };
 in
 {
   imports = [
@@ -38,6 +31,7 @@ in
     ./audio.nix
     ./hibernation-interlock.nix
     ./rescue.nix
+    ../../users/maddev/plymouth
   ];
 
   mad.interlock.enable = true;
@@ -211,21 +205,8 @@ in
     };
   };
 
-  # maddev prefers whitesur and an own unlock screen (foggy pine forest) over the shared tela/colorful_loop.
+  # maddev prefers whitesur over the shared tela.
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
-  boot.plymouth.theme = lib.mkForce "smalltop-forest";
-  boot.plymouth.themePackages = lib.mkForce [
-    (pkgs.runCommand "plymouth-theme-smalltop-forest" { nativeBuildInputs = [ pkgs.imagemagick ]; } ''
-      dir=$out/share/plymouth/themes/smalltop-forest
-      mkdir -p $dir
-      cp ${./plymouth/smalltop-forest}/* $dir/
-      chmod -R u+w $dir
-      substituteInPlace $dir/smalltop-forest.plymouth --replace-fail @dir@ $dir
-      magick ${forestPhoto} -resize 2880x1800^ -gravity center -extent 2880x1800 -colorspace Gray -strip $dir/background.png
-      magick -size 744x93 xc:none -fill "rgba(12,12,12,0.59)" -stroke "rgba(240,240,240,0.43)" -strokewidth 2 -draw "roundrectangle 1,1 742,91 46,46" $dir/entry.png
-      magick -size 24x24 xc:none -fill "rgb(240,240,240)" -draw "circle 12,12 12,1" $dir/dot.png
-    '')
-  ];
 
   users.users.maddev = {
     isNormalUser = true;

@@ -13,6 +13,7 @@
     ../modules/lan-discovery.nix
     ../modules/ghostty-terminfo.nix
     ./audio.nix
+    ../../users/maddev/plymouth
   ];
 
   boot.initrd.availableKernelModules = [
@@ -97,10 +98,6 @@
   xdg.portal.xdgOpenUsePortal = true;
 
   boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
-  boot.plymouth.theme = lib.mkForce "pixels";
-  boot.plymouth.themePackages = lib.mkForce [
-    (pkgs.adi1090x-plymouth-themes.override { selected_themes = [ "pixels" ]; })
-  ];
 
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

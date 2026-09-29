@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Forest
+Description=Foggy forest with a bare passphrase field
+ModuleName=script
+
+[script]
+ImageDir=@dir@
+ScriptFile=@dir@/forest.script

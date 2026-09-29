@@ -164,43 +164,35 @@ in
     group = "users";
     dataDir = "/nomad/maddev/Knowledge";
     configDir = "/home/maddev/.local/state/syncthing";
-    overrideDevices = false;
-    overrideFolders = false;
+    overrideDevices = true;
+    overrideFolders = true;
     settings = {
-      devices = {
-        Atmosphere.id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
-        WorkPC.id = "MUXVN5R-FEXPENP-4XNQPG7-XHCQEUH-E6MYV74-LQFFMMZ-ED3IBRT-RJALVQC";
-        FairCaly.id = "M555SO5-7CSX6PN-GHNILWD-7Q7MW4R-DRJUIB4-WYOOMUH-NRIYBZK-PMYRIA5";
-        bigsys.id = "NLGFRBA-4I2FD36-BF57YFJ-VUPZOKS-2TJHSUC-N7Z37J4-AQ73CRV-UMZ7FA6";
-        blanket.id = "OFVY5ZC-EEZD2RI-NV3YFUD-I64ALWY-FY6FYUK-W62IINS-YWAOZW2-4SL6GQE";
-        androidmoto.id = "W2DN3FF-YRPMIEO-XV2HOYB-ZQSCP3T-EJH3OIC-Y7WDC3N-EJSBFST-4FUL3AQ";
-        madsystem-skandal.id = "ZTX4L66-KQSPHNX-J2OVFZT-3BFEDHL-E47MEM6-N4XGPAJ-MYLMKTC-CFFONQC";
-        FP5.id = "4MQOIMD-JX4EUOA-ZF7ONSM-ZKBBDHX-PAT37XD-EBQEQFC-4Y2DCIU-PFZK3QG";
+      devices.Atmosphere = {
+        id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
+        addresses = [
+          "tcp://100.123.34.78:22000"
+          "dynamic"
+        ];
       };
       # The names are the folder IDs (and default labels); they must match the peers' exactly or nothing pairs up.
       folders = {
         "ObsidianVault" = {
           path = "/nomad/maddev/Knowledge/ObsidianVault";
           type = "sendreceive";
-          devices = [
-            "Atmosphere"
-            "WorkPC"
-            "FairCaly"
-            "bigsys"
-            "blanket"
-            "androidmoto"
-            "madsystem-skandal"
-            "FP5"
-          ];
+          devices = [ "Atmosphere" ];
         };
         "molten-river-knowledge" = {
           path = "/nomad/maddev/Knowledge/molten-river";
           type = "sendreceive";
-          devices = [
-            "Atmosphere"
-            "bigsys"
-          ];
+          devices = [ "Atmosphere" ];
         };
+      };
+      options = {
+        globalAnnounceEnabled = true;
+        localAnnounceEnabled = true;
+        relaysEnabled = true;
+        natEnabled = true;
+        urAccepted = -1;
       };
     };
   };

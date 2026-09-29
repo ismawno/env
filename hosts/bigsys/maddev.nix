@@ -23,4 +23,36 @@
       scale = 1;
     }
   ];
+
+  # Same folder IDs and ~ paths as the live config.xml, so nothing re-syncs; Atmosphere is the only peer.
+  services.syncthing = {
+    overrideDevices = true;
+    overrideFolders = true;
+    settings = {
+      devices.Atmosphere = {
+        id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
+        addresses = [
+          "tcp://100.123.34.78:22000"
+          "dynamic"
+        ];
+      };
+      folders = {
+        "ObsidianVault" = {
+          path = "~/Knowledge/ObsidianVault";
+          devices = [ "Atmosphere" ];
+        };
+        "molten-river-knowledge" = {
+          path = "~/Knowledge/molten-river-knowledge";
+          devices = [ "Atmosphere" ];
+        };
+      };
+      options = {
+        globalAnnounceEnabled = true;
+        localAnnounceEnabled = true;
+        relaysEnabled = true;
+        natEnabled = true;
+        urAccepted = -1;
+      };
+    };
+  };
 }

@@ -28,6 +28,8 @@ FLAKE_PATH="${1:-$SCRIPT_DIR}"
 echo "Flake path is $FLAKE_PATH"
 
 nix flake update nvim
+# Only claude-code and opencode come from unstable, so this bumps just those two.
+nix flake update nixpkgs-unstable
 
 echo "Rebuilding user $USER..."
 

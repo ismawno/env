@@ -31,7 +31,7 @@ let
   fonts = import ./look/fonts.nix { inherit lib pkgs; };
   icons = pkgs.callPackage ./gruvbox-plus-icons.nix { };
 
-  # GTK 3 has no border-spacing, yet several sheets carry GTK 4's, and every GTK 3 process printed a parse error for it.
+  # GTK 3 has no border-spacing, yet several sheets carry GTK 4's (a parse error in every GTK 3 process); a GTK 4 sheet of bare colour names (Rose Pine) left plain GTK 4 apps unstyled, so adw-gtk3 goes under it.
   nativeGtk = pkgs.runCommand "look-gtk-themes" { } ''
     ${lib.concatMapStrings (
       theme:
@@ -41,7 +41,18 @@ let
         [ -d "$src" ] || { echo "$src does not exist" >&2; exit 1; }
         mkdir -p "$dst/gtk-3.0"
         for entry in "$src"/*; do
-          [ "''${entry##*/}" = gtk-3.0 ] || ln -s "$entry" "$dst/"
+          name=''${entry##*/}
+          if [ "$name" = gtk-4.0 ] && ! grep -q '{' "$entry/gtk.css"; then
+            mkdir "$dst/gtk-4.0"
+            for variant in "" -dark; do
+              {
+                printf '@import url("file://%s/share/themes/adw-gtk3%s/gtk-4.0/gtk.css");\n' ${pkgs.adw-gtk3} "$variant"
+                cat "$entry/gtk.css"
+              } >"$dst/gtk-4.0/gtk$variant.css"
+            done
+          elif [ "$name" != gtk-3.0 ]; then
+            ln -s "$entry" "$dst/"
+          fi
         done
         for entry in "$src"/gtk-3.0/*; do
           case $entry in

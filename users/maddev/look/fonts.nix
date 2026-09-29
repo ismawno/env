@@ -81,7 +81,7 @@ in
     family = "Iosevka";
     mono = "Iosevka";
   }
-  # The bar's own character variants from before look-pick ride along.
+  # The bar's own OpenType features from before look-pick ride along.
   {
     name = "JetBrains Mono";
     package =
@@ -91,7 +91,7 @@ in
         (style: "fonts/ttf/JetBrainsMono-${style}.ttf");
     family = "JetBrains Mono";
     mono = "JetBrains Mono";
-    features = ''"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"'';
+    features = ''"zero", "ss01", "ss02"'';
   }
   {
     name = "Monaspace Neon";

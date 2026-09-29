@@ -32,4 +32,9 @@ in
     # Real pixels: at Plymouth's automatic 2x the photo is drawn at half resolution, then upscaled.
     extraConfig = "DeviceScale=1";
   };
+
+  systemd.services.plymouth-poweroff.enable = false;
+  systemd.services.plymouth-reboot.enable = false;
+  systemd.services.plymouth-halt.enable = false;
+  systemd.services.plymouth-kexec.enable = false;
 }

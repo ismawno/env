@@ -43,15 +43,13 @@ in
     NoDisplay=true
   '';
 
-  # Zen's profile directory name is generated at first launch, so match on the marker files.
+  # Zen names its profile directories at first launch, so match on the marker files; install -m, as cp keeps the store's 0444 and the next activation dies on it.
   config.home.activation.zenProfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for root in "''${XDG_CONFIG_HOME:-$HOME/.config}"/zen "$HOME"/.zen; do
       for profile in "$root"/*/; do
         if [ -f "$profile/prefs.js" ] || [ -f "$profile/times.json" ]; then
-          # install -m, not cp: cp preserves the store's 0444 and the next activation dies on it.
           install -m 0644 "${userJs}" "$profile/user.js"
           ${lib.optionalString (cfg.userChrome != null) ''
-            # A userChrome.css of his own is kept aside as .hm-bak, as Home Manager does with what it would clobber.
             chrome=$profile/chrome/userChrome.css
             [ ! -e "$chrome" ] || [ -L "$chrome" ] || mv "$chrome" "$chrome.hm-bak"
             mkdir -p "$profile/chrome"

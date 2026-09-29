@@ -64,7 +64,7 @@ rgba() {
   printf 'rgba(%s, %s)' "$(triple "$1")" "$2"
 }
 
-# Colour maths on #rrggbb, as colours MODE ARG...: WCAG 2 contrast, mixes, and HSL lightness moved only as far as 4.5:1 needs, either way.
+# Colour maths on #rrggbb, as colours MODE ARG...: WCAG 2 contrast, mixes, and HSL lightness moved only as far as 4.5:1 needs, or 3:1 where a mid-tone base under a tint caps every shade.
 colours() {
   awk -v mode="$1" -v args="${*:2}" '
     function ch(c, i) { return strtonum("0x" substr(c, 2 * i + 2, 2)) / 255 }
@@ -86,9 +86,7 @@ colours() {
       q = l < 0.5 ? l * (1 + s) : l + s - l * s
       return hex(hue(2 * l - q, q, h + 1 / 3), hue(2 * l - q, q, h), hue(2 * l - q, q, h - 1 / 3))
     }
-    # The worse of text on fill as drawn and on fill lifted toward white, which GTK 3 draws suggested buttons on.
     function onfill(f, t, lift, x, y) { x = cr(t, f); y = cr(t, mix(f, "#ffffff", lift)); return x < y ? x : y }
-    # fill F DARK LIFT: F and the better of white and DARK on it, F darkened for white or lightened for DARK when neither reads.
     function fill(f, dark, lift, i, c) {
       if (onfill(f, "#ffffff", lift) >= onfill(f, dark, lift) && onfill(f, "#ffffff", lift) >= 4.5) return f " #ffffff"
       if (onfill(f, dark, lift) >= 4.5) return f " " dark
@@ -97,7 +95,6 @@ colours() {
         c = shade(f, i / 200); if (onfill(c, dark, lift) >= 4.5) return c " " dark
       }
     }
-    # infobar X BG FG DARK: the tint GTK draws an infobar in and its text, FG while that reads, else white or DARK.
     function infobar(x, bg, fg, dark, tint, i, c) {
       tint = mix(bg, x, 0.3)
       for (i = 0; i <= 200; i++) {
@@ -108,7 +105,6 @@ colours() {
         if (cr(dark, c) >= 4.5) return c " " dark
       }
     }
-    # apart C ALPHA BASE...: C as text on each BASE under an ALPHA tint of C itself.
     function apart(c, i, x, v) { x = 99; for (i = 3; i <= n; i++) { v = cr(c, mix(a[i], c, a[2])); x = v < x ? v : x } return x }
     function flat(c, over, m) {
       if (c ~ /^#[0-9a-fA-F]{3}$/) c = "#" substr(c, 2, 1) substr(c, 2, 1) substr(c, 3, 1) substr(c, 3, 1) substr(c, 4, 1) substr(c, 4, 1)
@@ -126,7 +122,6 @@ colours() {
       else if (mode == "fill") print fill(a[1], a[2], a[3])
       else if (mode == "infobar") print infobar(a[1], a[2], a[3], a[4])
       else if (mode == "apart") {
-        # A mid-tone base under the tint caps every colour below 4.5:1; there the least change to 3:1 keeps the hue.
         for (goal = 4.5; goal >= 3; goal -= 1.5) {
           for (i = 0; i <= 200; i++) {
             if (apart(c = i ? shade(a[1], i / 200) : a[1]) >= goal || apart(c = shade(a[1], -i / 200)) >= goal) { print c; exit }

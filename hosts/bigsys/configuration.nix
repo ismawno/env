@@ -27,6 +27,7 @@
     "kvm-intel"
     "nct6775"
     "coretemp"
+    "nvidia_uvm" # nvidia now loads in the initrd, which lacks this, so its softdep never fires; CUDA and NVDEC need it
   ];
 
   programs.coolercontrol.enable = true;

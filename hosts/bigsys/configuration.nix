@@ -73,13 +73,20 @@
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
     modesetting.enable = true;
-    # GTX 1080 (Pascal) was dropped by the 590+ drivers; 580 is its last supported branch.
+    # GTX 1080 (Pascal) was dropped by the 590+ drivers; 580 is its last supported branch. Pascal has no GSP, so its firmware is dead weight.
     package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     open = false;
+    gsp.enable = false;
   };
   boot.kernelParams = [
     "nvidia_drm.modeset=1"
     "nvidia_drm.fbdev=1"
+  ];
+  # In the initrd, so Plymouth and the LUKS prompt get the GPU at native size; without it Plymouth waits 8 s, then takes simpledrm at 1024x768.
+  boot.initrd.kernelModules = [
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_drm"
   ];
   hardware.graphics.enable = lib.mkForce true;
 

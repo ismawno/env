@@ -44,6 +44,13 @@
 
   networking.hostName = "nomad";
 
+  services.tailscale.enable = true;
+  services.syncthing = {
+    enable = true;
+    user = "ismawno";
+    dataDir = "/home/ismawno";
+  };
+
   users.users = {
     ismawno = {
       isNormalUser = true;

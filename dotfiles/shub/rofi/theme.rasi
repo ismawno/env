@@ -85,6 +85,10 @@ element.selected.normal {
   text-color: @look-on-select;
 }
 
+element-text selected.normal {
+  highlight: @look-highlight-select;
+}
+
 element.selected.active {
   background-color: @look-accent-dark;
 }

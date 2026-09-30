@@ -225,6 +225,13 @@ on() {
   fi
 }
 
+# Matched letters stay fg where it reads at 3:1 on their row, else take the row's own text colour; underline and bold mark them either way.
+mark() {
+  local ink=${role[fg]}
+  [ "$(colours contrast "$ink" "$1")" -ge 300 ] || ink=$2
+  printf 'underline bold %s' "$ink"
+}
+
 cat >rofi.rasi <<EOF
 * {
   look-bg: ${role[bg]};
@@ -241,6 +248,9 @@ cat >rofi.rasi <<EOF
   look-crit: ${role[crit]};
   look-crit-bright: ${role[crit_bright]};
   look-highlight: underline bold ${role[fg]};
+  look-highlight-select: $(mark "$select_bg" "$select_fg");
+  look-highlight-accent: $(mark "${role[accent]}" "$(on "${role[accent]}")");
+  look-highlight-accent-dark: $(mark "${role[accent_dark]}" "$(on "${role[accent_dark]}")");
 }
 EOF
 

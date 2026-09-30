@@ -40,6 +40,14 @@ element.selected.active {
   text-color: @look-on-accent-dark;
 }
 
+element-text normal.active {
+  highlight: @look-highlight-accent;
+}
+
+element-text selected.active {
+  highlight: @look-highlight-accent-dark;
+}
+
 // wallpaper-pick breaks names to fit this width: its wrap_width counts characters of this font.
 element-text {
   font: @look-font-small;

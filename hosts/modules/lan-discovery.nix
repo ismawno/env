@@ -20,27 +20,10 @@
   # smbclient/nmblookup, for checking shares outside of Thunar.
   environment.systemPackages = with pkgs; [ samba ];
 
-  # Tailscale routed home traffic through allumeur, so the kernel dropped the NAS's
-  # announcements. Undo while running with: sudo ip rule del pref 5205
-  systemd.services.prefer-direct-lan-routes = {
-    description = "Prefer directly-connected routes over Tailscale subnet routes";
-    after = [
-      "network.target"
-      "tailscaled.service"
-    ];
-    wants = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      # 5205 sits just below Tailscale's own rules, so it is never overwritten.
-      ExecStart = pkgs.writeShellScript "prefer-direct-lan-up" ''
-        ${pkgs.iproute2}/bin/ip rule del pref 5205 2>/dev/null || true
-        ${pkgs.iproute2}/bin/ip rule add pref 5205 lookup main suppress_prefixlength 0
-      '';
-      ExecStop = pkgs.writeShellScript "prefer-direct-lan-down" ''
-        ${pkgs.iproute2}/bin/ip rule del pref 5205 2>/dev/null || true
-      '';
-    };
+  # allumeur's 192.168.1.0/24 wins over any local 192.168.1.x network, as on the phone; `tailscale down` reaches the local one.
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "client";
+    extraSetFlags = [ "--accept-routes" ];
   };
 }

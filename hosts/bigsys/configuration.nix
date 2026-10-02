@@ -100,8 +100,6 @@
     MOZ_DISABLE_RDD_SANDBOX = "1";
   };
 
-  services.tailscale.enable = true;
-
   # xdg-open ran zen-beta in the foreground and blocked callers like `gh auth login`; the portal launches it detached.
   xdg.portal.xdgOpenUsePortal = true;
 

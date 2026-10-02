@@ -72,7 +72,8 @@ element {
   background-color: @transparent;
 }
 
-element.normal.active {
+element.normal.active,
+element.alternate.active {
   background-color: @look-accent;
 }
 

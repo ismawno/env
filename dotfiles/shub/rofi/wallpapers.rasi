@@ -32,7 +32,8 @@ element.selected.normal {
   border-color: @look-fg;
 }
 
-element.normal.active {
+element.normal.active,
+element.alternate.active {
   text-color: @look-on-accent;
 }
 
@@ -40,7 +41,8 @@ element.selected.active {
   text-color: @look-on-accent-dark;
 }
 
-element-text normal.active {
+element-text normal.active,
+element-text alternate.active {
   highlight: @look-highlight-accent;
 }
 

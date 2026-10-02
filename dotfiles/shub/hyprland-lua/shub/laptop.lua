@@ -8,11 +8,12 @@ local function dpms(action)
   hl.dispatch(hl.dsp.dpms({ action = action, monitor = panel.output }))
 end
 
--- Hyprland wants one live monitor, so the panel only leaves the layout while another display is there.
+-- Hyprland wants one live monitor, so the panel only leaves the layout while another display is there; --verify-config has none, and a dispatch there segfaults.
 local function close()
-  if #hl.get_monitors() > 1 then
+  local count = #hl.get_monitors()
+  if count > 1 then
     hl.monitor({ output = panel.output, disabled = true })
-  else
+  elseif count == 1 then
     dpms("off")
   end
 end

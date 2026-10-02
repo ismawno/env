@@ -1,7 +1,7 @@
 for _, rule in ipairs({
   { match = { class = "(jetbrains-(studio|rustrover)|scrcpy|zen-.*|mpv|com\\.obsproject\\.Studio)" }, opaque = true },
   { match = { class = "(firefox)" }, opacity = 1, rounding = 3 },
-  { match = { class = "^(com.github.neithern.g4music|org.qbittorrent.qBittorrent)$" }, float = true },
+  { match = { class = "^(com.github.neithern.g4music)$" }, float = true },
   { match = { class = "^(it.mijorus.smile)" }, float = true },
   { match = { class = "^(xdg-desktop-portal-gtk)$" }, float = true },
   -- Waybar sizes the mixer itself through popup.sh; this only catches launches from rofi.

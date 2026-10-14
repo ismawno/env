@@ -37,6 +37,7 @@
         "nvidia-settings"
         "discord"
         "obsidian"
+        "claude-code"
       ];
       mkUserModule =
         { host, user }:

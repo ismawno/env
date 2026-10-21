@@ -149,6 +149,12 @@ in
 
   services.syncthing.enable = true;
 
+  # atmosphere's SMB shares, by MagicDNS name so they resolve on and off the LAN.
+  gtk.gtk3.bookmarks = [
+    "smb://atmosphere/ozone ozone"
+    "smb://atmosphere/MoltenRiver MoltenRiver"
+  ];
+
   # TUI tools rofi would otherwise miss, each floated in its own ghostty by popup.sh.
   xdg.desktopEntries =
     let
@@ -187,6 +193,24 @@ in
           "System"
           "Monitor"
         ];
+      };
+
+      # Shadows the packaged thunar.desktop: xdg-desktop-portal sets GIO_USE_VFS=local for itself
+      # and leaks it into what it opens, which leaves Thunar without gvfs (no smb://, no Network).
+      thunar = {
+        name = "Thunar File Manager";
+        genericName = "File Manager";
+        exec = "env -u GIO_USE_VFS ${thunarWithPlugins}/bin/thunar %U";
+        icon = "org.xfce.thunar";
+        categories = [
+          "System"
+          "Utility"
+          "Core"
+          "GTK"
+          "FileTools"
+          "FileManager"
+        ];
+        mimeType = [ "inode/directory" ];
       };
 
       mpv = {

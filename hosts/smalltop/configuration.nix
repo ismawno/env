@@ -25,7 +25,7 @@ in
     inputs.disko.nixosModules.disko
     ./disko.nix
     ../../users/maddev/modules/lan-discovery.nix
-    ../modules/ghostty-terminfo.nix
+    ../../modules/ghostty-terminfo.nix
     ./power-profiles.nix
     ./battery.nix
     ../../users/maddev/modules/smalltop-audio.nix

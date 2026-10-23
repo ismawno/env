@@ -11,7 +11,7 @@
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     ../../users/maddev/modules/lan-discovery.nix
-    ../modules/ghostty-terminfo.nix
+    ../../modules/ghostty-terminfo.nix
     ../../users/maddev/modules/bigsys-audio.nix
     ../../users/maddev/plymouth
   ];

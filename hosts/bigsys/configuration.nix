@@ -13,6 +13,7 @@
     ../../users/maddev/modules/lan-discovery.nix
     ../../modules/ghostty-terminfo.nix
     ../../users/maddev/modules/bigsys-audio.nix
+    ../../users/maddev/modules/fonts.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
@@ -65,23 +66,6 @@
       "wheel"
     ];
     shell = pkgs.zsh;
-  };
-
-  # Without defaultFonts, monospace resolved to DejaVu Sans Mono and Nerd Font icons rendered as tofu.
-  fonts = {
-    packages = with pkgs; [
-      noto-fonts
-      noto-fonts-color-emoji
-    ];
-    fontconfig = {
-      defaultFonts = {
-        monospace = [ "FiraCode Nerd Font Mono" ];
-        sansSerif = [ "Noto Sans" ];
-        serif = [ "Noto Serif" ];
-        emoji = [ "Noto Color Emoji" ];
-      };
-      useEmbeddedBitmaps = false;
-    };
   };
 
   # Allow unfree for Discord/Spotify

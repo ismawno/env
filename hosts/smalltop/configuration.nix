@@ -27,6 +27,7 @@ in
     ../../users/maddev/modules/smalltop-power-profiles.nix
     ../../users/maddev/modules/smalltop-battery.nix
     ../../users/maddev/modules/smalltop-audio.nix
+    ../../users/maddev/modules/fonts.nix
     ../../users/maddev/modules/smalltop-hibernation-interlock.nix
     ../../users/maddev/modules/smalltop-rescue.nix
     ../../users/maddev/modules/plymouth
@@ -89,18 +90,7 @@ in
         rgba = "none";
         lcdfilter = "none"; # only meaningful with subpixel AA
       };
-      useEmbeddedBitmaps = false; # low-DPI bitmaps are worse than the outline here
-      defaultFonts = {
-        monospace = [ "FiraCode Nerd Font Mono" ];
-        sansSerif = [ "Noto Sans" ];
-        serif = [ "Noto Serif" ];
-        emoji = [ "Noto Color Emoji" ];
-      };
     };
-    packages = with pkgs; [
-      noto-fonts
-      noto-fonts-color-emoji # never the noto-fonts-emoji alias: it fails at build, not at eval
-    ];
   };
 
   # Regdomain was observed as "00" (world), the most restrictive; user is in Spain.

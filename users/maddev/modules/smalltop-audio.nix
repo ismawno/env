@@ -1,4 +1,4 @@
-# smalltop audio preferences. Base stack and options: ../modules/audio.nix
+# smalltop audio preferences. Base stack and options: ./audio.nix
 { pkgs, ... }:
 
 let
@@ -10,7 +10,7 @@ let
   '';
 in
 {
-  imports = [ ../modules/audio.nix ];
+  imports = [ ./audio.nix ];
 
   mad.audio.support32Bit = true;
 

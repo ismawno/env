@@ -28,7 +28,7 @@ in
     ../modules/ghostty-terminfo.nix
     ./power-profiles.nix
     ./battery.nix
-    ./audio.nix
+    ../../users/maddev/modules/smalltop-audio.nix
     ./hibernation-interlock.nix
     ./rescue.nix
     ../../users/maddev/plymouth

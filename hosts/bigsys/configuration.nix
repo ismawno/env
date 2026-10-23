@@ -12,7 +12,7 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     ../modules/lan-discovery.nix
     ../modules/ghostty-terminfo.nix
-    ./audio.nix
+    ../../users/maddev/modules/bigsys-audio.nix
     ../../users/maddev/plymouth
   ];
 

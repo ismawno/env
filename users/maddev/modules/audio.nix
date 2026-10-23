@@ -1,5 +1,4 @@
-# Base audio stack plus the knobs a host may differ on. Hosts import this from
-# their own hosts/<name>/audio.nix and set only mad.audio.* there.
+# Base audio stack plus the knobs a host may differ on; each host sets mad.audio.* in its <host>-audio.nix.
 { config, lib, ... }:
 
 let

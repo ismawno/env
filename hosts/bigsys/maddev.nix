@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  imports = [ ../../users/modules/hypr-desktop.nix ];
+  imports = [ ../../users/maddev/modules/hypr-desktop.nix ];
 
   # NVIDIA only: Pascal has no AV1 decoder (off pushes YouTube to VP9) and Gecko 153 blocklists VA-API on the proprietary driver.
   mad.zen.extraPrefs = ''

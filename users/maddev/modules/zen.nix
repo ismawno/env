@@ -8,7 +8,7 @@
 
 let
   cfg = config.mad.zen;
-  shared = ../../dotfiles/shub/zen/user.js;
+  shared = ../../../dotfiles/shub/zen/user.js;
   userJs =
     if cfg.extraPrefs == "" then
       shared

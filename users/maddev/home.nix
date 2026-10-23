@@ -27,8 +27,8 @@ in
     ./gtk.nix
     ./look.nix
     ./opencode.nix
-    ../modules/zen.nix
-    ../modules/hypr-host.nix
+    ./modules/zen.nix
+    ./modules/hypr-host.nix
     ../modules/pkgs-unstable.nix
   ];
 

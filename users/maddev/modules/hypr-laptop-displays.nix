@@ -16,7 +16,7 @@ let
     export MAD_DISPLAYS_REPO_PATH=${lib.escapeShellArg repoPath}
     export MAD_DISPLAYS_FILE=${lib.escapeShellArg "${envDir}/${repoPath}"}
     export MAD_DISPLAYS_PANEL=${lib.escapeShellArg config.mad.hypr.lid.output}
-    exec ${pkgs.luajit}/bin/luajit ${../../dotfiles/shub/hyprland-lua/tools/display-layout-save.lua} "$@"
+    exec ${pkgs.luajit}/bin/luajit ${../../../dotfiles/shub/hyprland-lua/tools/display-layout-save.lua} "$@"
   '';
 in
 {
@@ -29,7 +29,7 @@ in
 
   config = lib.mkIf (repoPath != null) {
     mad.hypr = {
-      monitorsFile = ../.. + "/${repoPath}";
+      monitorsFile = ../../.. + "/${repoPath}";
       # A screen with no entry of its own; the shared Lua puts it right of the panel.
       facts.catchall = {
         mode = "3840x2160@60";

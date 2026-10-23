@@ -9,7 +9,7 @@
   # A desktop has no swap to hibernate into, so its power menu goes without Hibernate.
   xdg.configFile."wlogout/layout".source = lib.mkForce (
     pkgs.runCommand "wlogout-layout" { } ''
-      grep -v '"hibernate"' ${../../dotfiles/shub/wlogout/layout} > $out
+      grep -v '"hibernate"' ${../../../dotfiles/shub/wlogout/layout} > $out
     ''
   );
 }

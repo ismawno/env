@@ -16,7 +16,7 @@ let
     );
 in
 {
-  imports = [ ../../users/modules/hypr-laptop.nix ];
+  imports = [ ../../users/maddev/modules/hypr-laptop.nix ];
 
   # System syncthing only here; two daemons fight over the database lock.
   services.syncthing.enable = lib.mkForce false;

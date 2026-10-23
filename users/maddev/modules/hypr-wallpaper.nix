@@ -7,13 +7,13 @@
 }:
 
 let
-  shub = ../../dotfiles/shub;
+  shub = ../../../dotfiles/shub;
   envDir = "${config.home.homeDirectory}/env";
   repo = "Mars-Wave/caelestia-wallpapers-AMOLED";
   # An empty set in this file keeps the stock background.
   repoPath = "users/maddev/wallpaper.nix";
 
-  selection = import (../.. + "/${repoPath}");
+  selection = import (../../.. + "/${repoPath}");
 
   picture = pkgs.fetchurl {
     inherit (selection) url hash;
@@ -51,12 +51,12 @@ let
       export MAD_WP_PREFIX=wallpapers
       export MAD_WP_STABLE=${lib.escapeShellArg "${config.xdg.configHome}/backgrounds/current"}
       export MAD_WP_CONF=${lib.escapeShellArg "${config.xdg.configHome}/hypr/hyprpaper/hyprpaper.conf"}
-      export MAD_PIN_LIB=${../../dotfiles/shub/hyprland-lua/tools/flake-pin.sh}
+      export MAD_PIN_LIB=${../../../dotfiles/shub/hyprland-lua/tools/flake-pin.sh}
       # The test seams: a run may aim the picker at another collection, thumbnail source or home-manager.
       export MAD_WP_COLLECTION=''${MAD_WP_COLLECTION:-${lib.escapeShellArg "${config.home.homeDirectory}/Pictures/Wallpapers"}}
       export MAD_WP_THUMB_BASE=''${MAD_WP_THUMB_BASE:-${lib.escapeShellArg "https://raw.githubusercontent.com/${repo}/main"}}
       export MAD_WP_HM=''${MAD_WP_HM:-home-manager}
-      exec ${pkgs.bash}/bin/bash ${../../dotfiles/shub/hyprland-lua/tools/wallpaper-pick.sh} "$@"
+      exec ${pkgs.bash}/bin/bash ${../../../dotfiles/shub/hyprland-lua/tools/wallpaper-pick.sh} "$@"
     '';
   };
 in

@@ -8,7 +8,7 @@
 
 let
   cfg = config.mad.hypr;
-  shared = ../../dotfiles/shub/hyprland-lua;
+  shared = ../../../dotfiles/shub/hyprland-lua;
   hostLua = pkgs.writeText "hypr-host.lua" ''
     return ${lib.generators.toLua { } cfg.facts}
   '';

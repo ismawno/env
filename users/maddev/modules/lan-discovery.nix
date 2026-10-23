@@ -8,8 +8,7 @@ let
   directLanPref = "5205";
 in
 {
-  # File managers only see NAS boxes that announce themselves on the network.
-  # Nothing here names a server, so a new NAS shows up on its own.
+  # File managers only see NAS boxes that announce themselves; nothing here names a server.
   services.avahi = {
     enable = true;
     nssmdns4 = true;

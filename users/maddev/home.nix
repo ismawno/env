@@ -195,8 +195,7 @@ in
         ];
       };
 
-      # Shadows the packaged thunar.desktop: xdg-desktop-portal sets GIO_USE_VFS=local for itself
-      # and leaks it into what it opens, which leaves Thunar without gvfs (no smb://, no Network).
+      # Shadows thunar.desktop: the portal leaks GIO_USE_VFS=local into what it opens, which costs Thunar gvfs.
       thunar = {
         name = "Thunar File Manager";
         genericName = "File Manager";

@@ -1,7 +1,7 @@
 { lib, pkgs, ... }:
 
 let
-  # "Forested hills in Lysekil in fog" by W.carter, CC BY-SA 4.0; pinned like ../wallpaper.nix, never in git.
+  # "Forested hills in Lysekil in fog" by W.carter, CC BY-SA 4.0; pinned like ../../wallpaper.nix, never in git.
   photo = pkgs.fetchurl {
     name = "lysekil-fog.png";
     url = "https://media.githubusercontent.com/media/Mars-Wave/caelestia-wallpapers-AMOLED/bcd763a1a34780a546aed4557586bbb198220d54/wallpapers/nature-foggy-forest/Forested%20hills%20in%20Lysekil%20in%20fog%20-%20B%26W.png";

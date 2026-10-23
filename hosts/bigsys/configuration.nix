@@ -13,7 +13,7 @@
     ../../users/maddev/modules/lan-discovery.nix
     ../../modules/ghostty-terminfo.nix
     ../../users/maddev/modules/bigsys-audio.nix
-    ../../users/maddev/plymouth
+    ../../users/maddev/modules/plymouth
   ];
 
   boot.initrd.availableKernelModules = [

@@ -29,7 +29,7 @@ in
     ../../users/maddev/modules/smalltop-audio.nix
     ../../users/maddev/modules/smalltop-hibernation-interlock.nix
     ../../users/maddev/modules/smalltop-rescue.nix
-    ../../users/maddev/plymouth
+    ../../users/maddev/modules/plymouth
   ];
 
   mad.interlock.enable = true;

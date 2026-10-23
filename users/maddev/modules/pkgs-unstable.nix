@@ -7,8 +7,8 @@
         type = "github";
         owner = "NixOS";
         repo = "nixpkgs";
-        rev = "b4fd65b198c599cbe814fcb9f42d25d021595ec9";
-        narHash = "sha256-ilerN1WLSvF+HMjziC/Wv99J5y02maDH+6hZPwsORKg=";
+        rev = "02c087f3fe673c9e317f206a627cb6b910336dbe";
+        narHash = "sha256-IoNisKcGbUjdd45qCqywGMCYmZ5EnkxezvLII0FWwNA=";
       })
       {
         inherit (pkgs.stdenv.hostPlatform) system;

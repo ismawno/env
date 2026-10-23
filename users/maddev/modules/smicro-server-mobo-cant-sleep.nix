@@ -15,4 +15,7 @@
   systemd.sleep.settings.Sleep.AllowSuspend = false;
 
   services.logind.settings.Login.HandleSuspendKey = "hibernate";
+
+  # The proprietary NVIDIA sleep hooks can hang while systemd holds user.slice frozen.
+  systemd.services.systemd-hibernate.environment.SYSTEMD_SLEEP_FREEZE_USER_SESSIONS = "false";
 }

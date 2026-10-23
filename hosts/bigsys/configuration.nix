@@ -63,6 +63,23 @@
     shell = pkgs.zsh;
   };
 
+  # Without defaultFonts, monospace resolved to DejaVu Sans Mono and Nerd Font icons rendered as tofu.
+  fonts = {
+    packages = with pkgs; [
+      noto-fonts
+      noto-fonts-color-emoji
+    ];
+    fontconfig = {
+      defaultFonts = {
+        monospace = [ "FiraCode Nerd Font Mono" ];
+        sansSerif = [ "Noto Sans" ];
+        serif = [ "Noto Serif" ];
+        emoji = [ "Noto Color Emoji" ];
+      };
+      useEmbeddedBitmaps = false;
+    };
+  };
+
   # Allow unfree for Discord/Spotify
   nixpkgs.config.allowUnfree = lib.mkForce true;
 

@@ -29,7 +29,7 @@ in
     ./opencode.nix
     ./modules/zen.nix
     ./modules/hypr-host.nix
-    ../modules/pkgs-unstable.nix
+    ./modules/pkgs-unstable.nix
   ];
 
   home.packages = with pkgs; [

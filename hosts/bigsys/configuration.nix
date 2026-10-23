@@ -69,7 +69,6 @@
   # schedutil, not performance (pins max clock) and not PPD (laptop-oriented).
   powerManagement.enable = true;
   powerManagement.cpuFreqGovernor = "schedutil";
-  services.thermald.enable = true; # keeps the W-2155 at sustained turbo
 
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {

@@ -1,5 +1,4 @@
-# Network setup shared by maddev's two machines only: smalltop and bigsys.
-# Imported from those two host files, so nothing else on the flake is affected.
+# Network setup for maddev's two machines, smalltop and bigsys.
 { lib, pkgs, ... }:
 
 let

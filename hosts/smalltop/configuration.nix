@@ -24,7 +24,7 @@ in
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.disko.nixosModules.disko
     ./disko.nix
-    ../modules/lan-discovery.nix
+    ../../users/maddev/modules/lan-discovery.nix
     ../modules/ghostty-terminfo.nix
     ./power-profiles.nix
     ./battery.nix

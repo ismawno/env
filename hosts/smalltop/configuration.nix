@@ -3,7 +3,6 @@
   config,
   lib,
   pkgs,
-  inputs,
   modulesPath,
   ...
 }:
@@ -22,7 +21,6 @@ in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    inputs.disko.nixosModules.disko
     ../../users/maddev/modules/smalltop-disko.nix
     ../../users/maddev/modules/lan-discovery.nix
     ../../modules/ghostty-terminfo.nix

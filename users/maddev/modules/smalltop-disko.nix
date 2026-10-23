@@ -12,6 +12,18 @@ let
   ];
 in
 {
+  imports = [
+    "${
+      builtins.fetchTree {
+        type = "github";
+        owner = "nix-community";
+        repo = "disko";
+        rev = "de5708739256238fb912c62f03988815db89ec9a";
+        narHash = "sha256-CNzzBsRhq7gg4BMBuTDObiWDH/rFYHEuDRVOwCcwXw4=";
+      }
+    }/module.nix"
+  ];
+
   disko.devices = {
     disk.main = {
       type = "disk";

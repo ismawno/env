@@ -1,4 +1,4 @@
-// Zen Browser prefs, copied into the active profile on every Home Manager activation (users/modules/zen.nix).
+// Zen Browser prefs, copied into the active profile on every Home Manager activation (users/maddev/modules/zen.nix).
 
 // 5 = DoH off, system DNS only, so Tailscale MagicDNS / Pi-hole apply.
 user_pref("network.trr.mode", 5);

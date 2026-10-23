@@ -10,4 +10,9 @@
 
   # The LUKS prompt can outlast the 2-minute wait the EFI resume route otherwise puts on the root device.
   boot.kernelParams = [ "resumeflags=x-systemd.device-timeout=0" ];
+
+  # Also rules out hybrid-sleep and suspend-then-hibernate, which pass through s2idle.
+  systemd.sleep.settings.Sleep.AllowSuspend = false;
+
+  services.logind.settings.Login.HandleSuspendKey = "hibernate";
 }

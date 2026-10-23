@@ -23,11 +23,14 @@
     "usb_storage"
     "sd_mod"
   ];
+  # nvidia stays out of the initrd: there it refuses the quiesce a resume from hibernation needs.
   boot.kernelModules = [
     "kvm-intel"
     "nct6775"
     "coretemp"
-    "nvidia_uvm" # nvidia now loads in the initrd, which lacks this, so its softdep never fires; CUDA and NVDEC need it
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_drm"
   ];
 
   programs.coolercontrol.enable = true;
@@ -99,12 +102,6 @@
   boot.kernelParams = [
     "nvidia_drm.modeset=1"
     "nvidia_drm.fbdev=1"
-  ];
-  # In the initrd, so Plymouth and the LUKS prompt get the GPU at native size; without it Plymouth waits 8 s, then takes simpledrm at 1024x768.
-  boot.initrd.kernelModules = [
-    "nvidia"
-    "nvidia_modeset"
-    "nvidia_drm"
   ];
   hardware.graphics.enable = lib.mkForce true;
 

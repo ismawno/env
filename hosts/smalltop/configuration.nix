@@ -23,14 +23,14 @@ in
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
     inputs.disko.nixosModules.disko
-    ./disko.nix
+    ../../users/maddev/modules/smalltop-disko.nix
     ../../users/maddev/modules/lan-discovery.nix
     ../../modules/ghostty-terminfo.nix
-    ./power-profiles.nix
-    ./battery.nix
+    ../../users/maddev/modules/smalltop-power-profiles.nix
+    ../../users/maddev/modules/smalltop-battery.nix
     ../../users/maddev/modules/smalltop-audio.nix
-    ./hibernation-interlock.nix
-    ./rescue.nix
+    ../../users/maddev/modules/smalltop-hibernation-interlock.nix
+    ../../users/maddev/modules/smalltop-rescue.nix
     ../../users/maddev/plymouth
   ];
 
@@ -58,14 +58,14 @@ in
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # GRUB core lives in ../../configuration.nix; the CachyOS entries in ./hibernation-interlock.nix.
+  # GRUB core lives in ../../configuration.nix; the CachyOS entries in smalltop-hibernation-interlock.nix.
   boot.loader.efi.efiSysMountPoint = "/boot";
 
   # BOOT-CRITICAL: Samsung firmware discards EFI NVRAM, so boot lives on EFI/BOOT/BOOTX64.EFI.
   boot.loader.grub.efiInstallAsRemovable = true;
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
-  # boot.resumeDevice comes from ./disko.nix; never point it at cachyos-swap (vault: Infra/MadTop, "MadTop hibernation").
+  # boot.resumeDevice comes from smalltop-disko.nix; never point it at cachyos-swap (vault: Infra/MadTop, "MadTop hibernation").
 
   # i915 is what binds 8086:a7a0 on 6.18; xe is present but does not claim it.
   hardware.graphics = {
@@ -128,7 +128,7 @@ in
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
 
-  # ./disko.nix mounts @nomad root-owned; give maddev a place inside it.
+  # smalltop-disko.nix mounts @nomad root-owned; give maddev a place inside it.
   systemd.tmpfiles.rules = [
     "d /nomad 0755 root root -"
     "d /nomad/maddev 0700 maddev users -"

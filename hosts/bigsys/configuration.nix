@@ -14,6 +14,7 @@
     ../../modules/ghostty-terminfo.nix
     ../../users/maddev/modules/bigsys-audio.nix
     ../../users/maddev/modules/plymouth
+    ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
 
   boot.initrd.availableKernelModules = [

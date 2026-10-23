@@ -78,6 +78,7 @@
     package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
     open = false;
     gsp.enable = false;
+    powerManagement.enable = true;
   };
   boot.kernelParams = [
     "nvidia_drm.modeset=1"

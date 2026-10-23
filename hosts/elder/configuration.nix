@@ -52,6 +52,13 @@
   hardware.nvidia.modesetting.enable = true;
   hardware.nvidia.open = false;
 
+  services.tailscale.enable = true;
+  services.syncthing = {
+    enable = true;
+    user = "ismawno";
+    dataDir = "/home/ismawno";
+  };
+
   users.users = {
     ismawno = {
       isNormalUser = true;

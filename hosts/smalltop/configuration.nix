@@ -28,6 +28,7 @@ in
     ../../users/maddev/modules/smalltop-battery.nix
     ../../users/maddev/modules/smalltop-audio.nix
     ../../users/maddev/modules/fonts.nix
+    ../../users/maddev/modules/amoled-2k-215dpi-rendering.nix
     ../../users/maddev/modules/smalltop-hibernation-interlock.nix
     ../../users/maddev/modules/smalltop-rescue.nix
     ../../users/maddev/modules/plymouth
@@ -77,21 +78,6 @@ in
     ];
   };
   environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
-
-  # ~215 DPI: subpixel AA buys nothing and fringes at fractional scale.
-  fonts = {
-    fontconfig = {
-      antialias = true;
-      hinting = {
-        enable = true;
-        style = "slight"; # "full" would distort stems that are 3px wide here
-      };
-      subpixel = {
-        rgba = "none";
-        lcdfilter = "none"; # only meaningful with subpixel AA
-      };
-    };
-  };
 
   # Regdomain was observed as "00" (world), the most restrictive; user is in Spain.
   hardware.wirelessRegulatoryDatabase = true;

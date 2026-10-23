@@ -23,7 +23,7 @@ in
   options.mad.hypr.displays.repoPath = lib.mkOption {
     type = lib.types.nullOr lib.types.str;
     default = null;
-    example = "hosts/smalltop/monitors.lua";
+    example = "users/maddev/smalltop/monitors.lua";
     description = "The host's monitors.lua inside ~/env. Setting it moves the screen list out of mad.hypr.monitors and turns on the saver, which rewrites that working copy.";
   };
 

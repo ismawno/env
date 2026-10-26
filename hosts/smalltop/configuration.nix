@@ -31,6 +31,7 @@ in
     ../../users/maddev/modules/amoled-2k-215dpi-rendering.nix
     ../../users/maddev/modules/smalltop-hibernation-interlock.nix
     ../../users/maddev/modules/smalltop-rescue.nix
+    ../../users/maddev/modules/intel-iris-xe-video.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -66,18 +67,6 @@ in
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   # boot.resumeDevice comes from smalltop-disko.nix; never point it at cachyos-swap (vault: Infra/MadTop, "MadTop hibernation").
-
-  # i915 is what binds 8086:a7a0 on 6.18; xe is present but does not claim it.
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      intel-media-driver # VA-API for Gen9+ (iHD)
-      vpl-gpu-rt # oneVPL runtime, hardware encode
-      libvdpau-va-gl
-    ];
-  };
-  environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
 
   # Regdomain was observed as "00" (world), the most restrictive; user is in Spain.
   hardware.wirelessRegulatoryDatabase = true;

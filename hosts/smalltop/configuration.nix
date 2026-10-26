@@ -32,6 +32,7 @@ in
     ../../users/maddev/modules/smalltop-hibernation-interlock.nix
     ../../users/maddev/modules/smalltop-rescue.nix
     ../../users/maddev/modules/intel-iris-xe-video.nix
+    ../../users/maddev/modules/wifi-regdomain-es.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -67,12 +68,6 @@ in
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   # boot.resumeDevice comes from smalltop-disko.nix; never point it at cachyos-swap (vault: Infra/MadTop, "MadTop hibernation").
-
-  # Regdomain was observed as "00" (world), the most restrictive; user is in Spain.
-  hardware.wirelessRegulatoryDatabase = true;
-  boot.extraModprobeConfig = ''
-    options cfg80211 ieee80211_regdom="ES"
-  '';
 
   networking.useDHCP = lib.mkDefault true;
 

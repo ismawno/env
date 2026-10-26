@@ -23,6 +23,7 @@
     ../../users/maddev/modules/intel-iris-xe-video.nix
     ../../users/maddev/modules/wifi-regdomain-es.nix
     ../../users/maddev/modules/smalltop-nomad-binds.nix
+    ../../users/maddev/modules/hardware-poking-tools.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -140,21 +141,6 @@
     ];
     shell = pkgs.zsh;
   };
-
-  environment.systemPackages = with pkgs; [
-    # Hardware poking, all read-only by default.
-    pciutils
-    usbutils
-    nvme-cli
-    btrfs-progs
-    cryptsetup
-    lvm2
-    alsa-utils # aplay -l, amixer, speaker-test
-    v4l-utils # v4l2-ctl --list-devices
-    iw # iw reg get, to confirm the ES regdomain took
-    powertop
-    tpm2-tools
-  ];
 
   # Home Manager runs standalone via home-rebuild.sh; the embedded copy re-applied a stale generation at every boot.
   home-manager.users = lib.mkForce { };

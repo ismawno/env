@@ -16,6 +16,7 @@
     ../../users/maddev/modules/maddev-base-system.nix
     ../../users/maddev/modules/login-keyring.nix
     ../../users/maddev/modules/syncthing-atmosphere.nix
+    ../../users/maddev/modules/nvidia-gtx1080-legacy-580.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
@@ -27,14 +28,10 @@
     "usb_storage"
     "sd_mod"
   ];
-  # nvidia stays out of the initrd: there it refuses the quiesce a resume from hibernation needs.
   boot.kernelModules = [
     "kvm-intel"
     "nct6775"
     "coretemp"
-    "nvidia"
-    "nvidia_modeset"
-    "nvidia_drm"
   ];
 
   programs.coolercontrol.enable = true;
@@ -76,29 +73,7 @@
   powerManagement.enable = true;
   powerManagement.cpuFreqGovernor = "schedutil";
 
-  services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.nvidia = {
-    modesetting.enable = true;
-    # GTX 1080 (Pascal) was dropped by the 590+ drivers; 580 is its last supported branch. Pascal has no GSP, so its firmware is dead weight.
-    package = config.boot.kernelPackages.nvidiaPackages.legacy_580;
-    open = false;
-    gsp.enable = false;
-    powerManagement.enable = true;
-  };
-  boot.kernelParams = [
-    "nvidia_drm.modeset=1"
-    "nvidia_drm.fbdev=1"
-  ];
-  hardware.graphics.enable = lib.mkForce true;
-
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "nvidia";
-    GBM_BACKEND = "nvidia-drm";
-    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1";
-    # The RDD file broker denies nvidia_drv_video.so /proc/version; Gecko 153 has no narrower pref.
-    MOZ_DISABLE_RDD_SANDBOX = "1";
-  };
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

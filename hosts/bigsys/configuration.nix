@@ -17,6 +17,7 @@
     ../../users/maddev/modules/login-keyring.nix
     ../../users/maddev/modules/syncthing-atmosphere.nix
     ../../users/maddev/modules/nvidia-gtx1080-legacy-580.nix
+    ../../users/maddev/modules/fan-control.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
@@ -30,11 +31,7 @@
   ];
   boot.kernelModules = [
     "kvm-intel"
-    "nct6775"
-    "coretemp"
   ];
-
-  programs.coolercontrol.enable = true;
 
   boot.loader.grub.useOSProber = true;
 

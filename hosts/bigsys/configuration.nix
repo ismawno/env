@@ -14,6 +14,7 @@
     ../../users/maddev/modules/bigsys-audio.nix
     ../../users/maddev/modules/fonts.nix
     ../../users/maddev/modules/maddev-base-system.nix
+    ../../users/maddev/modules/login-keyring.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];

@@ -25,8 +25,6 @@ in
     # Keep the panel at SCALE 2, NOT 1.5, in monitors.lua: at 1.5 Ghostty's cell advance is 17.25px instead of 23px and GTK3 clients get downsampled.
     displays.repoPath = "users/maddev/smalltop/monitors.lua";
 
-    keyring = true;
-
     lid = {
       switch = "Lid Switch";
       output = "eDP-1";

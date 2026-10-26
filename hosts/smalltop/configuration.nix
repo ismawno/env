@@ -25,6 +25,7 @@
     ../../users/maddev/modules/smalltop-nomad-binds.nix
     ../../users/maddev/modules/hardware-poking-tools.nix
     ../../users/maddev/modules/maddev-base-system.nix
+    ../../users/maddev/modules/login-keyring.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -77,10 +78,6 @@
 
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
-
-  # App tokens (gh) are kept encrypted with the login password, which ly hands to the keyring at sign-in; mad.hypr.keyring finishes that startup in the session.
-  services.gnome.gnome-keyring.enable = true;
-  security.pam.services.ly.enableGnomeKeyring = true;
 
   # Never copy bigsys's syncthing state: the device ID is the identity.
   services.syncthing = {

@@ -147,6 +147,8 @@ in
     python3
   ];
 
+  mad.hypr.keyring = true;
+
   services.syncthing.enable = true;
 
   # atmosphere's SMB shares, by MagicDNS name so they resolve on and off the LAN.

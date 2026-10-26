@@ -149,8 +149,6 @@ in
 
   mad.hypr.keyring = true;
 
-  services.syncthing.enable = true;
-
   # atmosphere's SMB shares, by MagicDNS name so they resolve on and off the LAN.
   gtk.gtk3.bookmarks = [
     "smb://atmosphere/ozone ozone"

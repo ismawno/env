@@ -15,6 +15,7 @@
     ../../users/maddev/modules/fonts.nix
     ../../users/maddev/modules/maddev-base-system.nix
     ../../users/maddev/modules/login-keyring.nix
+    ../../users/maddev/modules/syncthing-atmosphere.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
@@ -58,6 +59,15 @@
   };
 
   networking.hostName = "bigsys";
+
+  # Same folder paths as the live config.xml, so nothing re-syncs.
+  services.syncthing = {
+    dataDir = "/home/maddev/Knowledge";
+    settings.folders = {
+      "ObsidianVault".path = "/home/maddev/Knowledge/ObsidianVault";
+      "molten-river-knowledge".path = "/home/maddev/Knowledge/molten-river-knowledge";
+    };
+  };
 
   # Allow unfree for Discord/Spotify
   nixpkgs.config.allowUnfree = lib.mkForce true;

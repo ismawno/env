@@ -26,6 +26,7 @@
     ../../users/maddev/modules/hardware-poking-tools.nix
     ../../users/maddev/modules/maddev-base-system.nix
     ../../users/maddev/modules/login-keyring.nix
+    ../../users/maddev/modules/syncthing-atmosphere.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -79,43 +80,12 @@
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
 
-  # Never copy bigsys's syncthing state: the device ID is the identity.
+  # smalltop's own folder directories, on @nomad.
   services.syncthing = {
-    enable = true;
-    user = "maddev";
-    group = "users";
     dataDir = "/nomad/maddev/Knowledge";
-    configDir = "/home/maddev/.local/state/syncthing";
-    overrideDevices = true;
-    overrideFolders = true;
-    settings = {
-      devices.Atmosphere = {
-        id = "LL7CJ3D-K2VWQWT-7XBOO6E-5ZCH3BP-PAMMOI2-TM3BX74-DSP4UX5-WAM6KQJ";
-        addresses = [
-          "tcp://100.123.34.78:22000"
-          "dynamic"
-        ];
-      };
-      # The names are the folder IDs (and default labels); they must match the peers' exactly or nothing pairs up.
-      folders = {
-        "ObsidianVault" = {
-          path = "/nomad/maddev/Knowledge/ObsidianVault";
-          type = "sendreceive";
-          devices = [ "Atmosphere" ];
-        };
-        "molten-river-knowledge" = {
-          path = "/nomad/maddev/Knowledge/molten-river";
-          type = "sendreceive";
-          devices = [ "Atmosphere" ];
-        };
-      };
-      options = {
-        globalAnnounceEnabled = true;
-        localAnnounceEnabled = true;
-        relaysEnabled = true;
-        natEnabled = true;
-        urAccepted = -1;
-      };
+    settings.folders = {
+      "ObsidianVault".path = "/nomad/maddev/Knowledge/ObsidianVault";
+      "molten-river-knowledge".path = "/nomad/maddev/Knowledge/molten-river";
     };
   };
 

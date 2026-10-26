@@ -2,7 +2,6 @@
 {
   config,
   lib,
-  pkgs,
   modulesPath,
   ...
 }:
@@ -14,6 +13,7 @@
     ../../modules/ghostty-terminfo.nix
     ../../users/maddev/modules/bigsys-audio.nix
     ../../users/maddev/modules/fonts.nix
+    ../../users/maddev/modules/maddev-base-system.nix
     ../../users/maddev/modules/plymouth
     ../../users/maddev/modules/smicro-server-mobo-cant-sleep.nix
   ];
@@ -58,16 +58,6 @@
 
   networking.hostName = "bigsys";
 
-  users.users.maddev = {
-    isNormalUser = true;
-    description = "maddev";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-    ];
-    shell = pkgs.zsh;
-  };
-
   # Allow unfree for Discord/Spotify
   nixpkgs.config.allowUnfree = lib.mkForce true;
 
@@ -99,15 +89,7 @@
     MOZ_DISABLE_RDD_SANDBOX = "1";
   };
 
-  # xdg-open ran zen-beta in the foreground and blocked callers like `gh auth login`; the portal launches it detached.
-  xdg.portal.xdgOpenUsePortal = true;
-
-  boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
-
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # Home Manager runs standalone via home-rebuild.sh; the embedded copy re-applied a stale generation at every boot.
-  home-manager.users = lib.mkForce { };
 }

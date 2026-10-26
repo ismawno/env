@@ -24,6 +24,7 @@
     ../../users/maddev/modules/wifi-regdomain-es.nix
     ../../users/maddev/modules/smalltop-nomad-binds.nix
     ../../users/maddev/modules/hardware-poking-tools.nix
+    ../../users/maddev/modules/maddev-base-system.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -77,9 +78,6 @@
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
 
-  # xdg-open ran the browser in the foreground and blocked callers like `gh auth login`; the portal launches it detached.
-  xdg.portal.xdgOpenUsePortal = true;
-
   # App tokens (gh) are kept encrypted with the login password, which ly hands to the keyring at sign-in; mad.hypr.keyring finishes that startup in the session.
   services.gnome.gnome-keyring.enable = true;
   security.pam.services.ly.enableGnomeKeyring = true;
@@ -124,24 +122,13 @@
     };
   };
 
-  # maddev prefers whitesur over the shared tela.
-  boot.loader.grub2-theme.theme = lib.mkForce "whitesur";
-
   users.users.maddev = {
-    isNormalUser = true;
     # Pinned: bind mounts do not translate ownership, so both distros must agree on the uid.
     uid = 1000;
-    description = "maddev";
     extraGroups = [
-      "networkmanager"
-      "wheel"
       "video"
       "input"
       "tss" # TPM2 access
     ];
-    shell = pkgs.zsh;
   };
-
-  # Home Manager runs standalone via home-rebuild.sh; the embedded copy re-applied a stale generation at every boot.
-  home-manager.users = lib.mkForce { };
 }

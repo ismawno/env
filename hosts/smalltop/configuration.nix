@@ -7,17 +7,6 @@
   ...
 }:
 
-let
-  # DATA-only dirs on @nomad, bind-mounted into $HOME (add a line + mv); never app STATE.
-  nomadBinds = {
-    "/home/maddev/Downloads" = "/nomad/maddev/Downloads";
-    "/home/maddev/Documents" = "/nomad/maddev/Documents";
-    "/home/maddev/Knowledge" = "/nomad/maddev/Knowledge";
-    "/home/maddev/Pictures" = "/nomad/maddev/Pictures";
-    "/home/maddev/Videos" = "/nomad/maddev/Videos";
-    "/home/maddev/Music" = "/nomad/maddev/Music";
-  };
-in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -33,6 +22,7 @@ in
     ../../users/maddev/modules/smalltop-rescue.nix
     ../../users/maddev/modules/intel-iris-xe-video.nix
     ../../users/maddev/modules/wifi-regdomain-es.nix
+    ../../users/maddev/modules/smalltop-nomad-binds.nix
     ../../users/maddev/modules/plymouth
   ];
 
@@ -85,25 +75,6 @@ in
 
   services.fwupd.enable = true; # BIOS P07RGU.330.240529.ZQ; LVFS may have newer
   services.libinput.enable = true;
-
-  # smalltop-disko.nix mounts @nomad root-owned; give maddev a place inside it.
-  systemd.tmpfiles.rules = [
-    "d /nomad 0755 root root -"
-    "d /nomad/maddev 0700 maddev users -"
-  ]
-  ++ map (src: "d ${src} 0700 maddev users -") (lib.attrValues nomadBinds);
-
-  # nofail: the sources do not exist on a fresh install and must not wedge boot.
-  fileSystems = lib.mapAttrs (_target: src: {
-    device = src;
-    fsType = "none";
-    depends = [ "/nomad" ]; # make the generated mount unit require /nomad
-    options = [
-      "bind"
-      "nofail"
-      "x-gvfs-hide"
-    ];
-  }) nomadBinds;
 
   # xdg-open ran the browser in the foreground and blocked callers like `gh auth login`; the portal launches it detached.
   xdg.portal.xdgOpenUsePortal = true;

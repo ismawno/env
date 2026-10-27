@@ -216,6 +216,7 @@ in
     "swaync/look-font.css".source = state "font/swaync.css";
     "rofi/look.rasi".source = state "theme/rofi.rasi";
     "rofi/look-font.rasi".source = state "font/rofi.rasi";
+    "hypr/look-hyprlock.conf".source = state "theme/hyprlock.conf";
     "hypr/look.lua".source = state "theme/hypr.lua";
     "gtk-4.0/gtk.css".source = state "theme/gtk4.css";
     "gtk-3.0/settings.ini".source = lib.mkForce (state "gtk3.ini");

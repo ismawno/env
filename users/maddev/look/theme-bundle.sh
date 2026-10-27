@@ -270,6 +270,14 @@ cat >waybar.json <<EOF
 }
 EOF
 
+# Hyprlock's colours as variables for its config to source; Pango markup there wants the hex with a doubled #.
+cat >hyprlock.conf <<EOF
+\$look_fg = $(rgba "${role[fg]}" 1)
+\$look_input_fill = $(rgba "${role[fg]}" 0.1)
+\$look_input_text = $(rgba "${role[fg]}" 0.8)
+\$look_fg_markup = #${role[fg]}
+EOF
+
 printf 'return { active_border = "rgb(%s)", inactive_border = "rgb(%s)" }\n' \
   "${role[fg]#\#}" "${role[inactive]#\#}" >hypr.lua
 printf "hl.config({ general = { col = { active_border = { colors = { 'rgb(%s)' }, angle = 0 }, inactive_border = 'rgb(%s)' } } })\n" \

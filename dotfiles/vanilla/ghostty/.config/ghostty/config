@@ -2,8 +2,14 @@ theme = catppuccin-mocha.conf
 cursor-color = #7a7d92
 font-family = FiraCode Nerd Font
 font-size = 14
-background-opacity = 0.9
+background-opacity = 0.68
 confirm-close-surface = false
 resize-overlay = never
 command = zsh -lc "fastfetch; exec zsh -l"
 
+window-padding-x = 8
+window-padding-y = 6
+window-padding-balance = true
+window-padding-color = extend
+window-decoration = none
+cursor-style-blink = false
